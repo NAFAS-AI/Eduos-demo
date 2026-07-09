@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة ولي/ة الأمر | EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-shield.js" defer></script>
+<style>
+:root{
+  --bg:#F0F4F8;--surface:#FFF;--card:#FFF;--border:#E2E8F0;
+  --primary:#6C3DD6;--pl:#EDE9FF;--cyan:#06B6D4;
+  --green:#059669;--gl:#D1FAE5;
+  --red:#DC2626;--rl:#FEE2E2;
+  --amber:#D97706;--al:#FEF3C7;
+  --blue:#2563EB;--bl:#DBEAFE;
+  --text:#1E293B;--ts:#64748B;--tm:#94A3B8;
+  --radius:16px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.10);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:16px;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:20px 24px;position:relative;}
+.header-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.school-brand{display:flex;align-items:center;gap:12px;color:#fff;}
+.school-logo{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.school-name{font-size:1rem;font-weight:900;}
+.school-sub{font-size:.72rem;opacity:.8;}
+.header-date{color:#fff;text-align:left;font-size:.82rem;opacity:.85;line-height:1.6;}
+
+/* CHILD CARD */
+.child-hero{background:var(--card);border-radius:var(--radius);box-shadow:0 4px 24px rgba(108,61,214,.15);max-width:800px;margin:-16px auto 24px;padding:24px;position:relative;border:1px solid var(--border);}
+.child-top{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.child-avatar{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;flex-shrink:0;}
+.child-info{flex:1;}
+.child-name{font-size:1.3rem;font-weight:900;color:var(--text);}
+.child-class{font-size:.88rem;color:var(--ts);margin-top:3px;}
+.child-id{font-size:.78rem;color:var(--tm);margin-top:2px;}
+.attendance-badge{display:flex;flex-direction:column;align-items:center;background:var(--gl);border-radius:12px;padding:10px 16px;border:1.5px solid var(--green);}
+.att-pct{font-size:1.5rem;font-weight:900;color:var(--green);}
+.att-lbl{font-size:.7rem;color:var(--green);font-weight:700;}
+
+.today-status{background:var(--bg);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;}
+.ts-icon{font-size:1.5rem;}
+.ts-text{flex:1;}
+.ts-title{font-size:.95rem;font-weight:800;color:var(--text);}
+.ts-sub{font-size:.82rem;color:var(--ts);margin-top:2px;}
+.ts-badge{font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:12px;}
+
+/* MAIN */
+.main{max-width:800px;margin:0 auto;padding:0 24px 24px;}
+
+/* SECTION */
+.section{margin-bottom:24px;}
+.section-title{font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+/* GRADES GRID */
+.grades-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+.grade-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow);transition:all .2s;}
+.grade-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.grade-subject{font-size:.82rem;font-weight:700;color:var(--ts);margin-bottom:8px;}
+.grade-score{font-size:2rem;font-weight:900;line-height:1;}
+.grade-max{font-size:.75rem;color:var(--tm);margin-top:4px;}
+.grade-trend{font-size:.75rem;margin-top:6px;font-weight:700;}
+.grade-card.excellent{border-top:3px solid var(--green);}
+.grade-card.good{border-top:3px solid var(--blue);}
+.grade-card.average{border-top:3px solid var(--amber);}
+.grade-card.weak{border-top:3px solid var(--red);}
+
+/* NOTIFICATIONS */
+.notif-list{display:flex;flex-direction:column;gap:10px;}
+.notif-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;}
+.notif-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.notif-body{flex:1;}
+.notif-title{font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:3px;}
+.notif-sub{font-size:.82rem;color:var(--ts);}
+.notif-date{font-size:.72rem;color:var(--tm);margin-top:4px;}
+.notif-item.urgent{border-right:3px solid var(--red);}
+.notif-item.info{border-right:3px solid var(--blue);}
+.notif-item.success{border-right:3px solid var(--green);}
+
+/* EVENTS */
+.events-list{display:flex;flex-direction:column;gap:8px;}
+.event-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);}
+.event-date-box{background:var(--primary);color:#fff;border-radius:10px;padding:6px 10px;text-align:center;min-width:48px;}
+.edb-day{font-size:1.2rem;font-weight:900;line-height:1;}
+.edb-mon{font-size:.68rem;font-weight:700;opacity:.8;}
+.event-info{flex:1;}
+.event-title{font-size:.92rem;font-weight:700;color:var(--text);}
+.event-type{font-size:.78rem;color:var(--ts);margin-top:2px;}
+
+/* MESSAGE BOX */
+.message-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);}
+.message-box h3{font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.msg-textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px;font-family:'Tajawal',sans-serif;font-size:.95rem;color:var(--text);outline:none;min-height:80px;resize:none;transition:border-color .2s;}
+.msg-textarea:focus{border-color:var(--primary);}
+.msg-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px;}
+.msg-target{font-size:.82rem;color:var(--ts);background:var(--bg);border-radius:8px;padding:6px 12px;}
+.btn-send-msg{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 24px;font-family:'Tajawal',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-send-msg:hover{background:#5B2FC9;}
+
+/* FOOTER */
+.nafas-footer{text-align:center;padding:24px;font-size:.72rem;color:var(--tm);}
+
+.loading{text-align:center;padding:32px;color:var(--ts);}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:24px;color:var(--ts);font-size:.9rem;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--text);color:#fff;padding:12px 24px;border-radius:12px;font-size:.9rem;font-weight:700;z-index:900;transition:transform .3s;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:var(--green);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="school-brand">
+      <div class="school-logo">🎓</div>
+      <div>
+        <div class="school-name">بوابة الجود الذكية</div>
+        <div class="school-sub">EduOS · بوابة ولي/ة الأمر</div>
+      </div>
+    </div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+</div>
+
+<!-- CHILD CARD -->
+<div style="padding:0 24px;max-width:848px;margin:0 auto">
+  <div class="child-hero" id="childHero">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- GRADES -->
+  <div class="section">
+    <div class="section-title">📊 آخر النتائج الدراسية</div>
+    <div class="grades-grid" id="gradesGrid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="section">
+    <div class="section-title">🔔 تنبيهات المدرسة</div>
+    <div class="notif-list" id="notifList">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- EVENTS -->
+  <div class="section">
+    <div class="section-title">📅 المواعيد القادمة</div>
+    <div class="events-list" id="eventsList">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- MESSAGE -->
+  <div class="section">
+    <div class="message-box">
+      <h3>✉️ رسالة للمدرسة</h3>
+      <textarea class="msg-textarea" id="msgText" placeholder="اكتب رسالتك هنا — يمكنك التواصل مع المعلم/ة أو الإدارة..."></textarea>
+      <div class="msg-footer">
+        <select class="msg-target" id="msgTarget" style="border:1px solid var(--border);outline:none;font-family:'Tajawal',sans-serif">
+          <option value="teacher">المعلم/ة المسؤول/ة</option>
+          <option value="principal">مدير/ة المدرسة</option>
+          <option value="counselor">المرشد/ة الطلابي/ة</option>
+          <option value="admin">الإدارة العامة</option>
+        </select>
+        <button class="btn-send-msg" onclick="sendMessage()">إرسال الرسالة</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="nafas-footer">NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712 · أبوظبي<br>© 2026 جميع الحقوق محفوظة</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQxMzE3NjksImV4cCI6MjA1OTcwNzc2OX0.gXMdMEIB7bVEBmQlqcvmJMCLJPHFh5pTdDoABWBOJok';
+
+const _rawUser=sessionStorage.getItem('edoos_user');
+if(!_rawUser){ window.location.replace('../eduos-login/'); }
+const user=JSON.parse(_rawUser||'{}');
+if(!user.student_id){ window.location.replace('../eduos-login/'); }
+const today=new Date();
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('headerDate').innerHTML=today.toLocaleDateString('ar-AE',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'<br>'+today.toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});
+  loadChildData();
+  loadNotifications();
+  loadEvents();
+});
+
+async function loadChildData(){
+  try{
+    const studentId=user.student_id;
+    // Load student info
+    const [sRes,gRes,aRes,saRes]=await Promise.all([
+      fetch(`${SB_URL}/rest/v1/students?student_id=eq.${studentId}&select=*&limit=1`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}}),
+      fetch(`${SB_URL}/rest/v1/student_grades?student_id=eq.${studentId}&order=created_at.desc&limit=20`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}}),
+      fetch(`${SB_URL}/rest/v1/attendance_qr_log?student_id=eq.${studentId}&order=scanned_at.desc&limit=30`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}}),
+      fetch(`${SB_URL}/rest/v1/student_attendance?student_id=eq.${studentId}&order=date.desc&limit=30`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}})
+    ]);
+    const students=await sRes.json().catch(()=>[]);
+    const grades=await gRes.json().catch(()=>[]);
+    const qrLog=await aRes.json().catch(()=>[]);
+    const saLog=await saRes.json().catch(()=>[]);
+
+    // Merge attendance: prefer student_attendance (has remote type), fallback to qr_log
+    const attendance=[...saLog.map(a=>({...a,scanned_at:a.recorded_at})),...qrLog];
+
+    const student=Array.isArray(students)&&students[0] ? students[0] : {name:user.name||'الطالب/ة',grade:'—',class_name:'—',student_id:studentId};
+    const attPct=attendance.length ? Math.round((attendance.filter(a=>a.status==='present').length/attendance.length)*100) : 0;
+
+    renderChildHero(student, attPct, attendance);
+    renderGrades(grades);
+  }catch(e){
+    renderChildHero({name:user.name||'الطالب/ة',grade:'—',class_name:'—'}, 0, []);
+    renderGrades([]);
+  }
+}
+
+function renderChildHero(student, attPct, attendance){
+  const todayStr=today.toISOString().slice(0,10);
+  const todayAtt=attendance.find(a=>(a.scanned_at||a.date||'').slice(0,10)===todayStr);
+  const isRemote=todayAtt?.attendance_type==='remote';
+  const attColor=attPct>=90?'var(--green)':attPct>=75?'var(--amber)':'var(--red)';
+  const attBg=attPct>=90?'var(--gl)':attPct>=75?'var(--al)':'var(--rl)';
+  const initial=(student.name||'ط').charAt(0);
+  const todayIcon=todayAtt?.status==='present'?(isRemote?'🏠':'✅'):todayAtt?'❌':'⏳';
+  const todayLabel=todayAtt?.status==='present'
+    ?(isRemote?'حاضر/ة من البيت — تعليم عن بُعد 🏠':'حاضر/ة — وصل/ت في الوقت المحدد')
+    :todayAtt?'غائب/ة اليوم':'لم يُسجَّل حضور اليوم بعد';
+  const todayBadge=todayAtt?.status==='present'
+    ?(isRemote?'🏠 عن بُعد':'حاضر/ة'):'—';
+  const todayBadgeBg=todayAtt?.status==='present'?(isRemote?'#EFF6FF':'var(--gl)'):'var(--al)';
+  const todayBadgeColor=todayAtt?.status==='present'?(isRemote?'#1D4ED8':'var(--green)'):'var(--amber)';
+  document.getElementById('childHero').innerHTML=`
+    <div class="child-top">
+      <div class="child-avatar">${initial}</div>
+      <div class="child-info">
+        <div class="child-name">${student.name||'—'}</div>
+        <div class="child-class">${student.grade||''} ${student.class_name||''}</div>
+        <div class="child-id">رقم الطالب/ة: ${student.student_id||'—'}</div>
+      </div>
+      <div class="attendance-badge" style="background:${attBg};border-color:${attColor}">
+        <div class="att-pct" style="color:${attColor}">${attPct}%</div>
+        <div class="att-lbl" style="color:${attColor}">الحضور</div>
+      </div>
+    </div>
+    <div class="today-status">
+      <div class="ts-icon">${todayIcon}</div>
+      <div class="ts-text">
+        <div class="ts-title">حضور اليوم</div>
+        <div class="ts-sub">${todayLabel}</div>
+      </div>
+      <span class="ts-badge" style="background:${todayBadgeBg};color:${todayBadgeColor}">${todayBadge}</span>
+    </div>
+  `;
+}
+
+function renderGrades(grades){
+  const el=document.getElementById('gradesGrid');
+  if(!grades.length){
+    el.innerHTML='<div class="empty-state">لا توجد درجات مسجلة حتى الآن</div>';return;
+  }
+  // Group by subject — take latest per subject
+  const bySubject={};
+  grades.forEach(g=>{
+    const key=g.subject_name||g.subject||'مادة';
+    if(!bySubject[key]) bySubject[key]=g;
+  });
+  el.innerHTML=Object.entries(bySubject).map(([subj,g])=>{
+    const score=g.score||g.grade||0;
+    const max=g.max_score||100;
+    const pct=Math.round((score/max)*100);
+    const cls=pct>=90?'excellent':pct>=75?'good':pct>=60?'average':'weak';
+    const color=pct>=90?'var(--green)':pct>=75?'var(--blue)':pct>=60?'var(--amber)':'var(--red)';
+    return `<div class="grade-card ${cls}">
+      <div class="grade-subject">${subj}</div>
+      <div class="grade-score" style="color:${color}">${score}</div>
+      <div class="grade-max">من ${max}</div>
+      <div class="grade-trend" style="color:${color}">${pct>=90?'ممتاز ⭐':pct>=75?'جيد جداً 👍':pct>=60?'جيد':'يحتاج دعم 📈'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadNotifications(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/parent_notifications?order=created_at.desc&limit=10`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+    let notifs=await r.json();
+    if(!Array.isArray(notifs)||!notifs.length) notifs=getDefaultNotifs();
+    document.getElementById('notifList').innerHTML=notifs.map(n=>`
+      <div class="notif-item ${n.type||'info'}">
+        <div class="notif-icon">${n.icon||getNotifIcon(n.type)}</div>
+        <div class="notif-body">
+          <div class="notif-title">${n.title||n.message||'—'}</div>
+          <div class="notif-sub">${n.body||n.content||''}</div>
+          <div class="notif-date">${formatDate(n.created_at)}</div>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){document.getElementById('notifList').innerHTML='<div class="empty-state">لا توجد تنبيهات حالياً</div>';}
+}
+
+async function loadEvents(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/school_events?order=event_date.asc&limit=6`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+    let events=await r.json();
+    if(!Array.isArray(events)||!events.length){document.getElementById('eventsList').innerHTML='<div class="empty-state">لا توجد فعاليات قادمة</div>';return;}
+    document.getElementById('eventsList').innerHTML=events.map(e=>{
+      const d=new Date(e.event_date||e.date||Date.now());
+      return `<div class="event-item">
+        <div class="event-date-box"><div class="edb-day">${d.getDate()}</div><div class="edb-mon">${d.toLocaleString('ar-AE',{month:'short'})}</div></div>
+        <div class="event-info"><div class="event-title">${e.title||e.name||'—'}</div><div class="event-type">${e.event_type||e.type||''}</div></div>
+      </div>`;
+    }).join('');
+  }catch(e){document.getElementById('eventsList').innerHTML='<div class="empty-state">لا توجد فعاليات</div>';}
+}
+
+async function sendMessage(){
+  const msg=document.getElementById('msgText').value.trim();
+  const target=document.getElementById('msgTarget').value;
+  if(!msg){showToast('يرجى كتابة رسالتك','error');return;}
+  try{
+    await fetch(`${SB_URL}/rest/v1/parent_messages`,{
+      method:'POST',headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({parent_id:user.id,student_id:user.student_id,message:msg,target_role:target,sent_at:new Date().toISOString()})
+    });
+    document.getElementById('msgText').value='';
+    showToast('✅ تم إرسال رسالتك','success');
+  }catch(e){showToast('خطأ في الإرسال','error');}
+}
+
+function getDefaultNotifs(){
+  return[
+    {title:'تذكير باجتماع أولياء الأمور',body:'الاجتماع الدوري — الأحد القادم 10:00 صباحاً',type:'info',created_at:new Date().toISOString()},
+    {title:'نتائج الاختبار الشهري',body:'تم رفع نتائج الاختبار الأسبوعي — يمكنك مراجعتها في قسم الدرجات',type:'success',created_at:new Date().toISOString()}
+  ];
+}
+function getNotifIcon(t){const m={info:'📢',success:'✅',urgent:'🚨',warning:'⚠️'};return m[t]||'📌';}
+function formatDate(ds){if(!ds)return'—';return new Date(ds).toLocaleDateString('ar-AE',{month:'long',day:'numeric'});}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>

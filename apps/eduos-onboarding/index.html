@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>تأهيل المستخدم/ة — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:linear-gradient(135deg,#6C3DD6 0%,#22D3EE 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.onboard-box{background:#fff;border-radius:20px;padding:40px 32px;max-width:520px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2);position:relative;overflow:hidden}
+.onboard-box::before{content:'🎓';position:absolute;top:-10px;right:-10px;font-size:5rem;opacity:.05}
+.step{display:none}.step.active{display:block}
+.logo{text-align:center;margin-bottom:24px}
+.logo-badge{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:16px;padding:14px 24px;font-size:1.6rem;font-weight:900;display:inline-block;margin-bottom:8px}
+.step-title{font-size:1.3rem;font-weight:900;color:var(--text);text-align:center;margin-bottom:8px}
+.step-sub{font-size:.88rem;color:var(--text2);text-align:center;margin-bottom:28px;line-height:1.6}
+.progress{display:flex;gap:6px;justify-content:center;margin-bottom:24px}
+.progress-dot{width:10px;height:10px;border-radius:50%;background:#e2e8f0;transition:.2s}
+.progress-dot.active{background:#6C3DD6}
+.progress-dot.done{background:#22D3EE}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.role-card{border:2px solid var(--border);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:.2s}
+.role-card:hover,.role-card.selected{border-color:#6C3DD6;background:#F5F3FF}
+.role-emoji{font-size:2rem;margin-bottom:6px}
+.role-name{font-weight:700;font-size:.88rem;color:var(--text)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+input,select{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus{outline:none;border-color:#6C3DD6}
+.btn{width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:700;transition:.2s;margin-top:4px}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2);margin-top:10px}.btn-outline:hover{border-color:#6C3DD6}
+.welcome-icon{font-size:4rem;text-align:center;display:block;margin-bottom:16px}
+.feature-list{margin:16px 0}
+.feature-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:#F8FAFF;margin-bottom:6px;font-size:.85rem;font-weight:600}
+</style>
+</head>
+<body>
+<div class="onboard-box">
+  <div class="logo"><div class="logo-badge">🎓 EduOS</div><div style="font-size:.75rem;color:var(--text2)">بوابة الجود الذكية</div></div>
+  <div class="progress" id="progressDots">
+    <div class="progress-dot active"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot"></div>
+    <div class="progress-dot"></div>
+  </div>
+
+  <!-- Step 1: Welcome -->
+  <div class="step active" id="step-1">
+    <span class="welcome-icon">👋</span>
+    <div class="step-title">أهلاً بك/ِ في EduOS</div>
+    <div class="step-sub">منصتك/ِ الذكية لإدارة التعليم. دعنا/ي نُعدّ حسابك/ِ في دقيقتين!</div>
+    <div class="feature-list">
+      <div class="feature-item">🤖 ذكاء اصطناعي يتعلم معك/ِ</div>
+      <div class="feature-item">📊 تقارير لحظية لكل أدوار المدرسة</div>
+      <div class="feature-item">🔒 بيانات آمنة ومحمية بالكامل</div>
+      <div class="feature-item">🌙 محتوى إسلامي يومي</div>
+    </div>
+    <button class="btn btn-primary" onclick="nextStep()">البدء ←</button>
+  </div>
+
+  <!-- Step 2: Role selection -->
+  <div class="step" id="step-2">
+    <div class="step-title">ما دورك/ِ؟ | Your Role</div>
+    <div class="step-sub">اختر/ي دورك/ِ لنُخصِّص تجربتك/ِ</div>
+    <div class="role-grid" id="roleGrid">
+      
+    </div>
+    <button class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+    <button class="btn btn-outline" onclick="prevStep()">→ رجوع</button>
+  </div>
+
+  <!-- Step 3: Personal info -->
+  <div class="step" id="step-3">
+    <div class="step-title">بياناتك/ِ الأساسية</div>
+    <div class="step-sub">سيُستخدَم هذا لتخصيص تجربتك/ِ</div>
+    <div class="form-group"><label class="form-label">الاسم الكامل | Full Name</label><input type="text" id="fullName" placeholder="اسمك/ِ الكامل..."/></div>
+    <div class="form-group"><label class="form-label">اللغة المفضلة | Language</label><select id="lang"><option value="ar">العربية (Arabic)</option><option value="en">English</option></select></div>
+    <div class="form-group"><label class="form-label">الإمارة | Emirate</label><select><option>أبوظبي</option><option>دبي</option><option>الشارقة</option><option>رأس الخيمة</option><option>الفجيرة</option><option>أم القيوين</option><option>عجمان</option></select></div>
+    <button class="btn btn-primary" onclick="nextStep()">التالي ←</button>
+    <button class="btn btn-outline" onclick="prevStep()">→ رجوع</button>
+  </div>
+
+  <!-- Step 4: Done -->
+  <div class="step" id="step-4">
+    <span class="welcome-icon">🎉</span>
+    <div class="step-title">حسابك/ِ جاهز!</div>
+    <div class="step-sub">تم إعداد حسابك/ِ بنجاح. ستجد/ين كل ما تحتاج/ين في الصفحة الرئيسية.</div>
+    <div class="feature-list">
+      <div class="feature-item">✅ الدور مُحدَّد</div>
+      <div class="feature-item">✅ اللغة والمنطقة مُعيَّنة</div>
+      <div class="feature-item">✅ النظام جاهز للاستخدام</div>
+    </div>
+    <button class="btn btn-primary" onclick="finishOnboarding()">🚀 ابدأ/ي الاستخدام</button>
+  </div>
+</div>
+<script src="../platform-lang.js" defer></script>
+<script>
+let currentStep=1; const totalSteps=4; let selectedRole='';
+function nextStep(){ if(currentStep<totalSteps){ currentStep++; updateUI(); } }
+function prevStep(){ if(currentStep>1){ currentStep--; updateUI(); } }
+function updateUI(){
+  for(let i=1;i<=totalSteps;i++){ document.getElementById(`step-${i}`).classList.toggle('active',i===currentStep); }
+  const dots=document.querySelectorAll('.progress-dot');
+  dots.forEach((d,i)=>{ d.className='progress-dot'; if(i<currentStep-1) d.classList.add('done'); else if(i===currentStep-1) d.classList.add('active'); });
+}
+function selectRole(role,el){ selectedRole=role; document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected')); el.classList.add('selected'); }
+function finishOnboarding(){
+  sessionStorage.setItem('onboarding_done','1');
+  location.href='/apps/eduos-hub/';
+}
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("roleGrid");
+  if(_c) _c.innerHTML=([{e:'👨‍🏫',n:'معلم/ة',v:'teacher'},{e:'🏫',n:'مدير/ة',v:'principal'},{e:'👨‍🎓',n:'طالب/ة',v:'student'},{e:'👪',n:'ولي/ة أمر',v:'parent'},{e:'🔬',n:'أخصائي/ة',v:'specialist'},{e:'👀',n:'مراقب/ة',v:'observer'}].map(r=>`<div class="role-card" onclick="selectRole('${r.v}',this)"><div class="role-emoji">${r.e}</div><div class="role-name">${r.n}</div></div>`).join(''));
+})();
+</script>
+</body>
+</html>

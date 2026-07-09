@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إجازات الكادر — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<style>
+:root{
+  --bg:#F4F6FB;--card:#fff;--border:#E2E8F0;
+  --brand:#6C3DD6;--brand2:#8B5CF6;--green:#10B981;
+  --gold:#F59E0B;--red:#EF4444;--blue:#3B82F6;
+  --text:#1E293B;--text2:#475569;--text3:#94A3B8;--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+.header{background:linear-gradient(135deg,#3B82F6,#4F46E5);padding:0 24px;box-shadow:0 2px 12px rgba(59,130,246,0.35);}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:68px;gap:16px;}
+.back-btn{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;}
+.h-logo{font-size:28px;}
+.h-title{font-size:20px;font-weight:900;color:#fff;}
+.h-sub{font-size:12px;color:rgba(255,255,255,0.7);}
+.h-add{margin-right:auto;padding:9px 18px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.h-add:hover{background:rgba(255,255,255,0.3);}
+.main{max-width:1100px;margin:0 auto;padding:24px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px;}
+.stat{background:var(--card);border-radius:16px;padding:18px;text-align:center;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.stat-num{font-size:32px;font-weight:900;line-height:1;}
+.stat-lbl{font-size:12px;color:var(--text3);margin-top:5px;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.tab{padding:10px 20px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text3);transition:all 0.2s;}
+.tab.active{background:var(--brand);color:#fff;border-color:var(--brand);}
+.panel{display:none;}.panel.active{display:block;}
+
+/* LEAVE CARDS */
+.leave-card{background:var(--card);border-radius:var(--radius);padding:22px;border:1px solid var(--border);border-right:4px solid var(--status-color,var(--brand));box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:14px;display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.leave-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.leave-info{flex:1;min-width:200px;}
+.leave-name{font-size:17px;font-weight:900;color:var(--text);margin-bottom:4px;}
+.leave-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.meta-pill{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);background:var(--bg);border-radius:50px;padding:4px 10px;border:1px solid var(--border);}
+.leave-reason{font-size:14px;color:var(--text2);line-height:1.6;}
+.leave-actions{display:flex;gap:8px;margin-top:12px;}
+.la-btn{padding:9px 18px;border-radius:10px;border:none;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-approve{background:rgba(16,185,129,0.1);color:var(--green);border:1.5px solid rgba(16,185,129,0.3);}
+.btn-approve:hover{background:var(--green);color:#fff;}
+.btn-reject{background:rgba(239,68,68,0.1);color:var(--red);border:1.5px solid rgba(239,68,68,0.3);}
+.btn-reject:hover{background:var(--red);color:#fff;}
+.btn-view{background:rgba(59,130,246,0.08);color:var(--blue);border:1.5px solid rgba(59,130,246,0.2);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:50px;font-size:12px;font-weight:700;}
+.status-pending{background:rgba(245,158,11,0.1);color:var(--gold);}
+.status-approved{background:rgba(16,185,129,0.1);color:var(--green);}
+.status-rejected{background:rgba(239,68,68,0.1);color:var(--red);}
+
+/* REQUEST FORM */
+.form-card{background:var(--card);border-radius:var(--radius);padding:28px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.form-title{font-size:18px;font-weight:900;margin-bottom:22px;color:var(--text);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;transition:border 0.2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--brand);}
+.form-textarea{min-height:90px;resize:vertical;line-height:1.6;}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--brand));color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:900;font-family:'Tajawal',sans-serif;cursor:pointer;}
+.submit-btn:hover{opacity:0.9;}
+
+@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/apps/eduos-hub/" class="back-btn">→</a>
+    <div class="h-logo">🏖️</div>
+    <div><div class="h-title">إجازات الكادر</div><div class="h-sub">طلبات الغياب والإجازات</div></div>
+    <button class="h-add" onclick="showTab('request',document.querySelector('.tab:last-child'))">+ طلب إجازة</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="stats">
+    <div class="stat"><div class="stat-num" style="color:var(--gold)" id="statPending">—</div><div class="stat-lbl">بانتظار الموافقة</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)" id="statApproved">—</div><div class="stat-lbl">موافق عليها</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--red)" id="statRejected">—</div><div class="stat-lbl">مرفوضة</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--blue)" id="statRemaining">—</div><div class="stat-lbl">يوم متبقٍ لي</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('pending',this)">⏳ بانتظار الموافقة</button>
+    <button class="tab" onclick="showTab('all',this)">📋 كل الطلبات</button>
+    <button class="tab" onclick="showTab('my',this)">👤 طلباتي</button>
+    <button class="tab" onclick="showTab('request',this)">+ طلب جديد</button>
+  </div>
+
+  <!-- PENDING -->
+  <div class="panel active" id="panel-pending">
+    <div id="pendingList"><div style="text-align:center;color:var(--text3);padding:40px;">جاري التحميل...</div></div>
+  </div>
+
+  <!-- ALL -->
+  <div class="panel" id="panel-all">
+    <div id="allList"><div style="text-align:center;color:var(--text3);padding:40px;">جاري التحميل...</div></div>
+  </div>
+
+  <!-- MY -->
+  <div class="panel" id="panel-my">
+    <div id="myList"><div style="text-align:center;color:var(--text3);padding:40px;">جاري التحميل...</div></div>
+  </div>
+
+  <!-- REQUEST -->
+  <div class="panel" id="panel-request">
+    <div class="form-card">
+      <div class="form-title">📝 طلب إجازة جديد</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">نوع الإجازة</label>
+          <select class="form-select" id="leaveType">
+            <option value="annual">إجازة سنوية</option>
+            <option value="sick">إجازة مرضية</option>
+            <option value="emergency">إجازة طارئة</option>
+            <option value="maternity">إجازة أمومة</option>
+            <option value="study">إجازة دراسية</option>
+            <option value="other">أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الأيام المطلوبة</label>
+          <input type="number" class="form-input" id="leaveDays" min="1" max="30" value="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">تاريخ البدء</label>
+          <input type="date" class="form-input" id="leaveStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">تاريخ الانتهاء</label>
+          <input type="date" class="form-input" id="leaveEnd">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">سبب الإجازة</label>
+        <textarea class="form-textarea" id="leaveReason" placeholder="اشرح سبب الإجازة بإيجاز..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitLeave()">📤 تقديم الطلب</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function sq(q){return fetch(`${SB}/rest/v1/${q}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(r=>r.json()).catch(()=>[]);}
+function sqpost(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+function sqpatch(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'PATCH',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+
+const user=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+const isPrincipal=user.role==='principal'||user.role==='admin';
+
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='pending')loadLeaves('pending');
+  else if(id==='all')loadLeaves('all');
+  else if(id==='my')loadLeaves('my');
+}
+
+const typeLabels={annual:'إجازة سنوية',sick:'إجازة مرضية',emergency:'إجازة طارئة',maternity:'إجازة أمومة',study:'إجازة دراسية',other:'إجازة أخرى'};
+
+function renderLeaves(leaves,containerId,showActions){
+  const el=document.getElementById(containerId);
+  if(!leaves||leaves.length===0){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:40px;font-size:15px;">لا توجد طلبات</div>';return;}
+  const statusColor={pending:'#F59E0B',approved:'#10B981',rejected:'#EF4444'};
+  el.innerHTML=leaves.map(l=>`
+    <div class="leave-card" style="--status-color:${statusColor[l.status]||'#94A3B8'}">
+      <div class="leave-avatar">${l.staff_name?l.staff_name[0]:'👤'}</div>
+      <div class="leave-info">
+        <div class="leave-name">${l.staff_name||'موظف/ة'}</div>
+        <div class="leave-meta">
+          <span class="meta-pill">🏷️ ${typeLabels[l.leave_type]||l.leave_type||'—'}</span>
+          <span class="meta-pill">📅 ${l.start_date?new Date(l.start_date).toLocaleDateString('ar-AE',{month:'short',day:'numeric'}):''} — ${l.end_date?new Date(l.end_date).toLocaleDateString('ar-AE',{month:'short',day:'numeric'}):''}</span>
+          <span class="meta-pill">📆 ${l.days_count||1} ${l.days_count===1?'يوم':'أيام'}</span>
+          <span class="status-badge status-${l.status}">${l.status==='pending'?'⏳ بانتظار الموافقة':l.status==='approved'?'✅ موافق عليها':'❌ مرفوض'}</span>
+        </div>
+        <div class="leave-reason">${l.reason||''}</div>
+        ${showActions&&isPrincipal&&l.status==='pending'?`
+        <div class="leave-actions">
+          <button class="la-btn btn-approve" onclick="updateLeave('${l.id}','approved')">✅ موافقة</button>
+          <button class="la-btn btn-reject" onclick="updateLeave('${l.id}','rejected')">❌ رفض</button>
+        </div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadLeaves(mode){
+  const q=mode==='pending'?'staff_leaves?select=*&status=eq.pending&order=created_at.desc':
+    mode==='my'?`staff_leaves?select=*&staff_id=eq.${user.id||'none'}&order=created_at.desc`:
+    'staff_leaves?select=*&order=created_at.desc&limit=50';
+  const data=await sq(q);
+  const leaves=Array.isArray(data)?data:[];
+  renderLeaves(leaves,mode==='pending'?'pendingList':mode==='all'?'allList':'myList',mode==='pending');
+  if(mode==='pending'){
+    document.getElementById('statPending').textContent=leaves.length;
+  }
+}
+
+async function updateLeave(id,status){
+  await sqpatch(`staff_leaves?id=eq.${id}`,{status,reviewed_by:user.id||null,reviewed_at:new Date().toISOString()});
+  loadLeaves('pending');loadLeaves('all');
+  const all=await sq('staff_leaves?select=status');
+  if(Array.isArray(all)){
+    document.getElementById('statApproved').textContent=all.filter(l=>l.status==='approved').length;
+    document.getElementById('statRejected').textContent=all.filter(l=>l.status==='rejected').length;
+  }
+}
+
+async function submitLeave(){
+  const type=document.getElementById('leaveType').value;
+  const days=parseInt(document.getElementById('leaveDays').value)||1;
+  const start=document.getElementById('leaveStart').value;
+  const end=document.getElementById('leaveEnd').value;
+  const reason=document.getElementById('leaveReason').value;
+  if(!start||!end){alert('يرجى تحديد تاريخ البدء والانتهاء');return;}
+  await sqpost('staff_leaves',{
+    staff_id:user.id||null,staff_name:user.name||'موظف/ة',
+    leave_type:type,days_count:days,start_date:start,end_date:end,
+    reason,status:'pending',created_at:new Date().toISOString()
+  });
+  alert('✅ تم تقديم طلب الإجازة بنجاح');
+  showTab('my',null);loadLeaves('my');
+}
+
+// Init
+document.getElementById('leaveStart').value=new Date().toISOString().split('T')[0];
+loadLeaves('pending');
+sq('staff_leaves?select=status').then(all=>{
+  if(Array.isArray(all)){
+    document.getElementById('statApproved').textContent=all.filter(l=>l.status==='approved').length;
+    document.getElementById('statRejected').textContent=all.filter(l=>l.status==='rejected').length;
+  }
+});
+document.getElementById('statRemaining').textContent='—';
+</script>
+</body>
+</html>

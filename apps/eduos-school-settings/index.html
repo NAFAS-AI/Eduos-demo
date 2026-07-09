@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>إعدادات المدرسة — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr:hover{background:rgba(255,255,255,.35)}
+.main{padding:24px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:240px 1fr;gap:20px}
+@media(max-width:768px){.main{grid-template-columns:1fr}}
+.sidebar{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:12px;height:fit-content;position:sticky;top:80px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text2);transition:.2s;margin-bottom:2px}
+.sidebar-item:hover{background:#F8FAFF;color:var(--text)}
+.sidebar-item.active{background:#ede9fe;color:var(--primary)}
+.sidebar-item-icon{font-size:1.1rem;flex-shrink:0}
+.settings-content{flex:1}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.section{display:none}.section.active{display:block}
+input,select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.form-hint{font-size:.72rem;color:var(--text2);margin-top:4px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:.88rem;font-weight:600}
+.toggle-sub{font-size:.75rem;color:var(--text2)}
+.toggle{width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;transition:.2s;position:relative;flex-shrink:0}
+.toggle.on{background:linear-gradient(135deg,#6C3DD6,#22D3EE)}
+.toggle.off{background:#cbd5e1}
+.toggle::after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;transition:.2s}
+.toggle.on::after{right:3px}.toggle.off::after{left:3px}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.btn-danger{background:#ef4444;color:#fff}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">⚙️</div>
+    <div>
+      <div class="hdr-title">إعدادات المدرسة | School Settings</div>
+      <div class="hdr-sub">الإعدادات العامة والمتقدمة — EduOS</div>
+    </div>
+  </div>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-principal/'">← رجوع</button>
+</header>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-item active" onclick="showSection('general')"><div class="sidebar-item-icon">🏫</div>بيانات المدرسة</div>
+    <div class="sidebar-item" onclick="showSection('academic')"><div class="sidebar-item-icon">📅</div>السنة الدراسية</div>
+    <div class="sidebar-item" onclick="showSection('schedule')"><div class="sidebar-item-icon">🕐</div>جدول الحصص</div>
+    <div class="sidebar-item" onclick="showSection('modules')"><div class="sidebar-item-icon">🧩</div>الوحدات</div>
+    <div class="sidebar-item" onclick="showSection('notifications')"><div class="sidebar-item-icon">🔔</div>الإشعارات</div>
+    <div class="sidebar-item" onclick="showSection('security')"><div class="sidebar-item-icon">🔒</div>الأمان</div>
+    <div class="sidebar-item" onclick="showSection('backup')"><div class="sidebar-item-icon">💾</div>النسخ الاحتياطي</div>
+  </div>
+
+  <div class="settings-content">
+    <div id="sec-general" class="section active">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏫 بيانات المدرسة | School Info</div><span class="badge badge-green">مدرسة الجود</span></div>
+        <div class="form-group"><label class="form-label">اسم المدرسة (عربي)</label><input type="text" value="مدرسة الجود النموذجية"/></div>
+        <div class="form-group"><label class="form-label">اسم المدرسة (إنجليزي)</label><input type="text" value="AlJood Model School"/></div>
+        <div class="form-group"><label class="form-label">الجهة التعليمية</label><select><option>تربية وتعليم أبوظبي (ADEK)</option><option>وزارة التربية والتعليم (MOE)</option></select></div>
+        <div class="form-group"><label class="form-label">المرحلة الدراسية</label><select><option>KG–12</option><option>KG–6</option><option>7–12</option></select></div>
+        <div class="form-group"><label class="form-label">الإمارة</label><select><option>أبوظبي</option><option>دبي</option><option>الشارقة</option></select></div>
+        <button class="btn btn-primary" onclick="saveSettings('general')">💾 حفظ البيانات</button>
+      </div>
+    </div>
+
+    <div id="sec-academic" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📅 السنة الدراسية | Academic Year</div></div>
+        <div class="form-group"><label class="form-label">السنة الدراسية الحالية</label><input type="text" value="2025-2026"/></div>
+        <div class="form-group"><label class="form-label">الفصل الحالي | Current Term</label><select><option value="3">الفصل الثالث | Term 3</option><option value="1">الفصل الأول</option><option value="2">الفصل الثاني</option></select></div>
+        <div class="form-group"><label class="form-label">أسبوع المنصة</label><input type="number" value="38" min="1" max="40"/><div class="form-hint">يُحدَّث تلقائياً من platform-week.js</div></div>
+        <button class="btn btn-primary" onclick="saveSettings('academic')">💾 حفظ</button>
+      </div>
+    </div>
+
+    <div id="sec-schedule" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🕐 جدول الحصص | Schedule</div></div>
+        <div class="form-group"><label class="form-label">نظام الجدول</label><select><option>KG–4: 40 دقيقة (07:15)</option><option>5+: 45 دقيقة (08:00)</option></select></div>
+        <div class="form-group"><label class="form-label">عدد الحصص اليومية</label><input type="number" value="7" min="5" max="10"/></div>
+        <div class="form-group"><label class="form-label">الفترات بالدقائق</label><input type="number" value="40" min="30" max="60"/></div>
+        <button class="btn btn-primary" onclick="saveSettings('schedule')">💾 حفظ</button>
+      </div>
+    </div>
+
+    <div id="sec-modules" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🧩 الوحدات | Modules</div></div>
+        
+      </div>
+    </div>
+
+    <div id="sec-notifications" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🔔 الإشعارات | Notifications</div></div>
+        
+      </div>
+    </div>
+
+    <div id="sec-security" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🔒 الأمان | Security</div></div>
+        <div class="form-group"><label class="form-label">مهلة تسجيل الخروج التلقائي</label><select><option value="15">15 دقيقة (الحالي)</option><option value="30">30 دقيقة</option><option value="60">60 دقيقة</option></select></div>
+        <div class="form-group"><label class="form-label">عدد محاولات تسجيل الدخول</label><input type="number" value="5" min="3" max="10"/></div>
+        
+        <div style="margin-top:16px"><button class="btn btn-danger" onclick="confirmReset()">⚠️ إعادة ضبط جميع الكلمات السرية</button></div>
+      </div>
+    </div>
+
+    <div id="sec-backup" class="section">
+      <div class="card">
+        <div class="card-header"><div class="card-title">💾 النسخ الاحتياطي | Backup</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div style="background:#F8FAFF;border-radius:10px;padding:14px;border:1px solid var(--border)"><div style="font-weight:700;font-size:.85rem;margin-bottom:4px">آخر نسخة احتياطية</div><div style="font-size:.82rem;color:var(--text2)">اليوم — 03:00 صباحاً</div><span class="badge badge-green">ناجحة</span></div>
+          <div style="background:#F8FAFF;border-radius:10px;padding:14px;border:1px solid var(--border)"><div style="font-weight:700;font-size:.85rem;margin-bottom:4px">الموعد القادم</div><div style="font-size:.82rem;color:var(--text2)">غداً — 03:00 صباحاً</div><span class="badge badge-blue">مجدول</span></div>
+        </div>
+        <div class="form-group"><label class="form-label">وتيرة النسخ</label><select><option>يومي (03:00 صباحاً)</option><option>أسبوعي</option><option>يدوي</option></select></div>
+        <button class="btn btn-primary" onclick="showToast('💾 جاري إنشاء نسخة احتياطية...')">💾 نسخة فورية الآن</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+function showSection(n){
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById(`sec-${n}`).classList.add('active');
+}
+function toggleModule(key){
+  const btn=document.getElementById(`toggle-${key}`);
+  btn.classList.toggle('on'); btn.classList.toggle('off');
+  showToast(`🧩 ${btn.classList.contains('on')?'تم تفعيل':'تم إيقاف'} الوحدة`);
+}
+function saveSettings(section){ showToast(`✅ تم حفظ إعدادات ${section==='general'?'المدرسة':section==='academic'?'السنة الدراسية':section==='schedule'?'الجدول':'الأمان'}`); }
+function confirmReset(){ if(confirm('هل أنت/ي متأكد/ة من إعادة ضبط جميع الكلمات السرية؟')) showToast('🔒 تم إرسال طلب إعادة الضبط'); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("sec-security");
+  if(_c) _c.innerHTML=([{label:'تفعيل Shield الأمني',on:true},{label:'مراقبة الروابط المكسورة',on:true},{label:'تشفير البيانات الحساسة',on:true}].map(s=>`
+        <div class="toggle-row">
+          <div class="toggle-label">${s.label}</div>
+          <button class="toggle ${s.on?'on':'off'}"></button>
+        </div>`).join(''));
+})();
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("sec-notifications");
+  if(_c) _c.innerHTML=([{label:'إشعار الغياب للأهل',sub:'تلقائي فور تسجيل الغياب',on:true},{label:'تقرير أسبوعي للأهل',sub:'كل أحد صباحاً',on:true},{label:'تنبيهات الدرجات المتدنية',sub:'عند نزول الدرجة عن 60%',on:true},{label:'إشعارات المعلم/ة البديل/ة',sub:'قبل 30 دقيقة من الحصة',on:true},{label:'تنبيهات الطوارئ',sub:'فورية عبر SMS + Push',on:true}].map(n=>`
+        <div class="toggle-row">
+          <div><div class="toggle-label">${n.label}</div><div class="toggle-sub">${n.sub}</div></div>
+          <button class="toggle ${n.on?'on':'off'}"></button>
+        </div>`).join(''));
+})();
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("sec-modules");
+  if(_c) _c.innerHTML=([{icon:'🧠',name:'أثير (Atheer)',key:'atheer',on:true},{icon:'📊',name:'التحليلات المتقدمة',key:'analytics',on:true},{icon:'🚌',name:'النقل المدرسي',key:'transport',on:true},{icon:'🍽️',name:'المقصف',key:'cafeteria',on:true},{icon:'📚',name:'المكتبة',key:'library',on:true},{icon:'♿',name:'التعليم الجامع',key:'inclusion',on:false},{icon:'🔬',name:'عُمق (Umq)',key:'umq',on:false}].map(m=>`
+        <div class="toggle-row">
+          <div><div class="toggle-label">${m.icon} ${m.name}</div><div class="toggle-sub">${m.key}</div></div>
+          <button class="toggle ${m.on?'on':'off'}" id="toggle-${m.key}" onclick="toggleModule('${m.key}')"></button>
+        </div>`).join(''));
+})();
+</script>
+</body>
+</html>

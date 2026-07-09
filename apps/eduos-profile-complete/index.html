@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>استكمال الملف الشخصي — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.box{background:#fff;border-radius:20px;padding:36px 32px;max-width:520px;width:100%;box-shadow:0 12px 40px rgba(108,61,214,.15)}
+.header-area{text-align:center;margin-bottom:28px}
+.logo-badge{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:16px;padding:12px 20px;font-size:1.3rem;font-weight:900;display:inline-block;margin-bottom:10px}
+.title{font-size:1.1rem;font-weight:900;color:var(--text);margin-bottom:4px}
+.sub{font-size:.82rem;color:var(--text2);margin-bottom:0}
+.progress-bar{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:6px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6C3DD6,#22D3EE);border-radius:4px;transition:.3s}
+.progress-label{font-size:.75rem;font-weight:700;color:var(--text2);text-align:center;margin-bottom:20px}
+.avatar-area{display:flex;flex-direction:column;align-items:center;margin-bottom:24px}
+.avatar-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;font-size:2rem;color:#fff;font-weight:900;cursor:pointer;margin-bottom:8px;border:3px solid rgba(108,61,214,.2);transition:.2s}
+.avatar-circle:hover{transform:scale(1.05)}
+.avatar-hint{font-size:.75rem;color:var(--text2)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.form-label .required{color:#ef4444}
+input,select,textarea{width:100%;background:#F8FAFF;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#6C3DD6;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:700;transition:.2s;margin-top:6px}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2);margin-top:8px}.btn-outline:hover{border-color:#6C3DD6}
+.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<div class="box">
+  <div class="header-area">
+    <div class="logo-badge">👤 EduOS</div>
+    <div class="title">استكمال الملف الشخصي</div>
+    <div class="sub">Complete Your Profile</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:30%"></div></div>
+  <div class="progress-label" id="progLabel">30% مكتمل</div>
+
+  <div class="avatar-area">
+    <div class="avatar-circle" id="avatarCircle" onclick="showToast('📷 رفع صورة — سيُفعَّل قريباً')">👤</div>
+    <div class="avatar-hint">انقر/ي لرفع صورة شخصية</div>
+  </div>
+
+  <div class="grid2">
+    <div class="form-group"><label class="form-label">الاسم الأول <span class="required">*</span></label><input type="text" id="firstName" placeholder="مثال: نورة" oninput="calcProgress()"/></div>
+    <div class="form-group"><label class="form-label">اسم العائلة <span class="required">*</span></label><input type="text" id="lastName" placeholder="مثال: المري" oninput="calcProgress()"/></div>
+  </div>
+  <div class="form-group"><label class="form-label">رقم الجوال | Phone <span class="required">*</span></label><input type="tel" id="phone" placeholder="+971 5X XXX XXXX" oninput="calcProgress()"/></div>
+  <div class="form-group"><label class="form-label">الجنسية | Nationality</label><select id="nationality" onchange="calcProgress()"><option value="">اختر...</option><option value="ae">🇦🇪 إماراتية</option><option value="sa">🇸🇦 سعودية</option><option value="eg">🇪🇬 مصرية</option><option value="jo">🇯🇴 أردنية</option><option value="other">أخرى</option></select></div>
+  <div class="grid2">
+    <div class="form-group"><label class="form-label">الجنس | Gender</label><select id="gender" onchange="calcProgress()"><option value="">اختر...</option><option value="female">أنثى</option><option value="male">ذكر</option></select></div>
+    <div class="form-group"><label class="form-label">اللغة المفضلة</label><select id="lang" onchange="calcProgress()"><option value="ar">العربية</option><option value="en">English</option></select></div>
+  </div>
+  <div class="form-group"><label class="form-label">نبذة مختصرة | Bio</label><textarea id="bio" style="min-height:60px" placeholder="نبذة عنك/ِ..." oninput="calcProgress()"></textarea></div>
+
+  <button class="btn btn-primary" onclick="saveProfile()">✅ حفظ الملف الشخصي</button>
+  <button class="btn btn-outline" onclick="location.href='/apps/eduos-hub/'">تخطي — Skip</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function calcProgress(){
+  const fields=['firstName','lastName','phone','nationality','gender','lang','bio'];
+  const filled=fields.filter(id=>document.getElementById(id).value.trim()!=='').length;
+  const pct=Math.round((filled/fields.length)*100);
+  document.getElementById('progFill').style.width=`${pct}%`;
+  document.getElementById('progLabel').textContent=`${pct}% مكتمل`;
+  const fn=document.getElementById('firstName').value;
+  if(fn) document.getElementById('avatarCircle').textContent=fn[0].toUpperCase();
+}
+async function saveProfile(){
+  const fn=document.getElementById('firstName').value;
+  const ln=document.getElementById('lastName').value;
+  const phone=document.getElementById('phone').value;
+  if(!fn||!ln||!phone){ showToast('⚠️ أكمل/ي الحقول الإلزامية'); return; }
+  try{
+    const session=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+    if(session?.user?.id){
+      await fetch(`${SB}/rest/v1/user_profiles?id=eq.${session.user.id}`,{method:'PATCH',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({full_name:`${fn} ${ln}`,phone,nationality:document.getElementById('nationality').value,gender:document.getElementById('gender').value,preferred_language:document.getElementById('lang').value,bio:document.getElementById('bio').value})});
+    }
+  }catch(e){}
+  showToast('✅ تم حفظ ملفك/ِ الشخصي بنجاح!');
+  setTimeout(()=>location.href='/apps/eduos-hub/',1500);
+}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>
