@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>التعليم الجامع — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.panel{display:none}.panel.active{display:block}
+.main{padding:24px;max-width:1200px;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--card);border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center}
+.kpi-icon{font-size:1.8rem;margin-bottom:6px}.kpi-num{font-size:1.6rem;font-weight:900}.kpi-label{font-size:.75rem;color:var(--text2)}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.student-inclusion{display:flex;align-items:flex-start;gap:14px;padding:16px;border-radius:12px;border:1px solid var(--border);margin-bottom:10px;transition:.2s}
+.student-inclusion:hover{background:#F8FAFF}
+.s-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0}
+.s-name{font-weight:700;font-size:.92rem}
+.s-type{font-size:.75rem;color:var(--text2);margin-top:2px}
+.s-plan{font-size:.82rem;color:var(--text);margin-top:6px}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}.badge-blue{background:#dbeafe;color:#1d4ed8}.badge-purple{background:#ede9fe;color:#7c3aed}
+input,select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">♿</div>
+    <div>
+      <div class="hdr-title">التعليم الجامع | Inclusion</div>
+      <div class="hdr-sub">دعم الطلاب/ات ذوي/ذوات الإعاقة — EduOS</div>
+    </div>
+  </div>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-hub/'">← الرئيسية</button>
+</header>
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('students')">👩‍🎓 الطلاب/ات</button>
+  <button class="tab" onclick="switchTab('plans')">📋 خطط الدعم (IEP)</button>
+  <button class="tab" onclick="switchTab('sessions')">📅 الجلسات</button>
+  <button class="tab" onclick="switchTab('add')">➕ إضافة طالب/ة</button>
+</div>
+<div class="main">
+  <div class="kpis">
+    <div class="kpi-card"><div class="kpi-icon">♿</div><div class="kpi-num" id="kpiInclusion">—</div><div class="kpi-label">طلاب/ات الدمج</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-num" id="kpiPlans">—</div><div class="kpi-label">خطط IEP نشطة</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-num" id="kpiSessions">—</div><div class="kpi-label">جلسات هذا الأسبوع</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-num" id="kpiProgress">—</div><div class="kpi-label">معدل التقدم</div></div>
+  </div>
+
+  <div id="tab-students" class="panel active">
+    <div class="card">
+      <div class="card-header"><div class="card-title">👩‍🎓 طلاب/ات التعليم الجامع</div></div>
+      <div id="inclusionStudents"></div>
+    </div>
+  </div>
+
+  <div id="tab-plans" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 خطط الدعم الفردية | IEP</div></div>
+      <div id="iepPlans"></div>
+    </div>
+  </div>
+
+  <div id="tab-sessions" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 سجل الجلسات | Session Log</div></div>
+      <div id="sessionLog"></div>
+    </div>
+  </div>
+
+  <div id="tab-add" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">➕ إضافة طالب/ة للدمج</div></div>
+      <div style="max-width:550px">
+        <div class="form-group"><label class="form-label">الطالب/ة | Student</label><select id="inclStudent"><option value="">اختر الطالب/ة...</option></select></div>
+        <div class="form-group"><label class="form-label">نوع الإعاقة / الاحتياج | Type</label>
+          <select id="inclType"><option value="learning">صعوبات تعلم</option><option value="speech">نطق وكلام</option><option value="behavioral">سلوكية</option><option value="physical">جسدية/حركية</option><option value="hearing">سمعية</option><option value="visual">بصرية</option><option value="autism">طيف التوحد</option><option value="gifted">موهبة وتفوق</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">مستوى الدعم المطلوب | Support Level</label>
+          <select id="inclSupport"><option value="low">خفيف — دعم داخل الفصل</option><option value="medium">متوسط — جلسات أسبوعية</option><option value="high">مكثف — جلسات يومية</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">ملاحظات | Notes</label><textarea id="inclNotes" style="min-height:70px"></textarea></div>
+        <button class="btn btn-primary" onclick="addInclusion()">➕ إضافة للبرنامج</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}); return r.ok?r.json():[]; }
+const typeAr={learning:'صعوبات تعلم',speech:'نطق وكلام',behavioral:'سلوكية',physical:'حركية',hearing:'سمعية',visual:'بصرية',autism:'طيف التوحد',gifted:'موهبة'};
+
+const DEMO=[{name:'طالب/ة أ',class:'3أ',type:'learning',support:'medium',progress:72},{name:'طالب/ة ب',class:'2ب',type:'speech',support:'high',progress:58},{name:'طالب/ة ج',class:'5أ',type:'gifted',support:'low',progress:90},{name:'طالب/ة د',class:'1أ',type:'autism',support:'high',progress:45}];
+
+async function init(){
+  document.getElementById('kpiInclusion').textContent=DEMO.length;
+  document.getElementById('kpiPlans').textContent=DEMO.length;
+  document.getElementById('kpiSessions').textContent='8';
+  document.getElementById('kpiProgress').textContent='66%';
+  renderStudents();
+  renderPlans();
+  renderSessions();
+  try{ const s=await get('students','select=id,full_name&order=full_name&limit=100'); s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.full_name; document.getElementById('inclStudent').appendChild(o); }); }catch(e){}
+}
+
+function renderStudents(){
+  document.getElementById('inclusionStudents').innerHTML=DEMO.map(d=>`
+    <div class="student-inclusion">
+      <div class="s-avatar">${d.name[0]}</div>
+      <div style="flex:1">
+        <div class="s-name">${d.name} — ${d.class}</div>
+        <div class="s-type">${typeAr[d.type]||d.type} · دعم ${d.support==='high'?'مكثف':d.support==='medium'?'متوسط':'خفيف'}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <div style="flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:${d.progress}%;background:linear-gradient(90deg,#6C3DD6,#22D3EE);border-radius:4px"></div></div>
+          <div style="font-weight:700;font-size:.82rem;color:var(--primary)">${d.progress}%</div>
+        </div>
+      </div>
+      <span class="badge ${d.support==='high'?'badge-yellow':d.support==='medium'?'badge-blue':'badge-green'}">${d.support==='high'?'مكثف':d.support==='medium'?'متوسط':'خفيف'}</span>
+    </div>`).join('');
+}
+
+function renderPlans(){
+  document.getElementById('iepPlans').innerHTML=DEMO.map(d=>`
+    <div style="border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:1.3rem">📋</div>
+      <div style="flex:1"><div style="font-weight:700">${d.name} — خطة IEP ${new Date().getFullYear()}</div><div style="font-size:.75rem;color:var(--text2)">${typeAr[d.type]||d.type} · تحديث أخير: اليوم</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-outline" style="padding:5px 12px;font-size:.75rem" onclick="showToast('📋 عرض الخطة...')">عرض</button>
+        <button class="btn btn-primary" style="padding:5px 12px;font-size:.75rem" onclick="showToast('✏️ تعديل الخطة...')">تعديل</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderSessions(){
+  const sessions=[{student:'طالب/ة أ',type:'تدريب لغوي',date:'اليوم 10:00',specialist:'أ. سارة',status:'completed'},{student:'طالب/ة ب',type:'جلسة نطق',date:'اليوم 11:30',specialist:'أ. نورة',status:'scheduled'},{student:'طالب/ة د',type:'دعم سلوكي',date:'غداً 09:00',specialist:'أ. فاطمة',status:'scheduled'}];
+  document.getElementById('sessionLog').innerHTML=sessions.map(s=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px">
+      <div style="font-size:1.2rem">${s.status==='completed'?'✅':'📅'}</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:.88rem">${s.student} — ${s.type}</div><div style="font-size:.75rem;color:var(--text2)">${s.date} · ${s.specialist}</div></div>
+      <span class="badge ${s.status==='completed'?'badge-green':'badge-blue'}">${s.status==='completed'?'مكتملة':'مجدولة'}</span>
+    </div>`).join('');
+}
+
+async function addInclusion(){
+  const st=document.getElementById('inclStudent').value;
+  if(!st){ showToast('⚠️ اختر/ي الطالب/ة'); return; }
+  try{
+    await fetch(`${SB}/rest/v1/inclusion_students`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({student_id:st,disability_type:document.getElementById('inclType').value,support_level:document.getElementById('inclSupport').value,notes:document.getElementById('inclNotes').value})});
+  }catch(e){}
+  showToast('✅ تم إضافة الطالب/ة لبرنامج الدمج');
+  switchTab('students');
+}
+
+function switchTab(n){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); ['students','plans','sessions','add'].forEach((t,i)=>{ if(t===n) document.querySelectorAll('.tab')[i].classList.add('active'); }); document.getElementById(`tab-${n}`).classList.add('active'); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+init();
+</script>
+</body>
+</html>

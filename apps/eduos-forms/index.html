@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>النماذج والطلبات — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.panel{display:none}.panel.active{display:block}
+.main{padding:24px;max-width:1100px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.forms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.form-type-card{background:var(--card);border-radius:14px;padding:18px;border:2px solid var(--border);text-align:center;cursor:pointer;transition:.2s}
+.form-type-card:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:0 4px 12px rgba(108,61,214,.15)}
+.form-emoji{font-size:2rem;margin-bottom:8px}
+.form-name{font-weight:700;font-size:.9rem;margin-bottom:4px}
+.form-desc{font-size:.75rem;color:var(--text2)}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}.badge-blue{background:#dbeafe;color:#1d4ed8}.badge-red{background:#fee2e2;color:#dc2626}
+input,select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.request-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#F8FAFF}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFF}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">📝</div>
+    <div>
+      <div class="hdr-title">النماذج والطلبات | Forms</div>
+      <div class="hdr-sub">تقديم وتتبع الطلبات الرسمية — EduOS</div>
+    </div>
+  </div>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-hub/'">← الرئيسية</button>
+</header>
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('browse')">📋 النماذج المتاحة</button>
+  <button class="tab" onclick="switchTab('myrequests')">📊 طلباتي</button>
+  <button class="tab" onclick="switchTab('admin')">⚙️ إدارة الطلبات</button>
+</div>
+<div class="main">
+  <div id="tab-browse" class="panel active">
+    <div class="forms-grid">
+      
+    </div>
+  </div>
+
+  <div id="tab-myrequests" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📊 طلباتي | My Requests</div></div>
+      <div class="tbl-wrap" id="myReqTable">
+        <table><thead><tr><th>النوع</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>
+          <tr><td>شهادة قيد</td><td>2026-06-25</td><td><span class="badge badge-green">مقبول</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem" onclick="showToast('📄 تحميل الشهادة...')">تحميل</button></td></tr>
+          <tr><td>إذن خروج</td><td>2026-06-28</td><td><span class="badge badge-yellow">قيد المراجعة</span></td><td>—</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-admin" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">⚙️ إدارة الطلبات | Admin View</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>الطالب/ة</th><th>النوع</th><th>التاريخ</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>
+          <tr><td>طالب/ة أ</td><td>شهادة قيد</td><td>2026-06-25</td><td><span class="badge badge-green">مقبول</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:.75rem" onclick="showToast('✅ مقبول مسبقاً')">عرض</button></td></tr>
+          <tr><td>طالب/ة ب</td><td>إذن خروج</td><td>2026-06-28</td><td><span class="badge badge-yellow">معلق</span></td><td><div style="display:flex;gap:4px"><button class="btn btn-primary" style="padding:4px 10px;font-size:.75rem" onclick="showToast('✅ تم القبول')">قبول</button><button class="btn" style="background:#ef4444;color:#fff;padding:4px 10px;font-size:.75rem" onclick="showToast('❌ تم الرفض')">رفض</button></div></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Form Modal -->
+<div id="formModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-weight:900;font-size:1rem" id="modalTitle">نموذج</div>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer">✕</button>
+    </div>
+    <div class="form-group"><label class="form-label">اسم الطالب/ة</label><input type="text" placeholder="الاسم الكامل..."/></div>
+    <div class="form-group"><label class="form-label">الصف</label><input type="text" placeholder="مثال: 5أ"/></div>
+    <div class="form-group"><label class="form-label">سبب / ملاحظات</label><textarea style="min-height:80px"></textarea></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="submitForm()">📤 إرسال الطلب</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+
+function openForm(name){ document.getElementById('modalTitle').textContent=`📝 ${name}`; document.getElementById('formModal').style.display='flex'; }
+function closeModal(){ document.getElementById('formModal').style.display='none'; }
+async function submitForm(){
+  try{ await fetch(`${SB}/rest/v1/form_requests`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({type:document.getElementById('modalTitle').textContent,status:'pending',created_at:new Date().toISOString()})}); }catch(e){}
+  closeModal(); showToast('✅ تم إرسال طلبك/ِ — سيُراجَع خلال 24 ساعة');
+}
+function switchTab(n){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); ['browse','myrequests','admin'].forEach((t,i)=>{ if(t===n) document.querySelectorAll('.tab')[i].classList.add('active'); }); document.getElementById(`tab-${n}`).classList.add('active'); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("tab-browse");
+  if(_c) _c.innerHTML=([{e:'📄',n:'شهادة قيد',d:'طلب شهادة دراسية رسمية',cat:'academic'},{e:'🏃',n:'إذن خروج',d:'إذن مبكر أو دخول متأخر',cat:'admin'},{e:'📚',n:'تغيير مجموعة',d:'طلب تغيير مجموعة الصف',cat:'academic'},{e:'🏠',n:'إجازة طارئة',d:'طلب إجازة غير مخططة',cat:'leave'},{e:'🔑',n:'بطاقة بديلة',d:'إعادة إصدار البطاقة',cat:'admin'},{e:'📋',n:'تغيير بيانات',d:'تحديث المعلومات الشخصية',cat:'admin'},{e:'🎓',n:'شهادة تخرج',d:'طلب وثيقة التخرج',cat:'academic'},{e:'📞',n:'تحديث جهة التواصل',d:'تغيير رقم ولي/ة الأمر',cat:'admin'}].map(f=>`
+      <div class="form-type-card" onclick="openForm('${f.n}')">
+        <div class="form-emoji">${f.e}</div>
+        <div class="form-name">${f.n}</div>
+        <div class="form-desc">${f.d}</div>
+      </div>`).join(''));
+})();
+</script>
+</body>
+</html>

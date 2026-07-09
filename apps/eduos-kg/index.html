@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة الروضة KG — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<style>
+:root{
+  --bg:linear-gradient(135deg,#FFF9F0 0%,#F0F4FF 50%,#F5FFF0 100%);
+  --card:#fff;--border:#E8F0FE;
+  --purple:#6C3DD6;--blue:#3B82F6;--green:#10B981;
+  --gold:#F59E0B;--pink:#EC4899;--orange:#F97316;
+  --text:#1E293B;--text2:#475569;--text3:#94A3B8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#6C3DD6,#EC4899);padding:0 24px;box-shadow:0 4px 20px rgba(108,61,214,0.3);}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:72px;gap:16px;}
+.back-btn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;}
+.h-logo{font-size:32px;}
+.h-title{font-size:22px;font-weight:900;color:#fff;}
+.h-sub{font-size:13px;color:rgba(255,255,255,0.75);}
+.h-right{margin-right:auto;display:flex;align-items:center;gap:10px;}
+.h-btn{padding:9px 18px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.h-btn:hover{background:rgba(255,255,255,0.3);}
+
+/* ── ROLE TABS ── */
+.role-tabs{display:flex;gap:12px;max-width:1200px;margin:28px auto 0;padding:0 24px;flex-wrap:wrap;}
+.role-tab{padding:14px 28px;border-radius:50px;font-size:16px;font-weight:700;cursor:pointer;border:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.role-tab.teacher{background:rgba(108,61,214,0.1);border-color:rgba(108,61,214,0.25);color:#6C3DD6;}
+.role-tab.parent{background:rgba(236,72,153,0.1);border-color:rgba(236,72,153,0.25);color:#EC4899;}
+.role-tab.smartboard{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#10B981;}
+.role-tab.active,.role-tab:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.12);}
+.role-tab.teacher.active{background:var(--purple);color:#fff;border-color:var(--purple);}
+.role-tab.parent.active{background:var(--pink);color:#fff;border-color:var(--pink);}
+.role-tab.smartboard.active{background:var(--green);color:#fff;border-color:var(--green);}
+
+/* ── MAIN ── */
+.main{max-width:1200px;margin:0 auto;padding:24px;}
+.panel{display:none;}.panel.active{display:block;}
+
+/* ── TEACHER PANEL ── */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;}
+.kpi{background:var(--card);border-radius:20px;padding:22px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.07);border:2px solid var(--border);transition:all 0.2s;}
+.kpi:hover{transform:translateY(-3px);}
+.kpi-ico{font-size:40px;margin-bottom:8px;}
+.kpi-num{font-size:34px;font-weight:900;}
+.kpi-lbl{font-size:14px;color:var(--text2);margin-top:4px;font-weight:600;}
+
+/* ── STUDENT CARDS ── */
+.students-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.student-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:28px;}
+.student-card{background:var(--card);border-radius:20px;padding:20px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.07);border:2px solid var(--border);cursor:pointer;transition:all 0.2s;position:relative;}
+.student-card:hover{transform:translateY(-4px);border-color:var(--purple);}
+.student-card.absent{opacity:0.6;border-color:#fecaca;background:#fff5f5;}
+.student-big-icon{font-size:48px;margin-bottom:10px;}
+.student-card-name{font-size:16px;font-weight:900;color:var(--text);line-height:1.3;}
+.student-card-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+.student-card-stars{display:flex;justify-content:center;gap:2px;margin-top:8px;}
+.student-card-stars span{font-size:14px;}
+.status-dot{width:12px;height:12px;border-radius:50%;position:absolute;top:10px;left:10px;}
+.dot-present{background:var(--green);}
+.dot-absent{background:var(--red,#EF4444);}
+.dot-late{background:var(--gold);}
+.star-btn{position:absolute;top:8px;right:8px;background:rgba(245,158,11,0.1);border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;}
+
+/* ── ACTIVITY TILES ── */
+.act-title{font-size:20px;font-weight:900;margin-bottom:16px;color:var(--text);}
+.act-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+.act-tile{border-radius:20px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:10px;border:2px solid rgba(255,255,255,0.5);}
+.act-tile:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+.act-tile-icon{font-size:52px;}
+.act-tile-name{font-size:17px;font-weight:900;color:#fff;}
+.act-tile-sub{font-size:13px;color:rgba(255,255,255,0.8);}
+
+/* ── PARENT PANEL ── */
+.parent-hero{background:linear-gradient(135deg,#EC4899,#8B5CF6);border-radius:24px;padding:32px;color:#fff;margin-bottom:24px;text-align:center;}
+.parent-hero h2{font-size:28px;font-weight:900;margin-bottom:8px;}
+.parent-hero p{font-size:15px;opacity:0.85;}
+.child-card{background:var(--card);border-radius:20px;padding:28px;box-shadow:0 4px 16px rgba(0,0,0,0.08);margin-bottom:20px;border:2px solid var(--border);}
+.child-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.child-avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#EC4899,#6C3DD6);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;}
+.child-name{font-size:22px;font-weight:900;color:var(--text);}
+.child-class{font-size:14px;color:var(--text3);}
+.child-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.c-stat{background:#F8FAFC;border-radius:14px;padding:16px;text-align:center;border:1px solid var(--border);}
+.c-stat-num{font-size:28px;font-weight:900;}
+.c-stat-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+.parent-msg{background:rgba(108,61,214,0.05);border:1.5px solid rgba(108,61,214,0.15);border-radius:14px;padding:16px;font-size:14px;color:var(--text2);line-height:1.7;}
+
+/* ── SMARTBOARD PANEL ── */
+.sb-layout{background:linear-gradient(135deg,#0D1B2A,#1a2a3a);min-height:calc(100vh - 100px);border-radius:24px;padding:32px;color:#fff;margin-bottom:0;}
+.sb-title{font-size:36px;font-weight:900;text-align:center;background:linear-gradient(135deg,#22D3EE,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:32px;}
+.sb-topic{background:rgba(255,255,255,0.07);border-radius:20px;padding:28px;text-align:center;margin-bottom:24px;font-size:22px;font-weight:700;color:#fff;line-height:1.5;}
+.sb-activity{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.sb-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.sb-card:hover{background:rgba(255,255,255,0.14);transform:scale(1.03);}
+.sb-card-icon{font-size:52px;margin-bottom:10px;}
+.sb-card-text{font-size:18px;font-weight:700;}
+.sb-poll{background:rgba(255,255,255,0.06);border-radius:18px;padding:24px;}
+.sb-poll-title{font-size:20px;font-weight:900;margin-bottom:16px;color:#22D3EE;}
+.poll-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.poll-opt{padding:18px;border-radius:14px;border:2px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);text-align:center;font-size:28px;cursor:pointer;transition:all 0.2s;}
+.poll-opt:hover{border-color:#22D3EE;background:rgba(34,211,238,0.1);transform:scale(1.05);}
+
+@media(max-width:600px){
+  .act-grid,.student-cards{grid-template-columns:repeat(2,1fr);}
+  .sb-activity,.poll-opts{grid-template-columns:1fr;}
+}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/apps/eduos-hub/" class="back-btn">→</a>
+    <div class="h-logo">🌈</div>
+    <div>
+      <div class="h-title">بوابة الروضة</div>
+      <div class="h-sub">KG — مدرسة الجود</div>
+    </div>
+    <div class="h-right">
+      <span id="liveTime" style="color:rgba(255,255,255,0.8);font-size:14px;background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:8px;"></span>
+      <button class="h-btn" onclick="window.location.href='/apps/eduos-hub/'">⏻ خروج</button>
+    </div>
+  </div>
+</header>
+
+<!-- ROLE TABS -->
+<div class="role-tabs">
+  <button class="role-tab teacher active" onclick="switchRole('teacher',this)">👩‍🏫 معلمة الروضة</button>
+  <button class="role-tab parent" onclick="switchRole('parent',this)">👨‍👩‍👧 ولي/ة الأمر</button>
+  <button class="role-tab smartboard" onclick="switchRole('smartboard',this)">📺 السبورة الذكية</button>
+</div>
+
+<div class="main">
+
+  <!-- TEACHER PANEL -->
+  <div class="panel active" id="panel-teacher">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-ico">👶</div><div class="kpi-num" id="kpiTotal" style="color:var(--purple)">—</div><div class="kpi-lbl">إجمالي الأطفال</div></div>
+      <div class="kpi"><div class="kpi-ico">✅</div><div class="kpi-num" id="kpiPresent" style="color:var(--green)">—</div><div class="kpi-lbl">حاضرون اليوم</div></div>
+      <div class="kpi"><div class="kpi-ico">⭐</div><div class="kpi-num" id="kpiStars" style="color:var(--gold)">—</div><div class="kpi-lbl">نجوم اليوم</div></div>
+      <div class="kpi"><div class="kpi-ico">🎯</div><div class="kpi-num" id="kpiActivity" style="color:var(--blue)">0</div><div class="kpi-lbl">أنشطة منجزة</div></div>
+    </div>
+
+    <!-- Students -->
+    <div class="students-title">👶 أطفال الصف <span id="classLabel" style="color:var(--purple)">KG1</span></div>
+    <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+      <button onclick="switchClass('KG1',this)" style="padding:8px 18px;border-radius:50px;background:var(--purple);color:#fff;border:none;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;" class="cls-btn active-cls">KG1</button>
+      <button onclick="switchClass('KG2',this)" style="padding:8px 18px;border-radius:50px;background:rgba(108,61,214,0.1);color:var(--purple);border:1px solid rgba(108,61,214,0.25);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;" class="cls-btn">KG2</button>
+      <button onclick="markAllPresent()" style="padding:8px 18px;border-radius:50px;background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.25);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-right:auto;">✅ كل الأطفال حاضرون</button>
+    </div>
+    <div class="student-cards" id="studentCards">
+      <div style="color:var(--text3);font-size:15px;grid-column:1/-1;text-align:center;padding:30px;">جاري تحميل قائمة الأطفال...</div>
+    </div>
+
+    <!-- Activities -->
+    <div class="act-title">🎨 أنشطة اليوم</div>
+    <div class="act-grid">
+      <a href="/apps/eduos-exit-ticket/?mode=kg" class="act-tile" style="background:linear-gradient(135deg,#6C3DD6,#8B5CF6)">
+        <div class="act-tile-icon">🎯</div>
+        <div class="act-tile-name">تقييم سريع</div>
+        <div class="act-tile-sub">بطاقة الخروج</div>
+      </a>
+      <div class="act-tile" style="background:linear-gradient(135deg,#EC4899,#F97316)" onclick="openStoryTime()">
+        <div class="act-tile-icon">📖</div>
+        <div class="act-tile-name">وقت القصة</div>
+        <div class="act-tile-sub">نشاط جماعي</div>
+      </div>
+      <div class="act-tile" style="background:linear-gradient(135deg,#10B981,#3B82F6)" onclick="openMovement()">
+        <div class="act-tile-icon">🏃</div>
+        <div class="act-tile-name">نشاط حركي</div>
+        <div class="act-tile-sub">تمارين ومرح</div>
+      </div>
+      <a href="/apps/eduos-reinforcement/" class="act-tile" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">
+        <div class="act-tile-icon">⭐</div>
+        <div class="act-tile-name">منح النجوم</div>
+        <div class="act-tile-sub">مكافأة الأطفال</div>
+      </a>
+      <a href="/apps/eduos-broadcasting/" class="act-tile" style="background:linear-gradient(135deg,#8B5CF6,#22D3EE)">
+        <div class="act-tile-icon">📢</div>
+        <div class="act-tile-name">رسالة للأهل</div>
+        <div class="act-tile-sub">إشعار فوري</div>
+      </a>
+      <a href="/apps/eduos-atheer/classroom.html" class="act-tile" style="background:linear-gradient(135deg,#1E293B,#334155)">
+        <div class="act-tile-icon">🌟</div>
+        <div class="act-tile-name">أثير للصف</div>
+        <div class="act-tile-sub">وضع السبورة</div>
+      </a>
+    </div>
+
+    <!-- Today's Notes -->
+    <div class="child-card">
+      <div class="students-title">📝 ملاحظات اليوم</div>
+      <textarea style="width:100%;min-height:100px;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:#F8FAFC;font-family:'Tajawal',sans-serif;font-size:15px;outline:none;resize:vertical;line-height:1.6;" id="teacherNotes" placeholder="اكتب ملاحظاتك اليومية عن الصف..."></textarea>
+      <button onclick="saveNotes()" style="margin-top:12px;padding:11px 24px;background:var(--purple);color:#fff;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">💾 حفظ الملاحظات</button>
+    </div>
+  </div>
+
+  <!-- PARENT PANEL -->
+  <div class="panel" id="panel-parent">
+    <div class="parent-hero">
+      <h2>متابعة طفلك/ي في الروضة 💛</h2>
+      <p>كل ما يخص نموّ وتطور طفلك/ي في متناول يدك</p>
+    </div>
+    <div class="child-card" id="parentChildCard">
+      <div class="child-header">
+        <div class="child-avatar-big">👶</div>
+        <div>
+          <div class="child-name" id="parentChildName">اسم الطفل/ة</div>
+          <div class="child-class" id="parentChildClass">الصف — مدرسة الجود</div>
+          <div style="margin-top:6px;display:flex;gap:6px;">
+            <span style="background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);border-radius:50px;padding:3px 12px;font-size:12px;font-weight:700;">● حاضر/ة اليوم</span>
+          </div>
+        </div>
+      </div>
+      <div class="child-stats">
+        <div class="c-stat"><div class="c-stat-num" style="color:var(--gold)" id="parentStars">—</div><div class="c-stat-lbl">نجوم هذا الأسبوع</div></div>
+        <div class="c-stat"><div class="c-stat-num" style="color:var(--green)" id="parentAtt">—%</div><div class="c-stat-lbl">نسبة الحضور</div></div>
+        <div class="c-stat"><div class="c-stat-num" style="color:var(--purple)" id="parentActivities">—</div><div class="c-stat-lbl">أنشطة مكتملة</div></div>
+      </div>
+      <div class="parent-msg" id="parentMsg">
+        🌟 طفلك/ي يُبدي اهتماماً جيداً في الأنشطة اليومية. استمر/ي في الدعم والتشجيع من المنزل!
+      </div>
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <a href="/apps/eduos-messaging/" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(108,61,214,0.08);border:1.5px solid rgba(108,61,214,0.2);border-radius:12px;color:var(--purple);text-decoration:none;font-weight:700;font-size:14px;">💬 رسالة للمعلمة</a>
+        <a href="/apps/eduos-calendar/" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:rgba(16,185,129,0.08);border:1.5px solid rgba(16,185,129,0.2);border-radius:12px;color:var(--green);text-decoration:none;font-weight:700;font-size:14px;">📅 التقويم المدرسي</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMARTBOARD PANEL -->
+  <div class="panel" id="panel-smartboard">
+    <div class="sb-layout">
+      <div class="sb-title">🌈 وقت التعلم معاً</div>
+      <div class="sb-topic" id="sbTopic">📚 موضوع اليوم: الحروف العربية الجميلة ✨</div>
+      <div class="sb-activity">
+        <div class="sb-card" onclick="sbActivity('حروف')">
+          <div class="sb-card-icon">🔤</div>
+          <div class="sb-card-text">الحروف</div>
+        </div>
+        <div class="sb-card" onclick="sbActivity('أرقام')">
+          <div class="sb-card-icon">🔢</div>
+          <div class="sb-card-text">الأرقام</div>
+        </div>
+        <div class="sb-card" onclick="sbActivity('ألوان')">
+          <div class="sb-card-icon">🎨</div>
+          <div class="sb-card-text">الألوان</div>
+        </div>
+        <div class="sb-card" onclick="sbActivity('حيوانات')">
+          <div class="sb-card-icon">🦁</div>
+          <div class="sb-card-text">الحيوانات</div>
+        </div>
+        <div class="sb-card" onclick="sbActivity('قرآن')">
+          <div class="sb-card-icon">📖</div>
+          <div class="sb-card-text">القرآن الكريم</div>
+        </div>
+        <div class="sb-card" onclick="sbActivity('رياضة')">
+          <div class="sb-card-icon">⚽</div>
+          <div class="sb-card-text">نشاط بدني</div>
+        </div>
+      </div>
+      <div class="sb-poll">
+        <div class="sb-poll-title">🙋 كيف تشعر/ين اليوم؟</div>
+        <div class="poll-opts">
+          <div class="poll-opt" onclick="recordMood('😊','سعيد/ة')">😊<div style="font-size:14px;margin-top:6px;color:rgba(255,255,255,0.7);">سعيد/ة</div></div>
+          <div class="poll-opt" onclick="recordMood('😐','عادي/ة')">😐<div style="font-size:14px;margin-top:6px;color:rgba(255,255,255,0.7);">عادي/ة</div></div>
+          <div class="poll-opt" onclick="recordMood('😢','حزين/ة')">😢<div style="font-size:14px;margin-top:6px;color:rgba(255,255,255,0.7);">حزين/ة</div></div>
+          <div class="poll-opt" onclick="recordMood('😴','متعب/ة')">😴<div style="font-size:14px;margin-top:6px;color:rgba(255,255,255,0.7);">متعب/ة</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function sq(q){return fetch(`${SB}/rest/v1/${q}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(r=>r.json()).catch(()=>[]);}
+function sqpost(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+
+const user=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+let currentClass='KG1';let studentAtt={};
+
+// Time
+setInterval(()=>document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'}),1000);
+document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});
+
+function switchRole(role,btn){
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+role).classList.add('active');
+  if(role==='parent')loadParentData();
+}
+
+function switchClass(cls,btn){
+  document.querySelectorAll('.cls-btn').forEach(b=>{b.style.background='rgba(108,61,214,0.1)';b.style.color='var(--purple)';});
+  btn.style.background='var(--purple)';btn.style.color='#fff';
+  currentClass=cls;
+  document.getElementById('classLabel').textContent=cls;
+  loadStudents(cls);
+}
+
+async function loadStudents(cls){
+  const grid=document.getElementById('studentCards');
+  const data=await sq(`students?select=id,full_name,student_number,emoji&class_name=eq.${encodeURIComponent(cls)}&order=full_name`);
+  const kids=Array.isArray(data)?data:[];
+  document.getElementById('kpiTotal').textContent=kids.length||'—';
+  if(kids.length===0){grid.innerHTML='<div style="color:var(--text3);font-size:15px;grid-column:1/-1;text-align:center;padding:30px;">لا يوجد أطفال مسجلون</div>';return;}
+  const emojis=['🐱','🐶','🦊','🐻','🐼','🦁','🐯','🐸','🐨','🐮','🦄','🐰'];
+  kids.forEach(k=>{if(!studentAtt[k.id])studentAtt[k.id]='present';});
+  grid.innerHTML=kids.map((k,i)=>`
+    <div class="student-card" id="sc-${k.id}" onclick="cycleAtt('${k.id}')">
+      <div class="status-dot dot-${studentAtt[k.id]||'present'}"></div>
+      <button class="star-btn" onclick="event.stopPropagation();giveStar('${k.id}','${k.full_name||''}')">⭐</button>
+      <div class="student-big-icon">${k.emoji||emojis[i%emojis.length]}</div>
+      <div class="student-card-name">${k.full_name||'طفل/ة'}</div>
+      <div class="student-card-sub" id="att-${k.id}">${studentAtt[k.id]==='present'?'✅ حاضر/ة':'❌ غائب/ة'}</div>
+      <div class="student-card-stars" id="stars-${k.id}">⭐⭐⭐</div>
+    </div>
+  `).join('');
+  const present=Object.values(studentAtt).filter(v=>v==='present').length;
+  document.getElementById('kpiPresent').textContent=present;
+}
+
+function cycleAtt(id){
+  studentAtt[id]=studentAtt[id]==='present'?'absent':'present';
+  const dot=document.querySelector(`#sc-${id} .status-dot`);
+  const lbl=document.getElementById('att-'+id);
+  if(dot){dot.className=`status-dot dot-${studentAtt[id]}`;}
+  if(lbl)lbl.textContent=studentAtt[id]==='present'?'✅ حاضر/ة':'❌ غائب/ة';
+  const present=Object.values(studentAtt).filter(v=>v==='present').length;
+  document.getElementById('kpiPresent').textContent=present;
+}
+
+function markAllPresent(){
+  Object.keys(studentAtt).forEach(id=>studentAtt[id]='present');
+  loadStudents(currentClass);
+}
+
+async function giveStar(id,name){
+  await sqpost('reinforcements',{student_id:id.toString(),student_name:name,type:'star',points:1,given_by:user.id||null,created_at:new Date().toISOString()});
+  const cur=parseInt(document.getElementById('kpiStars').textContent)||0;
+  document.getElementById('kpiStars').textContent=cur+1;
+}
+
+function saveNotes(){const n=document.getElementById('teacherNotes').value;if(n.trim())alert('✅ تم حفظ الملاحظات');}
+
+async function loadParentData(){
+  const child=user.children?.[0]||null;
+  if(child){
+    document.getElementById('parentChildName').textContent=child.name||'اسم الطفل/ة';
+    document.getElementById('parentChildClass').textContent=child.class||'KG1';
+  }
+  const stars=await sq(`reinforcements?select=id&student_id=eq.${user.student_id||'0'}&type=eq.star&created_at=gte.${getMonday()}&limit=1`);
+  if(Array.isArray(stars))document.getElementById('parentStars').textContent=stars.length||'0';
+}
+
+function getMonday(){const d=new Date();const diff=d.getDate()-(d.getDay()===0?6:d.getDay()-1);d.setDate(diff);return d.toISOString().split('T')[0];}
+function sbActivity(topic){document.getElementById('sbTopic').textContent=`📚 موضوع الآن: ${topic} ✨`;}
+async function recordMood(emoji,label){await sqpost('student_moods',{student_id:user.id?.toString()||null,mood_emoji:emoji,mood_label:label,recorded_at:new Date().toISOString()});alert(`تم تسجيل المزاج: ${emoji} ${label}`);}
+function openStoryTime(){alert('📖 وقت القصة — سيتم فتح مكتبة القصص قريباً!');}
+function openMovement(){alert('🏃 النشاط الحركي — سيتم فتح قائمة الأنشطة قريباً!');}
+
+loadStudents('KG1');
+</script>
+</body>
+</html>

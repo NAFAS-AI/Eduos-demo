@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الرسائل الداخلية — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<style>
+:root{
+  --bg:#F4F6FB;--card:#fff;--border:#E2E8F0;
+  --brand:#6C3DD6;--brand2:#8B5CF6;--accent:#22D3EE;
+  --green:#10B981;--gold:#F59E0B;--red:#EF4444;
+  --text:#1E293B;--text2:#475569;--text3:#94A3B8;--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;direction:rtl;overflow:hidden;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#4F46E5,#6C3DD6);padding:0 20px;box-shadow:0 2px 12px rgba(79,70,229,0.35);flex-shrink:0;}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:64px;gap:12px;}
+.back-btn{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,0.18);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;}
+.h-title{font-size:18px;font-weight:900;color:#fff;}
+.h-sub{font-size:12px;color:rgba(255,255,255,0.7);}
+.h-compose{margin-right:auto;padding:8px 16px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:9px;color:#fff;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.h-compose:hover{background:rgba(255,255,255,0.3);}
+
+/* LAYOUT */
+.chat-layout{display:flex;flex:1;overflow:hidden;max-width:1200px;margin:0 auto;width:100%;}
+
+/* SIDEBAR */
+.sidebar{width:300px;flex-shrink:0;border-left:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-search{padding:12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.search-input{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-family:'Tajawal',sans-serif;outline:none;color:var(--text);}
+.search-input:focus{border-color:var(--brand);}
+.conv-list{flex:1;overflow-y:auto;}
+.conv-item{display:flex;align-items:center;gap:10px;padding:14px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:all 0.2s;}
+.conv-item:hover,.conv-item.active{background:rgba(108,61,214,0.06);}
+.conv-item.active{border-right:3px solid var(--brand);}
+.conv-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;}
+.unread-dot{position:absolute;top:-2px;left:-2px;width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid var(--card);}
+.conv-info{flex:1;min-width:0;}
+.conv-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.conv-preview{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.conv-time{font-size:11px;color:var(--text3);flex-shrink:0;}
+
+/* CHAT AREA */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.chat-header{padding:14px 20px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.chat-header-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:20px;}
+.chat-header-name{font-size:16px;font-weight:900;color:var(--text);}
+.chat-header-role{font-size:12px;color:var(--text3);}
+.online-dot{width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:auto;flex-shrink:0;}
+
+/* MESSAGES */
+.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+.msg-date-divider{text-align:center;font-size:12px;color:var(--text3);padding:8px 0;}
+.msg{display:flex;gap:8px;align-items:flex-end;}
+.msg.sent{flex-direction:row-reverse;}
+.msg-bubble{max-width:72%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6;position:relative;}
+.msg.recv .msg-bubble{background:var(--card);border:1px solid var(--border);border-bottom-right-radius:4px;color:var(--text);}
+.msg.sent .msg-bubble{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-bottom-left-radius:4px;}
+.msg-time{font-size:10px;color:var(--text3);flex-shrink:0;margin-bottom:4px;}
+.msg.sent .msg-time{text-align:left;}
+.msg-read{font-size:11px;color:rgba(255,255,255,0.7);}
+.msg-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+
+/* INPUT */
+.chat-input-area{padding:14px 20px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-shrink:0;}
+.msg-input{flex:1;padding:12px 16px;border-radius:22px;border:1.5px solid var(--border);background:var(--bg);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;transition:border 0.2s;color:var(--text);}
+.msg-input:focus{border-color:var(--brand);}
+.send-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
+.send-btn:hover{transform:scale(1.1);opacity:0.9;}
+.attach-btn{width:40px;height:40px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);color:var(--text3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.attach-btn:hover{border-color:var(--brand);color:var(--brand);}
+
+/* NO CHAT */
+.no-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:12px;}
+.no-chat-ico{font-size:64px;opacity:0.4;}
+.no-chat-title{font-size:20px;font-weight:900;color:var(--text2);}
+
+/* COMPOSE MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:24px;padding:28px;width:90%;max-width:500px;border:1px solid var(--border);}
+.modal-title{font-size:20px;font-weight:900;margin-bottom:20px;color:var(--text);}
+.form-label{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:7px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:'Tajawal',sans-serif;outline:none;margin-bottom:14px;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--brand);}
+.form-textarea{min-height:90px;resize:vertical;margin-bottom:0;}
+.modal-btns{display:flex;gap:10px;margin-top:16px;}
+.modal-cancel{flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--border);background:transparent;color:var(--text2);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.modal-send{flex:2;padding:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+
+@media(max-width:640px){
+  .sidebar{display:none;}
+  .chat-area{width:100%;}
+}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/apps/eduos-hub/" class="back-btn">→</a>
+    <div>
+      <div class="h-title">💬 الرسائل الداخلية</div>
+      <div class="h-sub">Internal Messaging</div>
+    </div>
+    <button class="h-compose" onclick="openCompose()">✏️ رسالة جديدة</button>
+  </div>
+</header>
+
+<div class="chat-layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <input type="text" class="search-input" placeholder="🔍 بحث في المحادثات..." onkeyup="filterConvs(this.value)">
+    </div>
+    <div class="conv-list" id="convList">
+      <div style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area" id="chatArea">
+    <div class="no-chat" id="noChat">
+      <div class="no-chat-ico">💬</div>
+      <div class="no-chat-title">اختر محادثة</div>
+      <div style="font-size:14px;">Select a conversation to start</div>
+    </div>
+    <div id="activeChatHeader" style="display:none;" class="chat-header">
+      <div class="chat-header-avatar" id="activeChatAvatar">—</div>
+      <div>
+        <div class="chat-header-name" id="activeChatName">—</div>
+        <div class="chat-header-role" id="activeChatRole">—</div>
+      </div>
+      <div class="online-dot"></div>
+    </div>
+    <div class="messages" id="messagesDiv" style="display:none;"></div>
+    <div class="chat-input-area" id="chatInputArea" style="display:none;">
+      <button class="attach-btn" title="إرفاق ملف">📎</button>
+      <input type="text" class="msg-input" id="msgInput" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send-btn" onclick="sendMsg()">⬆</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSE MODAL -->
+<div class="modal-overlay" id="composeModal">
+  <div class="modal">
+    <div class="modal-title">✏️ رسالة جديدة</div>
+    <label class="form-label">إلى</label>
+    <select class="form-select" id="toUser">
+      <option value="">اختر المستلم...</option>
+    </select>
+    <label class="form-label">الموضوع</label>
+    <input type="text" class="form-input" id="msgSubject" placeholder="موضوع الرسالة...">
+    <label class="form-label">الرسالة</label>
+    <textarea class="form-textarea" id="msgBody" placeholder="اكتب رسالتك هنا..."></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeCompose()">إلغاء</button>
+      <button class="modal-send" onclick="sendNewMsg()">📤 إرسال</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function sq(q){return fetch(`${SB}/rest/v1/${q}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(r=>r.json()).catch(()=>[]);}
+function sqpost(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+
+const user=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+let currentConvId=null;let allConvs=[];
+const avatarPool=['👩‍🏫','👨‍🏫','👩‍💼','👨‍💼','🧑‍🎓','👩‍⚕️','👨‍⚕️','🧑‍💻'];
+
+function fmtTime(ts){
+  if(!ts)return'';
+  const d=new Date(ts);
+  const diff=Math.floor((new Date()-d)/60000);
+  if(diff<1)return'الآن';
+  if(diff<60)return`${diff}د`;
+  if(diff<1440)return`${Math.floor(diff/60)}س`;
+  return d.toLocaleDateString('ar-AE',{month:'short',day:'numeric'});
+}
+
+async function loadConversations(){
+  const el=document.getElementById('convList');
+  const uid=user.id;
+  if(!uid){
+    // Demo mode
+    allConvs=[
+      {id:'demo1',other_name:'نور أحمد',other_role:'معلمة رياضيات',last_message:'متى موعد الاجتماع القادم؟',last_at:new Date(Date.now()-300000).toISOString(),unread:2},
+      {id:'demo2',other_name:'سارة محمد',other_role:'معلمة علوم',last_message:'شكراً جزيلاً على التقرير',last_at:new Date(Date.now()-3600000).toISOString(),unread:0},
+      {id:'demo3',other_name:'مدير المدرسة',other_role:'مدير/ة',last_message:'تمت الموافقة على الطلب',last_at:new Date(Date.now()-86400000).toISOString(),unread:0},
+    ];
+    renderConvs(allConvs);
+    return;
+  }
+  const data=await sq(`messages?select=id,sender_id,receiver_id,sender_name,receiver_name,sender_role,receiver_role,content,created_at,is_read&or=(sender_id.eq.${uid},receiver_id.eq.${uid})&order=created_at.desc`);
+  if(!Array.isArray(data)||data.length===0){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">لا توجد رسائل بعد</div>';return;}
+  // Group by conversation partner
+  const convMap={};
+  data.forEach(m=>{
+    const otherId=m.sender_id===uid?m.receiver_id:m.sender_id;
+    const otherName=m.sender_id===uid?m.receiver_name:m.sender_name;
+    if(!convMap[otherId]||new Date(m.created_at)>new Date(convMap[otherId].last_at)){
+      convMap[otherId]={id:otherId,other_name:otherName,last_message:m.content,last_at:m.created_at,
+        unread:(!m.is_read&&m.receiver_id===uid)?1:0};
+    } else if(!m.is_read&&m.receiver_id===uid){
+      convMap[otherId].unread=(convMap[otherId].unread||0)+1;
+    }
+  });
+  allConvs=Object.values(convMap).sort((a,b)=>new Date(b.last_at)-new Date(a.last_at));
+  renderConvs(allConvs);
+}
+
+function renderConvs(convs){
+  const el=document.getElementById('convList');
+  if(convs.length===0){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:30px;font-size:13px;">لا توجد محادثات</div>';return;}
+  el.innerHTML=convs.map((c,i)=>`
+    <div class="conv-item ${c.id===currentConvId?'active':''}" onclick="openConv('${c.id}','${c.other_name||''}','${c.other_role||''}')">
+      <div class="conv-avatar">${avatarPool[i%avatarPool.length]}${c.unread>0?'<div class="unread-dot"></div>':''}</div>
+      <div class="conv-info">
+        <div class="conv-name">${c.other_name||'—'}</div>
+        <div class="conv-preview">${c.last_message||'—'}</div>
+      </div>
+      <div class="conv-time">${fmtTime(c.last_at)}</div>
+    </div>
+  `).join('');
+}
+
+function filterConvs(q){
+  if(!q)renderConvs(allConvs);
+  else renderConvs(allConvs.filter(c=>(c.other_name||'').includes(q)||(c.last_message||'').includes(q)));
+}
+
+async function openConv(otherId,name,role){
+  currentConvId=otherId;
+  document.getElementById('noChat').style.display='none';
+  document.getElementById('activeChatHeader').style.display='flex';
+  document.getElementById('messagesDiv').style.display='flex';
+  document.getElementById('chatInputArea').style.display='flex';
+  document.getElementById('activeChatAvatar').textContent=name?name[0]:'?';
+  document.getElementById('activeChatName').textContent=name;
+  document.getElementById('activeChatRole').textContent=role||'عضو الكادر';
+  // Refresh sidebar active
+  document.querySelectorAll('.conv-item').forEach(el=>{el.classList.remove('active');if(el.onclick.toString().includes(`'${otherId}'`))el.classList.add('active');});
+  const el=document.getElementById('messagesDiv');
+  const uid=user.id;
+  const data=await sq(`messages?select=*&or=(and(sender_id.eq.${uid},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${uid}))&order=created_at.asc`);
+  renderMessages(Array.isArray(data)?data:[]);
+}
+
+// renderDemoMessages removed — no fake data
+
+function renderMessages(msgs){
+  const el=document.getElementById('messagesDiv');
+  const uid=user.id;
+  if(msgs.length===0){el.innerHTML='<div style="text-align:center;color:var(--text3);padding:30px;font-size:14px;">لا توجد رسائل بعد — ابدأ المحادثة!</div>';return;}
+  el.innerHTML=msgs.map(m=>{
+    const isSent=m.sender_id===uid;
+    return `<div class="msg ${isSent?'sent':'recv'}">
+      ${!isSent?`<div class="msg-avatar">${(m.sender_name||'?')[0]}</div>`:''}
+      <div>
+        <div class="msg-bubble">${m.content||''}${isSent?`<div class="msg-read">${m.is_read?'✓✓':''}</div>`:''}</div>
+        <div class="msg-time">${fmtTime(m.created_at)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+async function sendMsg(){
+  const input=document.getElementById('msgInput');
+  const content=input.value.trim();
+  if(!content||!currentConvId)return;
+  input.value='';
+  if(currentConvId.startsWith('demo')){
+    const el=document.getElementById('messagesDiv');
+    el.innerHTML+=`<div class="msg sent"><div><div class="msg-bubble">${content}</div><div class="msg-time">الآن</div></div></div>`;
+    el.scrollTop=el.scrollHeight;
+    return;
+  }
+  await sqpost('messages',{
+    sender_id:user.id,receiver_id:currentConvId,
+    sender_name:user.name||'—',content,is_read:false,
+    created_at:new Date().toISOString()
+  });
+  openConv(currentConvId,document.getElementById('activeChatName').textContent,'');
+  loadConversations();
+}
+
+async function loadUsersForCompose(){
+  const sel=document.getElementById('toUser');
+  const data=await sq('profiles?select=id,full_name,role&limit=50');
+  if(Array.isArray(data)&&data.length>0){
+    sel.innerHTML='<option value="">اختر المستلم...</option>'+data.filter(u=>u.id!==user.id).map(u=>`<option value="${u.id}">${u.full_name||u.id} (${u.role||''})</option>`).join('');
+  }
+}
+
+function openCompose(){document.getElementById('composeModal').classList.add('open');loadUsersForCompose();}
+function closeCompose(){document.getElementById('composeModal').classList.remove('open');}
+
+async function sendNewMsg(){
+  const to=document.getElementById('toUser').value;
+  const subject=document.getElementById('msgSubject').value.trim();
+  const body=document.getElementById('msgBody').value.trim();
+  if(!to||!body){alert('يرجى اختيار المستلم وكتابة الرسالة');return;}
+  await sqpost('messages',{
+    sender_id:user.id,receiver_id:to,
+    sender_name:user.name||'—',
+    content:subject?`[${subject}]\n${body}`:body,
+    is_read:false,created_at:new Date().toISOString()
+  });
+  closeCompose();loadConversations();
+}
+
+loadConversations();
+</script>
+</body>
+</html>

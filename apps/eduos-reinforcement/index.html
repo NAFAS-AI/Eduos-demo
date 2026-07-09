@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام التعزيز والنجوم — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<style>
+:root{
+  --bg:#FFFDF0;--card:#fff;--border:#FDE68A;
+  --gold:#F59E0B;--gold2:#D97706;--brand:#6C3DD6;--brand2:#8B5CF6;
+  --green:#10B981;--red:#EF4444;--accent:#22D3EE;
+  --text:#1E293B;--text2:#475569;--text3:#94A3B8;--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#F59E0B,#D97706);padding:0 24px;box-shadow:0 4px 20px rgba(245,158,11,0.4);}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:68px;gap:16px;}
+.back-btn{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;}
+.h-logo{font-size:30px;}
+.h-title{font-size:20px;font-weight:900;color:#fff;}
+.h-sub{font-size:12px;color:rgba(255,255,255,0.75);}
+.h-class-sel{margin-right:auto;padding:8px 16px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;outline:none;}
+.h-class-sel option{color:var(--text);background:#fff;}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:24px;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:24px;}
+.stat{background:var(--card);border-radius:16px;padding:18px;text-align:center;border:1.5px solid var(--border);box-shadow:0 4px 16px rgba(245,158,11,0.1);}
+.stat-ico{font-size:32px;margin-bottom:6px;}
+.stat-num{font-size:30px;font-weight:900;color:var(--gold);}
+.stat-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* GIVE STARS */
+.give-card{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(253,230,138,0.3));border:2px solid rgba(245,158,11,0.3);border-radius:var(--radius);padding:24px;margin-bottom:24px;}
+.give-title{font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.student-select-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px;max-height:260px;overflow-y:auto;padding:2px;}
+.stu-chip{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.stu-chip:hover{border-color:var(--gold);transform:translateY(-2px);}
+.stu-chip.selected{border-color:var(--gold);background:rgba(245,158,11,0.08);}
+.stu-emoji{font-size:30px;}
+.stu-name{font-size:12px;font-weight:700;color:var(--text);margin-top:6px;line-height:1.3;}
+.stars-amount{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.stars-btn{width:52px;height:52px;border-radius:12px;border:2px solid var(--border);background:var(--card);font-size:20px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:900;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.stars-btn.selected,.stars-btn:hover{border-color:var(--gold);background:rgba(245,158,11,0.1);transform:scale(1.1);}
+.type-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.type-btn{padding:9px 16px;border-radius:50px;border:1.5px solid var(--border);background:var(--card);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.type-btn.selected,.type-btn:hover{border-color:var(--gold);background:rgba(245,158,11,0.08);color:var(--gold2);}
+.give-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:900;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all 0.2s;}
+.give-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,158,11,0.4);}
+
+/* LEADERBOARD */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card{background:var(--card);border-radius:var(--radius);padding:22px;border:1px solid #FDE68A;box-shadow:0 2px 8px rgba(245,158,11,0.06);}
+.card-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.rank-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;transition:all 0.2s;border:1px solid transparent;}
+.rank-item:hover{background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.2);}
+.rank-num{font-size:16px;font-weight:900;width:32px;text-align:center;flex-shrink:0;}
+.rank-1{color:#FFD700;}
+.rank-2{color:#C0C0C0;}
+.rank-3{color:#CD7F32;}
+.rank-x{color:var(--text3);}
+.rank-avatar{font-size:28px;flex-shrink:0;}
+.rank-name{flex:1;font-size:15px;font-weight:700;color:var(--text);}
+.rank-stars{display:flex;align-items:center;gap:4px;font-size:15px;font-weight:900;color:var(--gold);}
+
+/* HISTORY */
+.history-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(253,230,138,0.4);}
+.history-item:last-child{border-bottom:none;}
+.h-type{font-size:22px;flex-shrink:0;}
+.h-info{flex:1;}
+.h-student{font-size:14px;font-weight:700;color:var(--text);}
+.h-reason{font-size:13px;color:var(--text3);}
+.h-stars{font-size:15px;font-weight:900;color:var(--gold);}
+.h-time{font-size:11px;color:var(--text3);}
+
+/* CELEBRATE */
+#celebrate{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;flex-direction:column;}
+#celebrate.show{display:flex;}
+.celebrate-card{background:linear-gradient(135deg,#FFD700,#F59E0B);border-radius:28px;padding:48px;text-align:center;max-width:400px;color:#1E293B;}
+.celebrate-emoji{font-size:80px;margin-bottom:16px;animation:bounce 0.5s ease infinite alternate;}
+.celebrate-title{font-size:28px;font-weight:900;margin-bottom:8px;}
+.celebrate-sub{font-size:16px;opacity:0.8;margin-bottom:20px;}
+.celebrate-close{padding:12px 28px;background:#1E293B;color:#FFD700;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/apps/eduos-hub/" class="back-btn">→</a>
+    <div class="h-logo">⭐</div>
+    <div><div class="h-title">نظام التعزيز والنجوم</div><div class="h-sub">كافئ الطلاب — اصنع الفارق</div></div>
+    <select class="h-class-sel" id="classFilter" onchange="loadStudents(this.value)">
+      <option value="">كل الصفوف</option>
+      <option>KG1</option><option>KG2</option>
+      <option>الصف الأول</option><option>الصف الثاني</option>
+      <option>الصف الثالث</option><option>الصف الرابع</option>
+      <option>الصف الخامس</option><option>الصف السادس</option>
+    </select>
+  </div>
+</header>
+
+<div class="main">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-ico">⭐</div><div class="stat-num" id="statToday">0</div><div class="stat-lbl">نجمة اليوم</div></div>
+    <div class="stat"><div class="stat-ico">🏆</div><div class="stat-num" id="statWeek">0</div><div class="stat-lbl">نجوم الأسبوع</div></div>
+    <div class="stat"><div class="stat-ico">👑</div><div class="stat-num" id="statTop" style="font-size:15px;">—</div><div class="stat-lbl">المتصدر/ة</div></div>
+    <div class="stat"><div class="stat-ico">🎁</div><div class="stat-num" id="statRedeemed">0</div><div class="stat-lbl">مكافأة مستبدلة</div></div>
+  </div>
+
+  <!-- GIVE STARS -->
+  <div class="give-card">
+    <div class="give-title">⭐ منح نجوم</div>
+    <div class="student-select-grid" id="studentGrid">
+      <div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">اختر الصف من الأعلى</div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:10px;">عدد النجوم:</div>
+    <div class="stars-amount">
+      <button class="stars-btn selected" onclick="selectAmount(1,this)">⭐<br>1</button>
+      <button class="stars-btn" onclick="selectAmount(2,this)">⭐⭐<br>2</button>
+      <button class="stars-btn" onclick="selectAmount(3,this)">⭐⭐⭐<br>3</button>
+      <button class="stars-btn" onclick="selectAmount(5,this)">🌟<br>5</button>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:10px;">سبب التعزيز:</div>
+    <div class="type-grid">
+      <button class="type-btn selected" onclick="selectType(this,'مشاركة')">🙋 مشاركة</button>
+      <button class="type-btn" onclick="selectType(this,'إجابة صحيحة')">✅ إجابة صحيحة</button>
+      <button class="type-btn" onclick="selectType(this,'تعاون')">🤝 تعاون</button>
+      <button class="type-btn" onclick="selectType(this,'إبداع')">🎨 إبداع</button>
+      <button class="type-btn" onclick="selectType(this,'اجتهاد')">💪 اجتهاد</button>
+      <button class="type-btn" onclick="selectType(this,'مساعدة الزملاء')">💛 مساعدة الزملاء</button>
+    </div>
+    <button class="give-btn" onclick="giveStars()">⭐ منح النجوم الآن</button>
+  </div>
+
+  <div class="grid2">
+    <!-- Leaderboard -->
+    <div class="card">
+      <div class="card-title">👑 المتصدرون</div>
+      <div id="leaderboard"><div style="color:var(--text3);font-size:14px;text-align:center;padding:20px;">جاري التحميل...</div></div>
+    </div>
+    <!-- History -->
+    <div class="card">
+      <div class="card-title">🕐 آخر التعزيزات</div>
+      <div id="historyList" style="max-height:350px;overflow-y:auto;"><div style="color:var(--text3);font-size:14px;text-align:center;padding:20px;">جاري التحميل...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATE -->
+<div id="celebrate">
+  <div class="celebrate-card">
+    <div class="celebrate-emoji">⭐</div>
+    <div class="celebrate-title" id="celTitle">رائع!</div>
+    <div class="celebrate-sub" id="celSub">تم منح النجوم بنجاح</div>
+    <button class="celebrate-close" onclick="document.getElementById('celebrate').classList.remove('show')">حسناً! 👍</button>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function sq(q){return fetch(`${SB}/rest/v1/${q}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(r=>r.json()).catch(()=>[]);}
+function sqpost(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+
+const user=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+let selectedStudents=[];let starsAmount=1;let starsType='مشاركة';
+const emojis=['🐱','🐶','🦊','🐻','🐼','🦁','🐯','🐸','🐨','🐮','🦄','🐰','🦉','🦋','🌺','🌟'];
+
+function selectAmount(n,btn){
+  document.querySelectorAll('.stars-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');starsAmount=n;
+}
+function selectType(btn,type){
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');starsType=type;
+}
+
+async function loadStudents(cls){
+  const grid=document.getElementById('studentGrid');
+  if(!cls){grid.innerHTML='<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">اختر الصف من الأعلى</div>';return;}
+  const data=await sq(`students?select=id,full_name&class_name=eq.${encodeURIComponent(cls)}&order=full_name`);
+  const kids=Array.isArray(data)?data:[];
+  selectedStudents=[];
+  if(kids.length===0){grid.innerHTML='<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">لا يوجد طلاب</div>';return;}
+  grid.innerHTML=kids.map((k,i)=>`
+    <div class="stu-chip" id="stu-${k.id}" onclick="toggleStudent('${k.id}','${k.full_name||''}')">
+      <div class="stu-emoji">${emojis[i%emojis.length]}</div>
+      <div class="stu-name">${k.full_name||'طالب/ة'}</div>
+    </div>
+  `).join('');
+}
+
+function toggleStudent(id,name){
+  const idx=selectedStudents.findIndex(s=>s.id===id);
+  if(idx>=0)selectedStudents.splice(idx,1);
+  else selectedStudents.push({id,name});
+  const chip=document.getElementById('stu-'+id);
+  if(chip)chip.classList.toggle('selected',idx<0);
+}
+
+async function giveStars(){
+  if(selectedStudents.length===0){alert('اختر طالباً/ة أو أكثر');return;}
+  const promises=selectedStudents.map(s=>sqpost('reinforcements',{
+    student_id:s.id.toString(),student_name:s.name,
+    type:'star',points:starsAmount,reason:starsType,
+    given_by:user.id||null,given_by_name:user.name||null,
+    created_at:new Date().toISOString()
+  }));
+  await Promise.all(promises);
+  const names=selectedStudents.map(s=>s.name).join(' · ');
+  document.getElementById('celTitle').textContent=`رائع! ${selectedStudents.length>1?'تم تعزيز '+selectedStudents.length+' طلاب':'أحسنت '+names}!`;
+  document.getElementById('celSub').textContent=`${starsAmount} نجوم — ${starsType} ⭐`;
+  document.getElementById('celebrate').classList.add('show');
+  selectedStudents=[];document.querySelectorAll('.stu-chip').forEach(c=>c.classList.remove('selected'));
+  loadLeaderboard();loadHistory();loadStats();
+}
+
+async function loadStats(){
+  const today=new Date().toISOString().split('T')[0];
+  const monday=getMonday();
+  const [todayData,weekData]=await Promise.all([
+    sq(`reinforcements?select=points&created_at=gte.${today}T00:00:00`),
+    sq(`reinforcements?select=points&created_at=gte.${monday}T00:00:00`)
+  ]);
+  document.getElementById('statToday').textContent=Array.isArray(todayData)?todayData.reduce((s,r)=>s+(r.points||1),0):0;
+  document.getElementById('statWeek').textContent=Array.isArray(weekData)?weekData.reduce((s,r)=>s+(r.points||1),0):0;
+}
+
+async function loadLeaderboard(){
+  const el=document.getElementById('leaderboard');
+  const cls=document.getElementById('classFilter').value;
+  let q=`reinforcements?select=student_id,student_name,points&order=points.desc&limit=50`;
+  if(cls)q+=`&student_class=eq.${encodeURIComponent(cls)}`;
+  const data=await sq(q);
+  if(!Array.isArray(data)||data.length===0){el.innerHTML='<div style="color:var(--text3);font-size:14px;text-align:center;padding:20px;">لا توجد نجوم بعد</div>';return;}
+  const merged={};
+  data.forEach(r=>{
+    const k=r.student_id;
+    if(!merged[k])merged[k]={name:r.student_name,total:0};
+    merged[k].total+=(r.points||1);
+  });
+  const sorted=Object.values(merged).sort((a,b)=>b.total-a.total).slice(0,8);
+  document.getElementById('statTop').textContent=sorted[0]?.name||'—';
+  const medals=['🥇','🥈','🥉'];
+  const rankCls=['rank-1','rank-2','rank-3'];
+  el.innerHTML=sorted.map((s,i)=>`
+    <div class="rank-item">
+      <div class="rank-num ${rankCls[i]||'rank-x'}">${medals[i]||i+1}</div>
+      <div class="rank-avatar">${emojis[i%emojis.length]}</div>
+      <div class="rank-name">${s.name}</div>
+      <div class="rank-stars">⭐ ${s.total}</div>
+    </div>
+  `).join('');
+}
+
+async function loadHistory(){
+  const el=document.getElementById('historyList');
+  const data=await sq('reinforcements?select=student_name,points,reason,type,created_at&order=created_at.desc&limit=15');
+  if(!Array.isArray(data)||data.length===0){el.innerHTML='<div style="color:var(--text3);font-size:14px;text-align:center;padding:20px;">لا توجد تعزيزات</div>';return;}
+  const typeIco={star:'⭐',badge:'🏅',points:'💎',gift:'🎁'};
+  el.innerHTML=data.map(r=>`
+    <div class="history-item">
+      <div class="h-type">${typeIco[r.type]||'⭐'}</div>
+      <div class="h-info">
+        <div class="h-student">${r.student_name||'طالب/ة'}</div>
+        <div class="h-reason">${r.reason||'تعزيز'}</div>
+      </div>
+      <div><div class="h-stars">+${r.points||1} ⭐</div><div class="h-time">${fmtTime(r.created_at)}</div></div>
+    </div>
+  `).join('');
+}
+
+function getMonday(){const d=new Date();const diff=d.getDate()-(d.getDay()===0?6:d.getDay()-1);d.setDate(diff);return d.toISOString().split('T')[0];}
+function fmtTime(ts){if(!ts)return'الآن';const d=new Date(ts);const diff=Math.floor((new Date()-d)/60000);if(diff<1)return'الآن';if(diff<60)return`منذ ${diff}د`;if(diff<1440)return`منذ ${Math.floor(diff/60)}س`;return d.toLocaleDateString('ar-AE',{month:'short',day:'numeric'});}
+
+loadStats();loadLeaderboard();loadHistory();
+</script>
+</body>
+</html>

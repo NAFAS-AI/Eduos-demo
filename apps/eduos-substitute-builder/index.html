@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منشئ جدول الاحتياط الذكي — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Tajawal',Arial,sans-serif}
+body{
+    margin: 0;
+    padding: 0;background:#F8F5F0;color:#1C2A2A;min-height:100vh;direction:rtl}
+.header{background:linear-gradient(135deg,#0D3333,#1a4a4a);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-brand{display:flex;align-items:center;gap:12px}
+.logo-box{width:42px;height:42px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.header-title{font-size:20px;font-weight:700}
+.header-sub{font-size:12px;opacity:.7}
+.badge{background:rgba(212,168,75,.2);color:#D4A84B;border:1px solid #D4A84B;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.btn{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-family:'Tajawal',Arial,sans-serif;font-weight:600;transition:all .2s}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-gold{background:#D4A84B;color:#fff}
+.btn-green{background:#4caf50;color:#fff}
+.btn-red{background:#e74c3c;color:#fff}
+.container{max-width:1100px;margin:0 auto;padding:24px}
+.form-card{background:#fff;border-radius:14px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px}
+.form-title{font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+label{font-size:13px;color:#666;font-weight:600}
+select,input{padding:11px 14px;border:1.5px solid #e5e5e5;border-radius:8px;font-size:14px;font-family:'Tajawal',Arial,sans-serif;color:#1C2A2A;background:#fff;transition:border-color .2s}
+select:focus,input:focus{outline:none;border-color:#6C3DD6}
+.generate-btn{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;padding:14px 32px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Tajawal',Arial,sans-serif;transition:opacity .2s;margin-top:10px}
+.generate-btn:hover{opacity:.9}
+.absent-info{background:#fff3f0;border:1.5px solid #ffccbc;border-radius:10px;padding:16px;margin-top:16px;display:none}
+.absent-name{font-size:18px;font-weight:700;color:#e64a19}
+.absent-stats{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.absent-stat{background:#fff;border-radius:8px;padding:8px 14px;font-size:13px}
+.absent-stat strong{display:block;font-size:20px;font-weight:900;color:#e64a19}
+.result-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:none}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.result-title{font-size:18px;font-weight:700}
+.result-actions{display:flex;gap:10px}
+table{width:100%;border-collapse:collapse}
+th{background:#0D3333;color:#fff;padding:12px 14px;font-size:13px;font-weight:600;text-align:right}
+th:first-child{border-radius:8px 0 0 8px}
+th:last-child{border-radius:0 8px 8px 0;text-align:center}
+td{padding:12px 14px;border-bottom:1px solid #f0f0f0;font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.period-badge{background:#f0ebff;color:#6C3DD6;padding:4px 10px;border-radius:16px;font-size:12px;font-weight:700;display:inline-block}
+.day-badge{background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:16px;font-size:12px;font-weight:700;display:inline-block}
+.sub-select{padding:7px 10px;border:1.5px solid #e5e5e5;border-radius:7px;font-size:13px;font-family:'Tajawal',Arial,sans-serif;min-width:160px}
+.fairness-bar{display:flex;align-items:center;gap:6px;font-size:11px}
+.fair-dots{display:flex;gap:2px}
+.fair-dot{width:7px;height:7px;border-radius:50%;background:#e0e0e0}
+.fair-dot.filled{background:#6C3DD6}
+.status-pending{background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.status-approved{background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.summary-bar{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.summary-chip{background:#f0f0f0;border-radius:10px;padding:10px 16px;font-size:13px}
+.summary-chip strong{display:block;font-size:22px;font-weight:900;color:#6C3DD6}
+.flash{position:fixed;top:20px;right:20px;background:#4caf50;color:#fff;padding:12px 20px;border-radius:10px;z-index:2000;font-size:14px;font-weight:600;display:none}
+.flash.error{background:#e74c3c}
+.history-card{background:#fff;border-radius:14px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-top:24px}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f5f5}
+.history-item:last-child{border-bottom:none}
+.loading{text-align:center;padding:40px;color:#888;font-size:15px}
+.ai-tip{background:linear-gradient(135deg,#f0ebff,#e8f5fd);border-radius:10px;padding:14px;font-size:13px;color:#5c3a9e;margin-top:14px;border-right:4px solid #6C3DD6}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-brand">
+    <div class="logo-box">🔄</div>
+    <div>
+      <div class="header-title">منشئ جدول الاحتياط الذكي</div>
+      <div class="header-sub">Smart Substitute Schedule Builder · EduOS</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span class="badge">مستوى B — اعتماد المدير/ة مطلوب</span>
+    <button class="btn btn-ghost" onclick="location.href='../eduos-hub/'">← الرئيسية</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="form-card">
+    <div class="form-title">🤖 بيانات الغياب — Absence Input</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>المعلم/ة الغائب/ة · Absent Teacher</label>
+        <select id="absentTeacher" onchange="loadAbsentInfo()">
+          <option value="">— اختر المعلم/ة —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>تاريخ الغياب · Absence Date</label>
+        <input type="date" id="absenceDate">
+      </div>
+      <div class="form-group">
+        <label>سبب الغياب · Reason</label>
+        <select id="absenceReason">
+          <option value="sick">مرض · Sick</option>
+          <option value="personal">شخصي · Personal</option>
+          <option value="training">تدريب · Training</option>
+          <option value="emergency">طارئ · Emergency</option>
+          <option value="leave">إجازة · Leave</option>
+          <option value="other">آخر · Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ملاحظات · Notes</label>
+        <input type="text" id="absenceNotes" placeholder="اختياري…">
+      </div>
+    </div>
+    <div class="absent-info" id="absentInfo">
+      <div class="absent-name" id="absentName">–</div>
+      <div class="absent-stats" id="absentStats"></div>
+    </div>
+    <div class="ai-tip" id="aiTip" style="display:none">🤖 AI جاهز لتوليد جدول الاحتياط — سيوزَّع العبء بشكل عادل على المعلمين/ات المتاحين/ات بناءً على جداولهم/ن الفعلية.</div>
+    <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
+      <button class="generate-btn" onclick="generateSubstitute()">⚡ توليد جدول الاحتياط</button>
+      <button class="btn" style="background:#f5f5f5;color:#333;margin-top:10px" onclick="loadHistory()">📋 السجل السابق</button>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <div>
+        <div class="result-title">📋 جدول الاحتياط المقترح</div>
+        <div style="font-size:12px;color:#888;margin-top:4px">Generated Substitute Schedule — بانتظار اعتماد المدير/ة</div>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-green" onclick="approveAll()">✅ اعتماد الكل</button>
+        <button class="btn btn-gold" onclick="printSchedule()">🖨 طباعة</button>
+      </div>
+    </div>
+    <div class="summary-bar" id="summaryBar"></div>
+    <table>
+      <thead><tr>
+        <th>اليوم</th><th>الحصة</th><th>الفصل</th><th>المادة</th>
+        <th>المعلم/ة الأصلي/ة</th><th>الاحتياط المقترح</th><th>عبء عادل</th><th>الحالة</th>
+      </tr></thead>
+      <tbody id="substituteBody"></tbody>
+    </table>
+  </div>
+
+  <div class="history-card" id="historyCard" style="display:none">
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px">📅 سجل الاحتياط السابق · History</div>
+    <div id="historyBody"><div class="loading">جاري التحميل…</div></div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script src="../platform-config.js"></script>
+<script src="../platform-auth-guard.js"></script>
+<script>
+const DAYS = ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'];
+const SB_URL = window.EduOS?.SB_URL || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY = window.EduOS?.SB_KEY || '';
+
+let staffList = [];
+let absentSchedule = [];
+let generatedRows = [];
+
+// Staff exempt from substitute duty (by staff_db_id or categories)
+const EXEMPT_ROLES = ['admin','principal','vice_principal','specialist','nurse','security','technician','secretary'];
+const EXEMPT_IDS = ['T028']; // Sheikha (KG assistant doing teaching duties temporarily)
+
+async function sb(table, params='') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, {
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}
+  });
+  return r.json();
+}
+
+async function sbInsert(table, body) {
+  return fetch(`${SB_URL}/rest/v1/${table}`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'},
+    body: JSON.stringify(body)
+  }).then(r=>r.json());
+}
+
+async function sbPatch(table, filter, body) {
+  return fetch(`${SB_URL}/rest/v1/${table}?${filter}`, {
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+    body: JSON.stringify(body)
+  });
+}
+
+async function init() {
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('absenceDate').value = today;
+
+  // Load staff
+  staffList = await sb('staff_profiles', 'select=id,name_ar,name_en,staff_db_id,role_key&order=name_ar');
+  const sel = document.getElementById('absentTeacher');
+  (staffList||[]).filter(s=>s.role_key==='teacher'||s.role_key==='sub_teacher'||s.role_key==='coach').forEach(s=>{
+    const o = document.createElement('option');
+    o.value = s.staff_db_id||s.id;
+    o.textContent = s.name_ar||s.name_en;
+    o.dataset.dbid = s.staff_db_id||s.id;
+    sel.appendChild(o);
+  });
+}
+
+async function loadAbsentInfo() {
+  const tid = document.getElementById('absentTeacher').value;
+  if (!tid) { document.getElementById('absentInfo').style.display='none'; return; }
+  const teacher = staffList.find(s=>s.staff_db_id===tid||s.id===tid);
+  const rows = await sb('schedules', `select=*&staff_db_id=eq.${encodeURIComponent(tid)}&order=day_index,period_index`);
+  absentSchedule = rows||[];
+  document.getElementById('absentName').textContent = teacher?.name_ar||teacher?.name_en||tid;
+  const byDay = {};
+  absentSchedule.forEach(r=>{ byDay[r.day_index]=(byDay[r.day_index]||0)+1; });
+  let statsHtml = `<div class="absent-stat"><strong>${absentSchedule.length}</strong>حصة أسبوعياً</div>`;
+  DAYS.forEach((d,i)=>{ if(byDay[i]) statsHtml+=`<div class="absent-stat"><strong>${byDay[i]}</strong>${d}</div>`; });
+  document.getElementById('absentStats').innerHTML = statsHtml;
+  document.getElementById('absentInfo').style.display = 'block';
+  document.getElementById('aiTip').style.display = 'block';
+}
+
+async function generateSubstitute() {
+  const tid = document.getElementById('absentTeacher').value;
+  const dateStr = document.getElementById('absenceDate').value;
+  if (!tid || !dateStr) { showFlash('اختر المعلم/ة والتاريخ أولاً',true); return; }
+
+  const date = new Date(dateStr);
+  // JS day: 0=Sun, 1=Mon...5=Fri. AlJood week Mon-Fri = dayIndex 0-4
+  const jsDay = date.getDay();
+  const dayMap = {1:0,2:1,3:2,4:3,5:4}; // Mon=0, Tue=1...
+  const dayIndex = dayMap[jsDay];
+  if (dayIndex === undefined) { showFlash('التاريخ المختار ليس يوم دراسة (الاثنين–الجمعة)',true); return; }
+
+  // Get absent teacher's schedule for this day
+  const todayRows = absentSchedule.filter(r=>r.day_index===dayIndex);
+  if (!todayRows.length) { showFlash('لا توجد حصص لهذا/ه المعلم/ة في هذا اليوم'); return; }
+
+  // Get ALL teachers' schedules for this day (to find who is free)
+  const allDayRows = await sb('schedules', `select=staff_db_id,period_index,class_name&day_index=eq.${dayIndex}&staff_db_id=not.is.null&staff_db_id=neq.`);
+  const busyAt = {}; // staffDbId -> [periodIndexes]
+  (allDayRows||[]).forEach(r=>{
+    if (!r.staff_db_id) return;
+    if (!busyAt[r.staff_db_id]) busyAt[r.staff_db_id]=[];
+    busyAt[r.staff_db_id].push(r.period_index);
+  });
+
+  // Get today's duty count per teacher (how many substitutions today)
+  const todaySubs = await sb('substitute_assignments', `select=substitute_staff_db_id&assignment_date=eq.${dateStr}&status=not.eq.cancelled`);
+  const dutyCount = {};
+  (todaySubs||[]).forEach(r=>{ if(r.substitute_staff_db_id) dutyCount[r.substitute_staff_db_id]=(dutyCount[r.substitute_staff_db_id]||0)+1; });
+
+  // Get eligible substitutes (teachers not on exempt list)
+  const eligible = (staffList||[]).filter(s=>{
+    if (!s.staff_db_id && !s.id) return false;
+    const did = s.staff_db_id||s.id;
+    if (EXEMPT_ROLES.includes(s.role_key)) return false;
+    if (EXEMPT_IDS.includes(did)) return false;
+    if (did === tid) return false; // not self
+    return true;
+  });
+
+  generatedRows = [];
+  const teacher = staffList.find(s=>s.staff_db_id===tid||s.id===tid);
+
+  todayRows.sort((a,b)=>a.period_index-b.period_index).forEach(row=>{
+    // Find free teachers for this period
+    const freeTeachers = eligible.filter(s=>{
+      const did = s.staff_db_id||s.id;
+      const busy = busyAt[did]||[];
+      return !busy.includes(row.period_index);
+    });
+    // Sort by fairness: fewest duties today first, then fewest total periods
+    freeTeachers.sort((a,b)=>{
+      const da=dutyCount[a.staff_db_id||a.id]||0;
+      const db=dutyCount[b.staff_db_id||b.id]||0;
+      if(da!==db) return da-db;
+      const ba=busyAt[a.staff_db_id||a.id]||[];
+      const bb=busyAt[b.staff_db_id||b.id]||[];
+      return ba.length-bb.length; // prefer lighter load
+    });
+    const chosen = freeTeachers[0];
+    const chosenId = chosen?.staff_db_id||chosen?.id||'';
+    // Increment duty count for chosen
+    if (chosenId) dutyCount[chosenId]=(dutyCount[chosenId]||0)+1;
+    // Build all free teachers list for select
+    const allOptions = freeTeachers.slice(0,8).map(s=>`<option value="${s.staff_db_id||s.id}" ${(s.staff_db_id||s.id)===chosenId?'selected':''}>${s.name_ar||s.name_en}</option>`).join('');
+    generatedRows.push({
+      day_index:dayIndex, period_index:row.period_index, class_name:row.class_name,
+      subject:row.subject, absent_staff_db_id:tid,
+      substitute_staff_db_id:chosenId, substitute_name:chosen?.name_ar||chosen?.name_en||'—',
+      assignment_date:dateStr, status:'pending',
+      duty_today:dutyCount[chosenId]||0, all_options:allOptions,
+      freeCount:freeTeachers.length
+    });
+  });
+
+  // Render table
+  let html = '';
+  generatedRows.forEach((r,idx)=>{
+    html+=`<tr>
+      <td><span class="day-badge">${DAYS[r.day_index]}</span></td>
+      <td><span class="period-badge">حصة ${r.period_index+1}</span></td>
+      <td style="font-weight:700">${r.class_name}</td>
+      <td>${r.subject||'—'}</td>
+      <td style="color:#e64a19">${teacher?.name_ar||tid}</td>
+      <td><select class="sub-select" id="sub_${idx}" onchange="updateSub(${idx},this.value)">${r.all_options}</select></td>
+      <td><div class="fairness-bar"><div class="fair-dots">
+        ${[0,1,2,3,4].map(i=>`<div class="fair-dot${i<(r.duty_today)?' filled':''}"></div>`).join('')}
+      </div><span style="color:#888">${r.duty_today} اليوم</span></div></td>
+      <td><span class="status-pending">بانتظار الاعتماد</span></td>
+    </tr>`;
+  });
+  document.getElementById('substituteBody').innerHTML = html;
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="summary-chip"><strong>${todayRows.length}</strong>حصة تحتاج احتياطاً</div>
+    <div class="summary-chip"><strong>${DAYS[dayIndex]}</strong>اليوم</div>
+    <div class="summary-chip"><strong>${new Date(dateStr).toLocaleDateString('ar')}</strong>التاريخ</div>
+    <div class="summary-chip"><strong>${eligible.length}</strong>معلم/ة مؤهل/ة</div>`;
+  document.getElementById('resultCard').style.display='block';
+
+  // Record absence
+  await sbInsert('staff_absences', {
+    staff_db_id:tid, absence_date:dateStr,
+    reason:document.getElementById('absenceReason').value,
+    notes:document.getElementById('absenceNotes').value,
+    reported_by: (JSON.parse(sessionStorage.getItem('edoos_user')||'{}')).name||'admin'
+  });
+  showFlash('✅ تم توليد جدول الاحتياط — بانتظار اعتماد المدير/ة');
+}
+
+function updateSub(idx, newId) {
+  generatedRows[idx].substitute_staff_db_id = newId;
+  const staff = staffList.find(s=>s.staff_db_id===newId||s.id===newId);
+  generatedRows[idx].substitute_name = staff?.name_ar||staff?.name_en||newId;
+}
+
+async function approveAll() {
+  if (!generatedRows.length) return;
+  const session = JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+  for (const r of generatedRows) {
+    const subId = document.getElementById(`sub_${generatedRows.indexOf(r)}`).value || r.substitute_staff_db_id;
+    await sbInsert('substitute_assignments', {
+      absent_staff_db_id:r.absent_staff_db_id, substitute_staff_db_id:subId,
+      class_name:r.class_name, day_index:r.day_index, period_index:r.period_index,
+      subject:r.subject, assignment_date:r.assignment_date,
+      status:'approved', approved_by:session.name||'admin', approved_at:new Date().toISOString()
+    });
+  }
+  showFlash('✅ تم اعتماد جميع التعيينات وتسجيلها');
+  // Update UI
+  document.querySelectorAll('#substituteBody td:last-child').forEach(td=>{
+    td.innerHTML='<span class="status-approved">✅ مُعتمَد</span>';
+  });
+}
+
+async function loadHistory() {
+  const hist = document.getElementById('historyCard');
+  hist.style.display='block';
+  const rows = await sb('substitute_assignments', 'select=*&order=created_at.desc&limit=30');
+  if (!rows||!rows.length) { document.getElementById('historyBody').innerHTML='<div style="color:#888;padding:16px">لا سجلات سابقة</div>'; return; }
+  let html = '';
+  (rows||[]).forEach(r=>{
+    const absent = staffList.find(s=>s.staff_db_id===r.absent_staff_db_id||s.id===r.absent_staff_db_id);
+    const sub = staffList.find(s=>s.staff_db_id===r.substitute_staff_db_id||s.id===r.substitute_staff_db_id);
+    html+=`<div class="history-item">
+      <div><div style="font-weight:600">${r.assignment_date} — ${DAYS[r.day_index]||''} حصة ${r.period_index+1}</div>
+      <div style="font-size:12px;color:#888">${r.class_name} · ${r.subject||''}</div>
+      <div style="font-size:12px;color:#e64a19;margin-top:2px">غياب: ${absent?.name_ar||r.absent_staff_db_id} ← احتياط: ${sub?.name_ar||r.substitute_staff_db_id}</div></div>
+      <span class="${r.status==='approved'?'status-approved':'status-pending'}">${r.status==='approved'?'✅ مُعتمَد':'⏳ معلّق'}</span>
+    </div>`;
+  });
+  document.getElementById('historyBody').innerHTML = html;
+}
+
+function printSchedule() { window.print(); }
+
+function showFlash(msg, err=false) {
+  const f=document.getElementById('flash');
+  f.textContent=msg; f.className='flash'+(err?' error':'');
+  f.style.display='block';
+  setTimeout(()=>f.style.display='none',3500);
+}
+
+init();
+</script>
+</body>
+</html>

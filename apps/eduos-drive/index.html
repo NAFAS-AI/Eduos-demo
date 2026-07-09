@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>مستودع الملفات — EduOS Drive</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.main{padding:24px;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:220px 1fr;gap:20px}
+@media(max-width:768px){.main{grid-template-columns:1fr}}
+.sidebar{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:12px;height:fit-content;position:sticky;top:80px}
+.sidebar-section{font-size:.75rem;font-weight:700;color:var(--text2);padding:8px 12px 4px;text-transform:uppercase}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text2);transition:.2s;margin-bottom:2px}
+.sidebar-item:hover{background:#F8FAFF;color:var(--text)}
+.sidebar-item.active{background:#ede9fe;color:var(--primary)}
+.storage-bar{margin-top:16px;padding:12px}
+.storage-used{font-size:.75rem;font-weight:700;color:var(--text2);margin-bottom:4px}
+.storage-progress{height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-bottom:4px}
+.storage-fill{height:100%;background:linear-gradient(90deg,#6C3DD6,#22D3EE);border-radius:4px}
+.storage-label{font-size:.7rem;color:var(--text2)}
+.drive-content{flex:1}
+.toolbar{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;color:var(--text);transition:.2s}
+.toolbar-btn:hover{border-color:var(--primary);color:var(--primary)}
+.toolbar-btn.primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-color:transparent}
+.search-input{flex:1;min-width:200px;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:.85rem;background:#fff}
+.search-input:focus{outline:none;border-color:var(--primary)}
+.files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.file-card{background:var(--card);border-radius:12px;border:2px solid var(--border);padding:16px;text-align:center;cursor:pointer;transition:.2s}
+.file-card:hover{border-color:var(--primary);box-shadow:0 4px 12px rgba(108,61,214,.1)}
+.file-icon{font-size:2.2rem;margin-bottom:8px}
+.file-name{font-size:.78rem;font-weight:700;word-break:break-all;margin-bottom:4px}
+.file-meta{font-size:.68rem;color:var(--text2)}
+.list-view{display:none}
+.list-view.active{display:block}
+.grid-view.hidden{display:none}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#F8FAFF}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFF}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-blue{background:#dbeafe;color:#1d4ed8}.badge-green{background:#dcfce7;color:#16a34a}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">💾</div>
+    <div>
+      <div class="hdr-title">مستودع الملفات | EduOS Drive</div>
+      <div class="hdr-sub">تخزين مشترك آمن للكادر والطلاب/ات</div>
+    </div>
+  </div>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-hub/'">← الرئيسية</button>
+</header>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-section">التصنيفات</div>
+    <div class="sidebar-item active" onclick="filterFiles('all')">🏠 كل الملفات</div>
+    <div class="sidebar-item" onclick="filterFiles('pdf')">📄 PDF ووثائق</div>
+    <div class="sidebar-item" onclick="filterFiles('image')">🖼️ صور</div>
+    <div class="sidebar-item" onclick="filterFiles('video')">🎥 فيديو</div>
+    <div class="sidebar-item" onclick="filterFiles('excel')">📊 جداول بيانات</div>
+    <div class="sidebar-section">الوصول</div>
+    <div class="sidebar-item" onclick="filterFiles('shared')">🔗 مشترك معي</div>
+    <div class="sidebar-item" onclick="filterFiles('mine')">👤 ملفاتي</div>
+    <div class="storage-bar">
+      <div class="storage-used">المساحة المستخدمة</div>
+      <div class="storage-progress"><div class="storage-fill" style="width:34%"></div></div>
+      <div class="storage-label">3.4 GB من 10 GB</div>
+    </div>
+  </div>
+
+  <div class="drive-content">
+    <div class="toolbar">
+      <button class="toolbar-btn primary" onclick="showToast('📤 رفع ملف — سيُفعَّل مع Supabase Storage')">📤 رفع ملف</button>
+      <button class="toolbar-btn" onclick="showToast('📁 إنشاء مجلد')">📁 مجلد جديد</button>
+      <input class="search-input" placeholder="🔍 بحث في الملفات..." oninput="filterSearch(this.value)"/>
+      <button class="toolbar-btn" onclick="toggleView()" id="viewToggle">☰ قائمة</button>
+    </div>
+    <div class="files-grid" id="filesGrid"></div>
+    <div class="list-view" id="listView">
+      <div class="tbl-wrap" id="listTable"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const FILES=[
+  {icon:'📄',name:'دليل المنهج 2025-2026.pdf',type:'pdf',size:'2.4 MB',date:'2026-06-01',owner:'إدارة المدرسة'},
+  {icon:'📊',name:'جداول الدرجات T3.xlsx',type:'excel',size:'1.1 MB',date:'2026-06-20',owner:'أ. خالد'},
+  {icon:'🖼️',name:'صور حفل التخرج.zip',type:'image',size:'45 MB',date:'2026-06-15',owner:'الإدارة'},
+  {icon:'📄',name:'نتائج الامتحانات.pdf',type:'pdf',size:'890 KB',date:'2026-06-28',owner:'التعليم'},
+  {icon:'🎥',name:'محاضرة العلوم - الصف 5.mp4',type:'video',size:'120 MB',date:'2026-05-30',owner:'أ. نورة'},
+  {icon:'📊',name:'تقرير الحضور الأسبوعي.xlsx',type:'excel',size:'340 KB',date:'2026-06-27',owner:'الكادر'},
+];
+
+let isGrid=true;
+let filtered=FILES;
+
+function render(){
+  if(isGrid){
+    document.getElementById('filesGrid').style.display='grid';
+    document.getElementById('listView').classList.remove('active');
+    document.getElementById('filesGrid').innerHTML=filtered.map(f=>`
+      <div class="file-card" ondblclick="openFile('${f.name}')">
+        <div class="file-icon">${f.icon}</div>
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">${f.size} · ${f.date}</div>
+      </div>`).join('');
+  } else {
+    document.getElementById('filesGrid').style.display='none';
+    document.getElementById('listView').classList.add('active');
+    document.getElementById('listTable').innerHTML=`<table><thead><tr><th>الاسم</th><th>النوع</th><th>الحجم</th><th>التاريخ</th><th>المالك/ة</th><th>إجراء</th></tr></thead><tbody>${filtered.map(f=>`<tr><td>${f.icon} ${f.name}</td><td><span class="badge badge-blue">${f.type}</span></td><td>${f.size}</td><td>${f.date}</td><td>${f.owner}</td><td><button style="border:none;background:none;cursor:pointer;font-size:1rem" onclick="openFile('${f.name}')">👁️</button></td></tr>`).join('')}</tbody></table>`;
+  }
+}
+
+function filterFiles(type){ filtered=type==='all'?FILES:FILES.filter(f=>f.type===type||type==='mine'||type==='shared'); render(); document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active')); event.currentTarget.classList.add('active'); }
+function filterSearch(q){ filtered=FILES.filter(f=>f.name.includes(q)); render(); }
+function toggleView(){ isGrid=!isGrid; document.getElementById('viewToggle').textContent=isGrid?'☰ قائمة':'⊞ شبكة'; render(); }
+function openFile(name){ showToast(`👁️ فتح: ${name}`); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+render();
+</script>
+</body>
+</html>

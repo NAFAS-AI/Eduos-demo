@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الجلسة الصفية الحية — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<style>
+:root{
+  --bg:#F4F6FB;--surface:#fff;--card:#fff;--border:#E2E8F0;
+  --brand:#6C3DD6;--brand2:#8B5CF6;--accent:#22D3EE;
+  --green:#10B981;--gold:#F59E0B;--red:#EF4444;--orange:#F97316;
+  --text:#1E293B;--text2:#475569;--text3:#94A3B8;--radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#6C3DD6,#4F46E5);padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,0.25);}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:68px;gap:16px;}
+.back-btn{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;flex-shrink:0;}
+.back-btn:hover{background:rgba(255,255,255,0.25);}
+.header-logo{font-size:28px;}
+.header-info h1{font-size:20px;font-weight:900;color:#fff;}
+.header-info p{font-size:12px;color:rgba(255,255,255,0.7);}
+.header-timer{background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 20px;text-align:center;margin-right:auto;}
+.timer-val{font-size:24px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;}
+.timer-lbl{font-size:11px;color:rgba(255,255,255,0.7);}
+.header-actions{display:flex;gap:8px;}
+.hdr-btn{padding:9px 18px;border-radius:10px;border:none;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.hdr-btn-white{background:#fff;color:var(--brand);}
+.hdr-btn-white:hover{background:#f0ebff;}
+.hdr-btn-red{background:rgba(248,113,113,0.2);color:#fff;border:1px solid rgba(255,255,255,0.3);}
+.hdr-btn-red:hover{background:rgba(239,68,68,0.9);}
+
+/* ── SETUP SCREEN ── */
+#setupScreen{max-width:700px;margin:60px auto;padding:0 24px;}
+.setup-card{background:var(--card);border-radius:24px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,0.08);border:1px solid var(--border);}
+.setup-title{font-size:26px;font-weight:900;color:var(--text);margin-bottom:8px;text-align:center;}
+.setup-sub{font-size:15px;color:var(--text3);text-align:center;margin-bottom:32px;}
+.form-group{margin-bottom:20px;}
+.form-label{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px;display:block;}
+.form-select,.form-input{width:100%;padding:14px 18px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:15px;font-family:'Tajawal',sans-serif;outline:none;transition:border 0.2s;}
+.form-select:focus,.form-input:focus{border-color:var(--brand);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.start-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--brand),#4F46E5);color:#fff;border:none;border-radius:14px;font-size:18px;font-weight:900;font-family:'Tajawal',sans-serif;cursor:pointer;margin-top:8px;transition:all 0.2s;}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(108,61,214,0.35);}
+
+/* ── LIVE SCREEN ── */
+#liveScreen{display:none;max-width:1200px;margin:0 auto;padding:24px;}
+.session-info{background:var(--card);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;border:1px solid var(--border);display:flex;align-items:center;gap:24px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.session-badge{background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.3);border-radius:50px;padding:6px 16px;font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:6px;}
+.session-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+.session-detail{font-size:15px;font-weight:700;color:var(--text);}
+.session-detail span{color:var(--text3);font-weight:400;}
+
+/* ── GRID ── */
+.live-grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;}
+
+/* ── ATTENDANCE CARD ── */
+.card{background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.card-title{font-size:17px;font-weight:900;color:var(--text);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.card-title span{display:flex;align-items:center;gap:8px;}
+.att-stats{display:flex;gap:12px;margin-bottom:18px;}
+.att-stat{flex:1;text-align:center;background:var(--bg);border-radius:12px;padding:14px;border:1px solid var(--border);}
+.att-stat-num{font-size:28px;font-weight:900;}
+.att-stat-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+.student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;}
+.student-chip{border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+.student-chip.present{background:#f0fdf4;border-color:#bbf7d0;}
+.student-chip.absent{background:#fef2f2;border-color:#fecaca;}
+.student-chip.late{background:#fffbeb;border-color:#fde68a;}
+.student-chip:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+.student-avatar{font-size:24px;margin-bottom:6px;}
+.student-name{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;}
+.student-status{font-size:10px;margin-top:4px;font-weight:600;}
+.status-present{color:var(--green);}
+.status-absent{color:var(--red);}
+.status-late{color:var(--gold);}
+
+/* ── SIDEBAR ── */
+.sidebar{display:flex;flex-direction:column;gap:16px;}
+
+/* ── QUICK ACTIONS ── */
+.action-btn{width:100%;padding:14px 18px;border-radius:12px;border:none;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px;text-align:right;}
+.action-btn:hover{transform:translateY(-2px);}
+.btn-brand{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;}
+.btn-green{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.btn-gold{background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;}
+.btn-blue{background:linear-gradient(135deg,#3B82F6,#1D4ED8);color:#fff;}
+.btn-outline{background:var(--bg);border:1.5px solid var(--border);color:var(--text);}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand);}
+
+/* ── ACTIVITY LOG ── */
+.log-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.log-text{color:var(--text2);flex:1;line-height:1.5;}
+.log-time{color:var(--text3);flex-shrink:0;font-size:11px;}
+
+/* ── EXIT TICKET SHORTCUT ── */
+.exit-cta{background:linear-gradient(135deg,rgba(108,61,214,0.06),rgba(34,211,238,0.06));border:2px dashed rgba(108,61,214,0.3);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.exit-cta:hover{background:linear-gradient(135deg,rgba(108,61,214,0.1),rgba(34,211,238,0.1));border-style:solid;}
+.exit-cta-icon{font-size:36px;margin-bottom:8px;}
+.exit-cta-title{font-size:16px;font-weight:900;color:var(--brand);}
+.exit-cta-sub{font-size:13px;color:var(--text3);margin-top:4px;}
+
+/* ── NOTES ── */
+.notes-area{width:100%;min-height:120px;padding:14px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:'Tajawal',sans-serif;resize:vertical;outline:none;line-height:1.6;}
+.notes-area:focus{border-color:var(--brand);}
+
+@media(max-width:768px){
+  .live-grid{grid-template-columns:1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .student-grid{grid-template-columns:repeat(3,1fr);}
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <a href="/apps/eduos-hub/" class="back-btn">→</a>
+    <div class="header-logo">📡</div>
+    <div class="header-info">
+      <h1>الجلسة الصفية الحية</h1>
+      <p id="headerSub">ابدأ درسك الآن</p>
+    </div>
+    <div class="header-timer" id="sessionTimer" style="display:none;">
+      <div class="timer-val" id="timerVal">00:00</div>
+      <div class="timer-lbl">مدة الجلسة</div>
+    </div>
+    <div class="header-actions" id="liveActions" style="display:none;">
+      <button class="hdr-btn hdr-btn-white" onclick="openExitTicket()">🎯 بطاقة الخروج</button>
+      <button class="hdr-btn hdr-btn-red" onclick="endSession()">⏹ إنهاء الجلسة</button>
+    </div>
+  </div>
+</header>
+
+<!-- REMOTE DAY BANNER -->
+<div id="remoteBanner" style="display:none;background:linear-gradient(135deg,#0EA5E9,#6C3DD6);color:#fff;padding:12px 24px;text-align:center;font-family:'Tajawal',Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:0.3px;">
+  🏠 يوم تعليم عن بُعد — Remote Learning Day &nbsp;|&nbsp; <span id="remoteReason" style="font-weight:400;font-size:13px;opacity:0.9;"></span>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-title" id="setupTitle">📡 ابدأ جلستك الصفية</div>
+    <div class="setup-sub" id="setupSub">حدد تفاصيل الحصة وسيتم إعداد كل شيء تلقائياً</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">الصف الدراسي</label>
+        <select class="form-select" id="classSelect">
+          <option value="">اختر الصف...</option>
+          <option>KG1</option><option>KG2</option>
+          <option>الصف الأول</option><option>الصف الثاني</option>
+          <option>الصف الثالث</option><option>الصف الرابع</option>
+          <option>الصف الخامس</option><option>الصف السادس</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">المادة الدراسية</label>
+        <select class="form-select" id="subjectSelect">
+          <option value="">اختر المادة...</option>
+          <option>الرياضيات</option><option>اللغة العربية</option>
+          <option>اللغة الإنجليزية</option><option>العلوم</option>
+          <option>الدراسات الاجتماعية</option><option>التربية الإسلامية</option>
+          <option>الفنون</option><option>التربية البدنية</option><option>الحاسوب</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">موضوع الحصة</label>
+      <input type="text" class="form-input" id="topicInput" placeholder="مثال: الجمع والطرح — الوحدة الثانية">
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">نوع الحصة</label>
+        <select class="form-select" id="typeSelect">
+          <option value="lecture">شرح</option>
+          <option value="practice">تطبيق</option>
+          <option value="review">مراجعة</option>
+          <option value="assessment">تقييم</option>
+          <option value="project">مشروع</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">المرحلة الدراسية</label>
+        <select class="form-select" id="stageSelect">
+          <option value="kg">روضة (KG)</option>
+          <option value="lower" selected>ابتدائي 1-4</option>
+          <option value="upper">ابتدائي 5-6</option>
+        </select>
+      </div>
+    </div>
+    <button class="start-btn" id="startBtn" onclick="startSession()">🚀 ابدأ الجلسة الآن</button>
+  </div>
+</div>
+
+<!-- LIVE SCREEN -->
+<div id="liveScreen">
+  <!-- Session Info Bar -->
+  <div class="session-info">
+    <span class="session-badge">● جلسة نشطة</span>
+    <div class="session-detail" id="sessionClassName">—</div>
+    <div class="session-detail" id="sessionSubject">—</div>
+    <div class="session-detail" id="sessionTopic" style="color:var(--text3)">—</div>
+    <div class="session-detail" style="margin-right:auto;" id="sessionDate">—</div>
+  </div>
+
+  <div class="live-grid">
+    <!-- MAIN: Attendance -->
+    <div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">
+          <span>📋 سجل الحضور</span>
+          <div style="display:flex;gap:8px;">
+            <button onclick="markAll('present')" style="padding:6px 14px;border-radius:8px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">✅ الكل حاضر</button>
+            <button onclick="saveAttendance()" style="padding:6px 14px;border-radius:8px;background:var(--brand);color:#fff;border:none;font-family:'Tajawal',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">💾 حفظ</button>
+          </div>
+        </div>
+        <div class="att-stats">
+          <div class="att-stat"><div class="att-stat-num" id="countPresent" style="color:var(--green)">0</div><div class="att-stat-lbl">حاضر/ة</div></div>
+          <div class="att-stat"><div class="att-stat-num" id="countAbsent" style="color:var(--red)">0</div><div class="att-stat-lbl">غائب/ة</div></div>
+          <div class="att-stat"><div class="att-stat-num" id="countLate" style="color:var(--gold)">0</div><div class="att-stat-lbl">متأخر/ة</div></div>
+          <div class="att-stat"><div class="att-stat-num" id="countTotal" style="color:var(--text3)">0</div><div class="att-stat-lbl">الإجمالي</div></div>
+        </div>
+        <div class="student-grid" id="studentGrid">
+          <div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">جاري تحميل قائمة الطلاب...</div>
+        </div>
+      </div>
+
+      <!-- Exit Ticket CTA -->
+      <div class="exit-cta" onclick="openExitTicket()">
+        <div class="exit-cta-icon">🎯</div>
+        <div class="exit-cta-title">إطلاق بطاقة الخروج</div>
+        <div class="exit-cta-sub">اقيّم فهم الطلاب في نهاية الحصة — إجابات فورية وتحليل ذكي</div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Timer -->
+      <div class="card">
+        <div class="card-title"><span>⏱️ الحصة</span></div>
+        <div style="text-align:center;padding:10px 0;">
+          <div style="font-size:48px;font-weight:900;color:var(--brand);font-variant-numeric:tabular-nums;" id="bigTimer">00:00</div>
+          <div style="font-size:13px;color:var(--text3);margin-top:4px;">مدة الجلسة</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <div class="card-title"><span>⚡ إجراءات سريعة</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="action-btn btn-brand" onclick="openExitTicket()"><span>🎯</span>بطاقة الخروج</button>
+          <button class="action-btn btn-green" onclick="giveStars()" ><span>⭐</span>منح نجمة للصف</button>
+          <button class="action-btn btn-gold" onclick="sendBroadcast()"><span>📢</span>إشعار للأهل</button>
+          <button class="action-btn btn-blue" onclick="openDrive()"><span>📁</span>ملفات الدرس</button>
+          <button class="action-btn btn-outline" onclick="endSession()"><span>⏹</span>إنهاء الجلسة</button>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="card">
+        <div class="card-title"><span>📝 ملاحظات الحصة</span></div>
+        <textarea class="notes-area" id="sessionNotes" placeholder="اكتب ملاحظاتك عن سير الحصة..."></textarea>
+        <button onclick="saveNotes()" style="margin-top:10px;width:100%;padding:10px;background:rgba(108,61,214,0.08);border:1px solid rgba(108,61,214,0.2);border-radius:10px;color:var(--brand);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">💾 حفظ الملاحظات</button>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="card">
+        <div class="card-title"><span>🕐 سجل الأحداث</span></div>
+        <div id="activityLog" style="max-height:200px;overflow-y:auto;">
+          <div class="log-item"><div class="log-dot" style="background:var(--green)"></div><div class="log-text">الجلسة جاهزة للبدء</div><div class="log-time">الآن</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function sq(q){return fetch(`${SB}/rest/v1/${q}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}).then(r=>r.json()).catch(()=>[]);}
+function sqpost(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+function sqpatch(path,body){return fetch(`${SB}/rest/v1/${path}`,{method:'PATCH',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()).catch(()=>null);}
+
+const user=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+let sessionId=null; let timerInterval=null; let startTime=null;
+let students=[]; let attendance={};
+let isRemoteDay=false; let remoteDayId=null;
+
+// ── CHECK REMOTE DAY ──
+async function checkRemoteDay(){
+  const today=new Date().toISOString().split('T')[0];
+  const data=await sq(`remote_days?date=eq.${today}&is_active=eq.true&select=id,reason`);
+  if(Array.isArray(data)&&data.length>0){
+    isRemoteDay=true;
+    remoteDayId=data[0].id;
+    const reason=data[0].reason||'';
+    document.getElementById('remoteBanner').style.display='block';
+    document.getElementById('remoteReason').textContent=reason;
+    document.getElementById('setupTitle').textContent='🏠 ابدأ حصتك — يوم تعليم عن بُعد';
+    document.getElementById('setupSub').textContent='Remote Learning Day — الحضور يُسجَّل رقمياً';
+    document.getElementById('startBtn').textContent='🏠 ابدأ الحصة عن بُعد';
+    document.getElementById('startBtn').style.background='linear-gradient(135deg,#0EA5E9,#6C3DD6)';
+    addLog('🏠 يوم تعليم عن بُعد مُفعَّل','#0EA5E9');
+  }
+}
+
+async function startSession(){
+  const cls=document.getElementById('classSelect').value;
+  const subj=document.getElementById('subjectSelect').value;
+  const topic=document.getElementById('topicInput').value;
+  const type=document.getElementById('typeSelect').value;
+  if(!cls||!subj){alert('يرجى تحديد الصف والمادة');return;}
+
+  const sess=await sqpost('lesson_sessions',{
+    class_name:cls, subject:subj, topic:topic||null,
+    session_type:type, teacher_id:user.id||null,
+    teacher_name:user.name||user.name_ar||null,
+    started_at:new Date().toISOString(), status:'active',
+    is_remote:isRemoteDay,
+    remote_day_id:remoteDayId||null
+  });
+  if(Array.isArray(sess)&&sess.length>0) sessionId=sess[0].id;
+  else sessionId='local-'+Date.now();
+
+  document.getElementById('setupScreen').style.display='none';
+  document.getElementById('liveScreen').style.display='block';
+  document.getElementById('sessionTimer').style.display='block';
+  document.getElementById('liveActions').style.display='flex';
+  document.getElementById('headerSub').textContent=`${cls} — ${subj}${isRemoteDay?' 🏠':''}`;
+  document.getElementById('sessionClassName').textContent=`📚 ${cls}`;
+  document.getElementById('sessionSubject').innerHTML=`<span style="color:var(--brand2)">${subj}</span>${isRemoteDay?' <span style="background:#0EA5E9;color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;margin-right:6px;">عن بُعد</span>':''}`;
+  document.getElementById('sessionTopic').textContent=topic||'';
+  document.getElementById('sessionDate').textContent=new Date().toLocaleDateString('ar-AE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  startTime=Date.now();
+  timerInterval=setInterval(updateTimer,1000);
+  loadStudents(cls);
+  addLog(isRemoteDay?'🏠 بدأت الحصة عن بُعد':'بدأت الجلسة الصفية','#10B981');
+}
+
+function updateTimer(){
+  const elapsed=Math.floor((Date.now()-startTime)/1000);
+  const m=Math.floor(elapsed/60).toString().padStart(2,'0');
+  const s=(elapsed%60).toString().padStart(2,'0');
+  const v=`${m}:${s}`;
+  document.getElementById('timerVal').textContent=v;
+  document.getElementById('bigTimer').textContent=v;
+}
+
+async function loadStudents(cls){
+  const grid=document.getElementById('studentGrid');
+  const data=await sq(`students?select=id,full_name,student_number&class_name=eq.${encodeURIComponent(cls)}&order=full_name`);
+  students=Array.isArray(data)?data:[];
+  if(students.length===0){
+    grid.innerHTML='<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">لا يوجد طلاب/ات مسجلون في هذا الصف</div>';
+    return;
+  }
+  students.forEach(s=>{attendance[s.id]='present';});
+  renderStudents();
+  document.getElementById('countTotal').textContent=students.length;
+}
+
+function renderStudents(){
+  const grid=document.getElementById('studentGrid');
+  const icons={'present':'✅','absent':'❌','late':'⏰'};
+  const presentLabel=isRemoteDay?'متصل/ة':'حاضر/ة';
+  grid.innerHTML=students.map(s=>`
+    <div class="student-chip ${attendance[s.id]||'present'}" onclick="cycleStatus('${s.id}')" id="chip-${s.id}">
+      <div class="student-avatar">${icons[attendance[s.id]||'present']}</div>
+      <div class="student-name">${s.full_name||'طالب/ة'}</div>
+      <div class="student-status status-${attendance[s.id]||'present'}">${
+        attendance[s.id]==='present'?presentLabel:
+        attendance[s.id]==='absent'?'غائب/ة':'متأخر/ة'
+      }</div>
+    </div>
+  `).join('');
+  updateCounts();
+}
+
+function cycleStatus(id){
+  const cycle=['present','absent','late'];
+  const cur=attendance[id]||'present';
+  attendance[id]=cycle[(cycle.indexOf(cur)+1)%3];
+  renderStudents();
+}
+
+function markAll(status){
+  students.forEach(s=>{attendance[s.id]=status;});
+  renderStudents();
+  addLog(`تم تعليم الجميع: ${status==='present'?(isRemoteDay?'متصل/ة':'حاضر/ة'):'غائب/ة'}`,'#F59E0B');
+}
+
+function updateCounts(){
+  const vals=Object.values(attendance);
+  document.getElementById('countPresent').textContent=vals.filter(v=>v==='present').length;
+  document.getElementById('countAbsent').textContent=vals.filter(v=>v==='absent').length;
+  document.getElementById('countLate').textContent=vals.filter(v=>v==='late').length;
+}
+
+async function saveAttendance(){
+  const today=new Date().toISOString().split('T')[0];
+  const cls=document.getElementById('sessionClassName').textContent.replace('📚 ','');
+  const rows=students.map(s=>({
+    student_id:s.id.toString(),
+    class_name:cls,
+    date:today,
+    status:attendance[s.id]||'present',
+    attendance_type:isRemoteDay?'remote':'physical',
+    session_id:(sessionId&&!sessionId.startsWith('local'))?sessionId:null,
+    recorded_by:user.id||null,
+    recorded_at:new Date().toISOString()
+  }));
+  if(rows.length===0)return;
+  await fetch(`${SB}/rest/v1/student_attendance`,{
+    method:'POST',
+    headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+    body:JSON.stringify(rows)
+  });
+  addLog(`✅ تم حفظ الحضور (${rows.length} طالب/ة) — ${isRemoteDay?'عن بُعد':'حضوري'}`,'#10B981');
+  alert(`✅ تم حفظ الحضور بنجاح\n${rows.length} طالب/ة — ${isRemoteDay?'🏠 عن بُعد':'🏫 حضوري'}`);
+}
+
+function saveNotes(){
+  const notes=document.getElementById('sessionNotes').value;
+  if(!notes.trim())return;
+  if(sessionId&&!sessionId.startsWith('local')){
+    sqpatch(`lesson_sessions?id=eq.${sessionId}`,{notes:notes});
+  }
+  addLog('تم حفظ ملاحظات الحصة','#6C3DD6');
+}
+
+function addLog(text,color='#94A3B8'){
+  const log=document.getElementById('activityLog');
+  const time=new Date().toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});
+  const item=document.createElement('div');
+  item.className='log-item';
+  item.innerHTML=`<div class="log-dot" style="background:${color}"></div><div class="log-text">${text}</div><div class="log-time">${time}</div>`;
+  log.insertBefore(item,log.firstChild);
+}
+
+function openExitTicket(){window.location.href='/apps/eduos-exit-ticket/?session='+sessionId;}
+function giveStars(){window.location.href='/apps/eduos-reinforcement/?session='+sessionId;}
+function sendBroadcast(){window.location.href='/apps/eduos-broadcasting/';}
+function openDrive(){window.location.href='/apps/eduos-drive/';}
+
+async function endSession(){
+  if(!confirm('هل أنت/ي متأكد/ة من إنهاء الجلسة؟'))return;
+  clearInterval(timerInterval);
+  saveNotes();
+  if(sessionId&&!sessionId.startsWith('local')){
+    await sqpatch(`lesson_sessions?id=eq.${sessionId}`,{status:'completed',ended_at:new Date().toISOString()});
+  }
+  addLog('انتهت الجلسة','#EF4444');
+  setTimeout(()=>window.location.href='/apps/eduos-hub/',1500);
+}
+
+// Init
+checkRemoteDay();
+</script>
+</body>
+</html>

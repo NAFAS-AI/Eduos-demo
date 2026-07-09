@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>تسجيل الدخول اليومي — EduOS Check-in</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:linear-gradient(135deg,#6C3DD6 0%,#22D3EE 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;direction:rtl;padding:20px;text-align:center}
+.box{background:#fff;border-radius:24px;padding:40px 36px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.logo-badge{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:16px;padding:12px 24px;font-size:1.4rem;font-weight:900;display:inline-block;margin-bottom:16px}
+.checkin-time{font-size:3rem;font-weight:900;color:#1e293b;margin-bottom:4px;line-height:1}
+.checkin-date{font-size:.9rem;color:#64748b;margin-bottom:24px}
+.status-circle{width:120px;height:120px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,#6C3DD6,#22D3EE);box-shadow:0 8px 20px rgba(108,61,214,.4);cursor:pointer;transition:.2s}
+.status-circle:hover{transform:scale(1.05)}
+.status-circle.checked{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.status-title{font-size:1.1rem;font-weight:700;color:#1e293b;margin-bottom:6px}
+.status-sub{font-size:.82rem;color:#64748b;margin-bottom:24px}
+.mood-section{margin-bottom:20px}
+.mood-title{font-size:.85rem;font-weight:700;color:#1e293b;margin-bottom:10px}
+.mood-options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mood-btn{width:52px;height:52px;border-radius:50%;border:3px solid #e2e8f0;background:#F8FAFF;font-size:1.5rem;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center}
+.mood-btn:hover,.mood-btn.selected{border-color:#6C3DD6;background:#F5F3FF;transform:scale(1.15)}
+.btn{width:100%;padding:12px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:.92rem;font-weight:700;transition:.2s;margin-top:6px}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid #e2e8f0;color:#64748b;margin-top:8px}.btn-outline:hover{border-color:#6C3DD6}
+.streak{background:linear-gradient(135deg,rgba(108,61,214,.08),rgba(34,211,238,.08));border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.streak-icon{font-size:1.8rem}
+.streak-num{font-size:1.2rem;font-weight:900;color:#6C3DD6}
+.streak-label{font-size:.75rem;color:#64748b}
+.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(34,197,94,.9);align-items:center;justify-content:center;z-index:999;flex-direction:column}
+.success-overlay.show{display:flex}
+.success-emoji{font-size:6rem;margin-bottom:16px;animation:bounce 0.5s ease}
+.success-text{font-size:1.5rem;font-weight:900;color:#fff}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<div class="box">
+  <div class="logo-badge">✅ EduOS</div>
+  <div class="checkin-time" id="timeDisplay">--:--</div>
+  <div class="checkin-date" id="dateDisplay">...جارٍ التحميل</div>
+
+  <div class="streak">
+    <div class="streak-icon">🔥</div>
+    <div><div class="streak-num" id="streakNum">--</div><div class="streak-label">يوم متتالي</div></div>
+    <div style="flex:1"></div>
+    <div style="text-align:left"><div style="font-size:1.2rem;font-weight:900;color:#22c55e" id="monthCount">--</div><div style="font-size:.72rem;color:#64748b">هذا الشهر</div></div>
+  </div>
+
+  <div class="status-circle" id="checkinBtn" onclick="doCheckin()">📲</div>
+  <div class="status-title" id="statusTitle">انقر/ي للتسجيل</div>
+  <div class="status-sub" id="statusSub">Tap to Check In</div>
+
+  <div class="mood-section">
+    <div class="mood-title">😊 كيف حالك/ِ اليوم؟ | How are you today?</div>
+    <div class="mood-options">
+      
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="submitBtn" onclick="submitCheckin()">✅ تأكيد الحضور</button>
+  <button class="btn btn-outline" onclick="location.href='/apps/eduos-hub/'">← الرئيسية</button>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+  <div class="success-emoji">🎉</div>
+  <div class="success-text">تم تسجيل حضورك/ِ!</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+let selectedMood='😊'; let checkedIn=false;
+function updateClock(){
+  const now=new Date();
+  document.getElementById('timeDisplay').textContent=now.toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});
+  const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('dateDisplay').textContent=now.toLocaleDateString('ar-AE',opts);
+}
+updateClock(); setInterval(updateClock,1000);
+document.getElementById('streakNum').textContent=Math.floor(Math.random()*20)+1;
+document.getElementById('monthCount').textContent=Math.floor(Math.random()*20)+1;
+function selectMood(el,m){ selectedMood=m; document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
+function doCheckin(){
+  if(!checkedIn){
+    checkedIn=true;
+    document.getElementById('checkinBtn').textContent='✅';
+    document.getElementById('checkinBtn').classList.add('checked');
+    document.getElementById('statusTitle').textContent='تم التسجيل — مرحباً!';
+    document.getElementById('statusSub').textContent='Check-In Recorded ✅';
+  }
+}
+async function submitCheckin(){
+  doCheckin();
+  try{
+    const session=JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+    const userId=session?.user?.id||'anonymous';
+    const today=new Date().toISOString().split('T')[0];
+    await fetch(`${SB}/rest/v1/daily_checkins`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({user_id:userId,checkin_date:today,mood:selectedMood,checkin_time:new Date().toISOString()})});
+  }catch(e){}
+  document.getElementById('successOverlay').classList.add('show');
+  setTimeout(()=>{ document.getElementById('successOverlay').classList.remove('show'); location.href='/apps/eduos-hub/'; },2500);
+}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("statusSub");
+  if(_c) _c.innerHTML=(['😊','😄','😐','😴','😟','🤒'].map(m=>`<button class="mood-btn" onclick="selectMood(this,'${m}')">${m}</button>`).join(''));
+})();
+</script>
+</body>
+</html>
