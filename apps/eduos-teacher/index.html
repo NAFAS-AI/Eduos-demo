@@ -714,12 +714,10 @@ tr:hover td{background:var(--surface2)}
 
 <script>
 // ── CONFIG ──
-const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
 const _k1='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
 const _k2='eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwODgyNDAsImV4cCI6MjA5NDY2NDI0MH0';
 const _k3='FqOUqiR7GfttAEI8NY3bbOwFPnupxBsHMgYJCNT68PI';
-const SB_KEY = [_k1,_k2,_k3].join('.');
-const sb = window.supabase?.createClient(SB_URL, SB_KEY);
+const sb = window.supabase?.createClient((window.EduOS?window.EduOS.SB_URL:''), (window.EduOS?window.EduOS.SB_KEY:''));
 
 // ── SESSION ──
 const session = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
