@@ -448,18 +448,24 @@ function initWeek() {
 // --- CHILDREN ---
 async function loadChildren() {
   const user = getUser();
-  currentParentId = user.db_id || user.id;
+  currentParentId = user.parent_id || user.db_id || user.id;
 
-  // Fetch linked children via parents table
-  const links = await dbGet('parents', `select=student_id&parent_id=eq.${currentParentId}`);
-  const ids = links.map(l => l.student_id).filter(Boolean);
+  // First: use student_ids from session (set by EF at login)
+  const sessionIds = Array.isArray(user.student_ids) ? user.student_ids.filter(Boolean) : [];
 
-  if (!ids.length) {
-    // try parent_id directly on students
-    const direct = await dbGet('students', `select=id,name,grade,section&parent_id=eq.${currentParentId}`);
-    children = direct;
+  if (sessionIds.length) {
+    // Query students by TEXT student_id column
+    children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${sessionIds.join(',')})`);
   } else {
-    children = await dbGet('students', `select=id,name,grade,section&id=in.(${ids.join(',')})`);
+    // Fallback: query parent_credentials by national_id
+    const nat = user.national_id;
+    if (nat) {
+      const pc = await dbGet('parent_credentials', `select=student_ids&national_id=eq.${nat}&limit=1`);
+      const ids2 = (pc[0] && pc[0].student_ids) ? pc[0].student_ids : [];
+      if (ids2.length) {
+        children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${ids2.join(',')})`);
+      }
+    }
   }
 
   renderChildTabs();
@@ -476,7 +482,7 @@ function renderChildTabs() {
   }
 
   const html = children.map((c, i) =>
-    `<button class="child-tab${i===0?' active':''}" onclick="selectChild('${c.id}', this, '${c.name}')">${c.name} · ${c.grade || ''}${c.section || ''}</button>`
+    `<button class="child-tab${i===0?' active':''}" data-sid="${c.student_id}" onclick="selectChild('${c.student_id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
   ).join('');
 
   containers.forEach(id => {
@@ -485,7 +491,7 @@ function renderChildTabs() {
   });
 
   // auto-select first child
-  if (children.length) selectChild(children[0].id, null, children[0].name);
+  if (children.length) selectChild(children[0].student_id, null, children[0].name);
 }
 
 async function selectChild(id, btn, name) {
