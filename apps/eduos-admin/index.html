@@ -542,7 +542,7 @@ function roleBadge(r) {
 async function loadOverview() {
   try {
     const [staff, students, parents, schedules] = await Promise.all([
-      dbGet('staff_profiles', 'select=id,role_key,role&limit=500'),
+      dbGet('staff_profiles', 'select=id,role_key&limit=500'),
       dbGet('students', 'select=id,student_number,class_name&limit=2000'),
       dbGet('parents', 'select=id&limit=2000'),
       dbGet('schedules', 'select=id&limit=1&head=true')
@@ -607,7 +607,7 @@ async function loadOverview() {
 // ── STAFF ──
 var allStaff = [];
 async function loadStaff() {
-  var res = await dbGet('staff_profiles', 'select=id,name_ar,name_en,username,role_key,role,subject_ar,homeroom_classes,is_active&order=name_ar.asc&limit=500');
+  var res = await dbGet('staff_profiles', 'select=id,name_ar,name_en,username,role_key,subject,department,is_active&order=name_ar.asc&limit=500');
   allStaff = res.data;
   renderStaff(allStaff);
   document.getElementById('staffCount').textContent = 'إجمالي: ' + allStaff.length + ' موظف/ة';
@@ -625,10 +625,10 @@ function renderStaff(list) {
     return;
   }
   document.getElementById('staffBody').innerHTML = list.map(function(s) {
-    var effectiveRole = s.role_key || s.role || 'staff';
+    var effectiveRole = s.role_key || 'staff';
     var isActive = s.is_active !== false;
     var safeName = (s.name_ar || '').replace(/'/g, '').replace(/"/g, '');
-    return '<tr><td><strong>' + (s.name_ar || s.name_en || '—') + '</strong>' + (s.name_en ? '<div style="font-size:11px;color:var(--text3)">' + s.name_en + '</div>' : '') + '</td><td style="color:var(--text3);font-family:monospace;font-size:12px">' + (s.username || '—') + '</td><td>' + roleBadge(effectiveRole) + '</td><td>' + (s.subject_ar || '<span style="color:var(--text3)">—</span>') + '</td><td>' + (s.homeroom_classes || '<span style="color:var(--text3)">—</span>') + '</td><td><span class="badge ' + (isActive ? 'b-green' : 'b-red') + '">' + (isActive ? 'نشط/ة' : 'موقوف/ة') + '</span></td><td><button class="btn btn-outline btn-sm" data-id="' + s.id + '" data-name="' + safeName + '" data-role="' + effectiveRole + '" onclick="openEditRole(this)">تعديل الدور</button></td></tr>';
+    return '<tr><td><strong>' + (s.name_ar || s.name_en || '—') + '</strong>' + (s.name_en ? '<div style="font-size:11px;color:var(--text3)">' + s.name_en + '</div>' : '') + '</td><td style="color:var(--text3);font-family:monospace;font-size:12px">' + (s.username || '—') + '</td><td>' + roleBadge(effectiveRole) + '</td><td>' + (s.subject || '<span style="color:var(--text3)">—</span>') + '</td><td>' + (s.department || '<span style="color:var(--text3)">—</span>') + '</td><td><span class="badge ' + (isActive ? 'b-green' : 'b-red') + '">' + (isActive ? 'نشط/ة' : 'موقوف/ة') + '</span></td><td><button class="btn btn-outline btn-sm" data-id="' + s.id + '" data-name="' + safeName + '" data-role="' + effectiveRole + '" onclick="openEditRole(this)">تعديل الدور</button></td></tr>';
   }).join('');
 }
 
@@ -639,8 +639,8 @@ function filterStaff() {
     return (s.name_ar || '').toLowerCase().includes(q) ||
            (s.name_en || '').toLowerCase().includes(q) ||
            (s.username || '').toLowerCase().includes(q) ||
-           (s.role_key || s.role || '').toLowerCase().includes(q) ||
-           (s.subject_ar || '').includes(q);
+           (s.role_key || '').toLowerCase().includes(q) ||
+           (s.subject || '').includes(q);
   }));
 }
 
@@ -692,7 +692,7 @@ async function loadStudents() {
 
 // ── ROLES ──
 async function loadRoles() {
-  var res = await dbGet('staff_profiles', 'select=id,name_ar,username,role_key,role&limit=500');
+  var res = await dbGet('staff_profiles', 'select=id,name_ar,username,role_key&limit=500');
   var list = res.data;
 
   var roleCounts = {};
@@ -864,9 +864,8 @@ async function saveNewStaff() {
     name_en: document.getElementById('newNameEn').value.trim() || null,
     username: username,
     role_key: roleKey,
-    role: roleKey,
-    subject_ar: document.getElementById('newSubject').value.trim() || null,
-    homeroom_classes: document.getElementById('newClass').value.trim() || null,
+    subject: document.getElementById('newSubject').value.trim() || null,
+    department: document.getElementById('newClass').value.trim() || null,
     is_active: true
   };
 
@@ -882,7 +881,7 @@ async function saveNewStaff() {
 async function saveRoleEdit() {
   var id = document.getElementById('editId').value;
   var roleKey = document.getElementById('editRole').value;
-  var ok = await dbPatch('staff_profiles', id, { role_key: roleKey, role: roleKey });
+  var ok = await dbPatch('staff_profiles', id, { role_key: roleKey });
   if (ok) {
     showAlert('editAlert', 'تم تحديث الدور بنجاح ✅', 'ok');
     setTimeout(function() { closeModal('editRoleModal'); loadStaff(); if (document.getElementById('panel-roles').classList.contains('active')) loadRoles(); }, 1200);
