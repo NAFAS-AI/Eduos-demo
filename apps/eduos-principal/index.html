@@ -538,7 +538,7 @@ tr:hover td{background:var(--surface2)}
 <div class="toast" id="toast"></div>
 
 <script>
-const SB_URL = (window.EduOS && window.EduOS.SB_URL) || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
 const _k1='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',_k2='eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwODgyNDAsImV4cCI6MjA5NDY2NDI0MH0',_k3='FqOUqiR7GfttAEI8NY3bbOwFPnupxBsHMgYJCNT68PI';
 const SB_KEY = [_k1,_k2,_k3].join('.');
 const sb = window.supabase?.createClient(SB_URL, SB_KEY);
@@ -880,12 +880,12 @@ function switchTab(name, btn) {
 async function loadStaff() {
   if (!sb) return;
   try {
-    const { data } = await sb.from('staff_profiles').select('id,name_ar,role_key,role_title_ar,subject_ar,homeroom_classes').order('name_ar').limit(100);
+    const { data } = await sb.from('staff_profiles').select('id,name_ar,role_key,role_title_ar,subject,department').order('name_ar').limit(100);
     document.getElementById('staffBody').innerHTML = (data||[]).map((s,i) => `<tr>
       <td>${i+1}</td>
       <td style="font-weight:700;color:var(--text)">${s.name_ar||'—'}</td>
       <td>${s.role_title_ar||s.role_key||'—'}</td>
-      <td>${Array.isArray(s.homeroom_classes)?s.homeroom_classes.join(', '):(s.homeroom_classes||s.subject_ar||'—')}</td>
+      <td>${Array.isArray(s.department)?s.department.join(', '):(s.department||s.subject||'—')}</td>
       <td>—</td><td>—</td>
       <td><span class="chip chip-green">نشط/ة / Active</span></td>
     </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">لا بيانات / No data</td></tr>';

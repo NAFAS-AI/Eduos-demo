@@ -146,7 +146,7 @@ const SB='https://zuyizaiugpmhmeycqton.supabase.co';
 const KEY=window.EduOS?.SB_KEY;
 async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}); return r.ok?r.json():[]; }
 async function init(){
-  try{ const s=await get('students','select=id,full_name&order=full_name&limit=100'); s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.full_name; document.getElementById('orderStudent').appendChild(o); }); }catch(e){}
+  try{ const s=await get('students','select=id,name&order=name&limit=100'); s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.name; document.getElementById('orderStudent').appendChild(o); }); }catch(e){}
 }
 async function placeOrder(){
   const st=document.getElementById('orderStudent').value;

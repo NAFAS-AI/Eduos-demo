@@ -278,10 +278,10 @@ async function loadClasses() {
 
 async function loadTeachers() {
   try {
-    const teachers = await get('staff_profiles','select=id,full_name&role=eq.teacher&order=full_name&limit=60');
+    const teachers = await get('staff_profiles','select=id,name_ar&role_key=eq.teacher&order=name_ar&limit=60');
     const sel = document.getElementById('selTeacher');
     teachers.forEach(t=>{
-      const o=document.createElement('option'); o.value=t.id; o.textContent=t.full_name||'معلم/ة'; sel.appendChild(o);
+      const o=document.createElement('option'); o.value=t.id; o.textContent=t.name_ar||'معلم/ة'; sel.appendChild(o);
     });
   } catch(e){}
 }

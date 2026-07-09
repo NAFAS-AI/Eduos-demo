@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>بطاقة الطالب/ة — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-autologout.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.main{padding:24px;max-width:600px;margin:0 auto}
+.card-container{display:flex;gap:20px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+/* Student ID Card */
+.id-card{width:320px;min-height:200px;border-radius:20px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:20px;color:#fff;box-shadow:0 8px 24px rgba(108,61,214,.3);position:relative;overflow:hidden}
+.id-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.1)}
+.id-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.id-card-school{font-size:.72rem;font-weight:700;opacity:.9}
+.id-card-logo{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.id-card-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:900;margin-bottom:10px;border:2px solid rgba(255,255,255,.4)}
+.id-card-name{font-size:1rem;font-weight:900;margin-bottom:4px}
+.id-card-class{font-size:.78rem;opacity:.85;margin-bottom:12px}
+.id-card-footer{display:flex;justify-content:space-between;align-items:center}
+.id-card-id{font-size:.72rem;font-family:monospace;background:rgba(0,0,0,.2);padding:4px 8px;border-radius:6px}
+.qr-box{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text2);font-weight:600}
+.info-val{font-weight:700}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">🪪</div>
+    <div>
+      <div class="hdr-title">بطاقة الطالب/ة | Student Card</div>
+      <div class="hdr-sub">الهوية المدرسية الرقمية — EduOS</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-hdr" onclick="printCard()">🖨️ طباعة</button>
+    <button class="btn-hdr" onclick="history.back()">← رجوع</button>
+  </div>
+</header>
+<div class="main">
+  <!-- Digital ID Card -->
+  <div style="display:flex;justify-content:center;margin-bottom:20px">
+    <div class="id-card" id="studentCard">
+      <div class="id-card-header">
+        <div>
+          <div class="id-card-school">🏫 مدرسة الجود النموذجية</div>
+          <div style="font-size:.65rem;opacity:.7;margin-top:2px">AlJood Model School</div>
+        </div>
+        <div class="id-card-logo">🎓</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="id-card-avatar" id="cardAvatar">ط</div>
+        <div>
+          <div class="id-card-name" id="cardName">طالب/ة EduOS</div>
+          <div class="id-card-class" id="cardClass">الصف الخامس أ | Grade 5A</div>
+          <div style="font-size:.72rem;opacity:.7">السنة الدراسية 2025–2026</div>
+        </div>
+      </div>
+      <div class="id-card-footer" style="margin-top:14px">
+        <div class="id-card-id" id="cardId">ID: 2026001</div>
+        <div class="qr-box">▩</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">📋 تفاصيل الهوية | Card Details</div></div>
+    <div id="cardDetails"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">🔍 عرض بطاقة طالب/ة | Search Student</div></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="searchInput" style="flex:1;min-width:200px" placeholder="اكتب الاسم أو الرقم..."/>
+      <button class="btn btn-primary" onclick="searchStudent()">🔍 بحث</button>
+    </div>
+    <div id="searchResults" style="margin-top:14px"></div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="printCard()">🖨️ طباعة البطاقة</button>
+    <button class="btn btn-outline" onclick="showToast('📱 QR Code — سيُفعَّل قريباً')">📱 رمز QR</button>
+    <button class="btn btn-outline" onclick="showToast('💾 حفظ PDF — سيُفعَّل قريباً')">💾 حفظ PDF</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+const params=new URLSearchParams(location.search);
+const studentId=params.get('id');
+
+async function init(){
+  if(studentId){
+    try{
+      const r=await fetch(`${SB}/rest/v1/students?id=eq.${studentId}&select=*&limit=1`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+      const s=r.ok?await r.json():null;
+      if(s&&s[0]) loadCard(s[0]); else showEmptyCard();
+    }catch(e){ showEmptyCard(); }
+  } else showEmptyCard();
+}
+
+function showEmptyCard(){
+  document.getElementById('cardAvatar').textContent='🔍';
+  document.getElementById('cardName').textContent='—';
+  document.getElementById('cardClass').textContent='ابحث/ي عن طالب/ة';
+  document.getElementById('cardId').textContent='';
+  document.getElementById('cardDetails').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2);font-size:.88rem">أدخل/ي اسم الطالب/ة أو رقمه/ا للبحث</div>';
+}
+// renderDemoCard removed
+
+function loadCard(s){
+  document.getElementById('cardAvatar').textContent=(s.name||'ط')[0];
+  document.getElementById('cardName').textContent=s.name||'—';
+  document.getElementById('cardClass').textContent=`الصف ${s.class_id||'5أ'}`;
+  document.getElementById('cardId').textContent=`ID: ${s.student_number||'2026001'}`;
+  document.getElementById('cardDetails').innerHTML=[{l:'الاسم الكامل',v:s.name||'—'},{l:'الرقم الأكاديمي',v:s.student_number||'—'},{l:'الصف',v:s.class_id||'—'},{l:'تاريخ الميلاد',v:s.dob||'—'},{l:'الجنسية',v:s.nationality||'إماراتية'},{l:'العام الدراسي',v:'2025–2026'}].map(r=>`<div class="info-row"><span class="info-label">${r.l}</span><span class="info-val">${r.v}</span></div>`).join('');
+}
+
+async function searchStudent(){
+  const q=document.getElementById('searchInput').value.trim();
+  if(!q){ showToast('⚠️ أدخل/ي الاسم أو الرقم'); return; }
+  try{
+    const r=await fetch(`${SB}/rest/v1/students?or=(name.ilike.*${q}*,student_number.ilike.*${q}*)&select=*&limit=5`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+    const res=r.ok?await r.json():[];
+    if(res.length===0){ document.getElementById('searchResults').innerHTML='<div style="color:var(--text2);font-size:.85rem;padding:8px">لا نتائج</div>'; return; }
+    document.getElementById('searchResults').innerHTML=res.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><div><div style="font-weight:700">${s.name}</div><div style="font-size:.75rem;color:var(--text2)">${s.class_id} · ${s.student_number}</div></div><button class="btn btn-primary" style="padding:5px 12px;font-size:.78rem" onclick="loadCard(${JSON.stringify(s)})">عرض</button></div>`).join('');
+  }catch(e){ showToast('❌ خطأ في البحث'); }
+}
+
+function printCard(){ window.print(); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+init();
+</script>
+</body>
+</html>

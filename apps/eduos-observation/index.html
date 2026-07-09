@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 async function loadData(){
   const [staffRes, obsRes] = await Promise.all([
-    fetch(`${SB_URL}/rest/v1/staff_profiles?select=id,full_name,role,subject&order=full_name.asc`, {headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}}),
+    fetch(`${SB_URL}/rest/v1/staff_profiles?select=id,name_ar,subject&order=name_ar.asc`, {headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}}),
     fetch(`${SB_URL}/rest/v1/lesson_observation_results?order=observed_at.desc&limit=200`, {headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}})
   ]);
   allStaff = await staffRes.json().catch(()=>[]);

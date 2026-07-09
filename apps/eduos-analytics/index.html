@@ -464,7 +464,7 @@ async function loadAlertsList(){
 // Teachers
 async function loadTeachers(){
   const el=document.getElementById('teachersList');
-  const data=await sq('staff_profiles?select=full_name,role,department&limit=30');
+  const data=await sq('staff_profiles?select=name_ar,department&limit=30');
   if(!Array.isArray(data)||data.length===0){el.innerHTML='<p style="color:var(--text3);">لا توجد بيانات</p>';return;}
   el.innerHTML=`<table class="status-table">
     <tr><th>الاسم</th><th>الدور</th><th>القسم</th><th>الحالة</th></tr>

@@ -708,7 +708,7 @@ async function sbPatch(table, id, data) {
 async function loadStaff() {
   try {
     const data = await sbFetch('staff_profiles',
-      'select=id,staff_id,name_ar,name_en,role_key,role_title_ar,department,subject_ar,subjects_en,email,phone,is_active,is_emirati,is_online,nafis_registered,contract_end_date,employment_start_date,years_experience,homeroom_classes,national_id,employee_number,training_hours_ytd,created_at&order=name_ar.asc&limit=500'
+      'select=id,staff_id,name_ar,name_en,role_key,role_title_ar,department,subject,subjects_en,email,phone,is_active,is_emirati,is_online,nafis_registered,contract_end_date,employment_start_date,years_experience,department,national_id,employee_number,training_hours_ytd,created_at&order=name_ar.asc&limit=500'
     );
     allStaff = data || [];
     filteredStaff = [...allStaff];
@@ -821,7 +821,7 @@ function renderTable() {
       '<td dir="ltr" style="font-size:12px;color:#4A5A5A">' + (s.staff_id || '—') + '</td>' +
       '<td>' + badge + '</td>' +
       '<td style="font-size:12px">' + (s.department || '—') + '</td>' +
-      '<td style="font-size:12px">' + (s.subject_ar || '—') + '</td>' +
+      '<td style="font-size:12px">' + (s.subject || '—') + '</td>' +
       '<td>' + status + '</td>' +
       '<td style="font-size:12px;direction:ltr">' + (s.email || '—') + '</td>' +
       '<td><div style="display:flex;gap:6px">' +
@@ -927,8 +927,8 @@ function closeModal() {
 
 function clearForm() {
   const ids = ['name_ar','name_en','staff_id','username','role_key','role_title_ar','email','phone',
-    'nationality','national_id','is_active','is_emirati','subject_ar','subjects_en','department',
-    'subject_specialization','grades_taught','homeroom_classes','years_experience','qualification',
+    'nationality','national_id','is_active','is_emirati','subject','subjects_en','department',
+    'subject_specialization','grades_taught','department','years_experience','qualification',
     'training_hours_ytd','weekly_max_periods','nafis_registered','nafis_id',
     'employment_start_date','contract_start_date','contract_end_date','contract_source',
     'employee_number','covers_national_edu','notes','emergency_name','emergency_phone',
@@ -966,9 +966,9 @@ function openEditModal(id) {
       role_key:r.role_key,role_title_ar:r.role_title_ar,email:r.email,phone:r.phone,
       nationality:r.nationality,national_id:r.national_id,
       is_active:String(r.is_active !== false),is_emirati:String(!!r.is_emirati),
-      subject_ar:r.subject_ar,subjects_en:r.subjects_en,department:r.department,
+      subject:r.subject,subjects_en:r.subjects_en,department:r.department,
       subject_specialization:r.subject_specialization,grades_taught:r.grades_taught,
-      homeroom_classes:r.homeroom_classes,years_experience:r.years_experience,
+      department:r.department,years_experience:r.years_experience,
       qualification:r.qualification,training_hours_ytd:r.training_hours_ytd,
       weekly_max_periods:r.weekly_max_periods,nafis_registered:String(!!r.nafis_registered),
       nafis_id:r.nafis_id,employment_start_date:r.employment_start_date,
@@ -1012,12 +1012,12 @@ async function saveStaff() {
     national_id: document.getElementById('f_national_id').value.trim() || null,
     is_active: document.getElementById('f_is_active').value === 'true',
     is_emirati: document.getElementById('f_is_emirati').value === 'true',
-    subject_ar: document.getElementById('f_subject_ar').value.trim() || null,
+    subject: document.getElementById('f_subject_ar').value.trim() || null,
     subjects_en: document.getElementById('f_subjects_en').value.trim() || null,
     department: document.getElementById('f_department').value.trim() || null,
     subject_specialization: document.getElementById('f_subject_specialization').value.trim() || null,
     grades_taught: document.getElementById('f_grades_taught').value.trim() || null,
-    homeroom_classes: document.getElementById('f_homeroom_classes').value.trim() || null,
+    department: document.getElementById('f_homeroom_classes').value.trim() || null,
     years_experience: parseInt(document.getElementById('f_years_experience').value) || 0,
     qualification: document.getElementById('f_qualification').value.trim() || null,
     training_hours_ytd: parseInt(document.getElementById('f_training_hours_ytd').value) || 0,
@@ -1109,10 +1109,10 @@ async function viewProfile(id) {
       ]) +
 
       infoCard('🎓 الأكاديمي', [
-        ['المادة', s.subject_ar || s.subjects_en || '—', true],
+        ['المادة', s.subject || s.subjects_en || '—', true],
         ['القسم', s.department || '—', true],
         ['الصفوف', s.grades_taught || '—'],
-        ['الفصل الرئيسي', s.homeroom_classes || '—'],
+        ['الفصل الرئيسي', s.department || '—'],
         ['سنوات الخبرة', (s.years_experience || 0) + ' سنة'],
         ['المؤهل', s.qualification || '—', true],
         ['ساعات التدريب', (s.training_hours_ytd || 0) + ' ساعة'],
@@ -1173,7 +1173,7 @@ function exportCSV() {
   const headers = ['الاسم بالعربي','الاسم بالإنجليزي','المعرف','الدور','القسم','المادة','البريد','الهاتف','الحالة','إماراتي'];
   const rows = filteredStaff.map(s => [
     s.name_ar||'', s.name_en||'', s.staff_id||'',
-    s.role_key||'', s.department||'', s.subject_ar||'',
+    s.role_key||'', s.department||'', s.subject||'',
     s.email||'', s.phone||'',
     s.is_active !== false ? 'نشط' : 'غير نشط',
     s.is_emirati ? 'نعم' : 'لا'

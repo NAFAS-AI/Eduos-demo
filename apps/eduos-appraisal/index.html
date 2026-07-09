@@ -162,8 +162,8 @@ function setScore(key,val){ scores[key]=val; renderCriteria(); }
 
 async function loadStaff(){
   try{
-    const s=await get('staff_profiles','select=id,full_name,role&order=full_name&limit=100');
-    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=`${st.full_name} — ${st.role||'موظف/ة'}`; document.getElementById('evalStaff').appendChild(o); });
+    const s=await get('staff_profiles','select=id,name_ar,role_key&order=name_ar&limit=100');
+    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=`${st.name_ar} — ${st.role||'موظف/ة'}`; document.getElementById('evalStaff').appendChild(o); });
   }catch(e){}
 }
 

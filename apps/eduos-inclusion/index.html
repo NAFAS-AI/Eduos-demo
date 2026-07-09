@@ -131,7 +131,7 @@ async function init(){
   renderStudents();
   renderPlans();
   renderSessions();
-  try{ const s=await get('students','select=id,full_name&order=full_name&limit=100'); s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.full_name; document.getElementById('inclStudent').appendChild(o); }); }catch(e){}
+  try{ const s=await get('students','select=id,name&order=name&limit=100'); s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.name; document.getElementById('inclStudent').appendChild(o); }); }catch(e){}
 }
 
 function renderStudents(){

@@ -362,7 +362,7 @@ function updateTimer(){
 
 async function loadStudents(cls){
   const grid=document.getElementById('studentGrid');
-  const data=await sq(`students?select=id,full_name,student_number&class_name=eq.${encodeURIComponent(cls)}&order=full_name`);
+  const data=await sq(`students?select=id,name,student_number&class_name=eq.${encodeURIComponent(cls)}&order=name`);
   students=Array.isArray(data)?data:[];
   if(students.length===0){
     grid.innerHTML='<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:20px;">لا يوجد طلاب/ات مسجلون في هذا الصف</div>';

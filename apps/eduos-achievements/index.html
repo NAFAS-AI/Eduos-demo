@@ -185,8 +185,8 @@ async function loadHistory(){
 
 async function loadStudents(){
   try{
-    const s=await get('students','select=id,full_name&order=full_name&limit=100');
-    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.full_name; document.getElementById('awardStudent').appendChild(o); });
+    const s=await get('students','select=id,name&order=name&limit=100');
+    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=st.name; document.getElementById('awardStudent').appendChild(o); });
   }catch(e){}
 }
 

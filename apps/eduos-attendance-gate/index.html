@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>بوابة الحضور — EduOS Gate</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#e2e8f0;min-height:100vh;direction:rtl;display:flex;flex-direction:column}
+.header-bar{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.header-logo{background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:10px;padding:8px 14px;font-size:1.2rem;font-weight:900;color:#fff}
+.header-time{font-size:1.6rem;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+.header-date{font-size:.75rem;color:rgba(255,255,255,.6);text-align:center}
+.gate-main{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.gate-box{text-align:center;max-width:480px;width:100%}
+.gate-ring{width:200px;height:200px;border-radius:50%;border:6px solid rgba(108,61,214,.3);margin:0 auto 28px;display:flex;align-items:center;justify-content:center;font-size:4.5rem;position:relative;cursor:pointer;transition:.2s;background:rgba(108,61,214,.1)}
+.gate-ring:hover{border-color:#6C3DD6;background:rgba(108,61,214,.2);transform:scale(1.02)}
+.gate-ring.scanning{border-color:#22D3EE;animation:scanpulse 1s ease-in-out infinite}
+.gate-ring.success{border-color:#22c55e;background:rgba(34,197,94,.15)}
+.gate-ring.fail{border-color:#ef4444;background:rgba(239,68,68,.1)}
+@keyframes scanpulse{0%,100%{box-shadow:0 0 0 0 rgba(34,211,238,.3)}50%{box-shadow:0 0 0 20px rgba(34,211,238,0)}}
+.gate-title{font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:8px}
+.gate-sub{font-size:.82rem;color:rgba(255,255,255,.6);margin-bottom:28px}
+.input-area{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);border-radius:16px;padding:16px;margin-bottom:20px}
+.input-label{font-size:.78rem;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:8px}
+.id-input{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;color:#fff;padding:12px 16px;font-family:inherit;font-size:1.1rem;font-weight:700;text-align:center;letter-spacing:2px}
+.id-input:focus{outline:none;border-color:#22D3EE;background:rgba(34,211,238,.08)}
+.id-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:0}
+.btn{padding:12px 28px;border-radius:12px;border:none;cursor:pointer;font-family:inherit;font-size:.9rem;font-weight:700;transition:.2s;width:100%;margin-top:10px}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff}
+.recent-checkins{padding:16px 24px;border-top:1px solid rgba(255,255,255,.1);max-height:200px;overflow-y:auto}
+.recent-title{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:10px}
+.checkin-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.checkin-name{flex:1;font-size:.85rem;font-weight:600;color:#fff}
+.checkin-time{font-size:.72rem;color:rgba(255,255,255,.5)}
+.badge-in{background:rgba(34,197,94,.25);color:#4ade80;border-radius:6px;padding:2px 8px;font-size:.7rem;font-weight:700}
+.result-banner{display:none;position:fixed;inset:0;align-items:center;justify-content:center;z-index:99;flex-direction:column}
+.result-banner.show{display:flex}
+.result-inner{text-align:center;padding:40px}
+.result-emoji{font-size:8rem;animation:pop .5s cubic-bezier(.17,.89,.32,1.49)}
+.result-name{font-size:2rem;font-weight:900;color:#fff;margin-top:16px}
+.result-time{font-size:1rem;color:rgba(255,255,255,.7);margin-top:8px}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<div class="header-bar">
+  <div class="header-logo">🚪 EduOS Gate</div>
+  <div>
+    <div class="header-time" id="gateTime">--:--:--</div>
+    <div class="header-date" id="gateDate">...</div>
+  </div>
+  <div style="font-size:.85rem;font-weight:600;color:rgba(255,255,255,.6)">مدرسة الجود</div>
+</div>
+
+<div class="gate-main">
+  <div class="gate-box">
+    <div class="gate-ring" id="gateRing" onclick="startScan()">📲</div>
+    <div class="gate-title" id="gateTitle">امسح/ي بطاقتك/ِ أو أدخل/ي رقمك/ِ</div>
+    <div class="gate-sub" id="gateSub">Scan your card or enter your ID</div>
+
+    <div class="input-area">
+      <div class="input-label">🔢 رقم الطالب/ة | Student ID</div>
+      <input class="id-input" type="text" id="idInput" placeholder="أدخل/ي رقمك/ِ..." maxlength="20" onkeydown="if(event.key==='Enter')checkIn()"/>
+    </div>
+    <button class="btn btn-primary" onclick="checkIn()">✅ تسجيل الحضور</button>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="location.href='/apps/eduos-attendance/'">📋 سجل الحضور الكامل</button>
+  </div>
+</div>
+
+<div class="recent-checkins">
+  <div class="recent-title">🕐 آخر الحضور | Recent Check-ins</div>
+  <div id="recentList">
+    
+  </div>
+</div>
+
+<!-- Result overlay -->
+<div class="result-banner" id="resultBanner">
+  <div class="result-inner" id="resultInner">
+    <div class="result-emoji" id="resultEmoji">✅</div>
+    <div class="result-name" id="resultName">--</div>
+    <div class="result-time" id="resultTime">--</div>
+  </div>
+</div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+function updateTime(){
+  const now=new Date();
+  document.getElementById('gateTime').textContent=now.toLocaleTimeString('ar-AE');
+  document.getElementById('gateDate').textContent=now.toLocaleDateString('ar-AE',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+updateTime(); setInterval(updateTime,1000);
+function startScan(){
+  document.getElementById('gateRing').classList.add('scanning');
+  document.getElementById('gateTitle').textContent='جارٍ المسح...';
+  document.getElementById('gateSub').textContent='Scanning...';
+  setTimeout(()=>{
+    document.getElementById('gateRing').classList.remove('scanning');
+    document.getElementById('gateTitle').textContent='امسح/ي بطاقتك/ِ أو أدخل/ي رقمك/ِ';
+    document.getElementById('gateSub').textContent='Scan your card or enter your ID';
+  },3000);
+}
+async function checkIn(){
+  const id=document.getElementById('idInput').value.trim();
+  if(!id){ document.getElementById('idInput').focus(); return; }
+  try{
+    const r=await fetch(`${SB}/rest/v1/students?student_id=eq.${id}&select=name,class_name`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+    const d=await r.json();
+    const name=d?.[0]?.name||`طالب/ة رقم ${id}`;
+    const cls=d?.[0]?.class_name||'';
+    const now=new Date().toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});
+    await fetch(`${SB}/rest/v1/attendance`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({student_id:id,date:new Date().toISOString().split('T')[0],status:'present',check_in_time:new Date().toISOString()})});
+    showResult('✅',name,`${now} · ${cls}`,'rgba(34,197,94,.85)');
+    addToRecent(name,now,cls);
+    document.getElementById('idInput').value='';
+  }catch(e){ showResult('❌','خطأ في التحقق',id,'rgba(239,68,68,.8)'); }
+}
+function showResult(em,name,time,bg){
+  document.getElementById('resultEmoji').textContent=em;
+  document.getElementById('resultName').textContent=name;
+  document.getElementById('resultTime').textContent=time;
+  const b=document.getElementById('resultBanner');
+  b.style.background=bg; b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),2500);
+}
+function addToRecent(name,time,cls){
+  const row=document.createElement('div');
+  row.className='checkin-row';
+  row.innerHTML=`<span style="font-size:.9rem">✅</span><div class="checkin-name">${name} · ${cls}</div><div class="checkin-time">${time}</div><span class="badge-in">داخل/ة</span>`;
+  const list=document.getElementById('recentList');
+  list.insertBefore(row,list.firstChild);
+}
+</script>
+<script>
+(function(){
+  var _c=document.getElementById("recentList");
+  if(_c) _c.innerHTML=([{n:'نورة أحمد المري',t:'07:18','class':'5أ'},{n:'محمد سالم الحوسني',t:'07:22','class':'3ب'},{n:'مريم خالد الزعابي',t:'07:25','class':'4أ'},{n:'فاطمة راشد الكعبي',t:'07:28','class':'6ب'}].map(c=>`
+    <div class="checkin-row"><span style="font-size:.9rem">✅</span><div class="checkin-name">${c.n} · ${c.class}</div><div class="checkin-time">${c.t}</div><span class="badge-in">داخل/ة</span></div>`).join(''));
+})();
+</script>
+</body>
+</html>

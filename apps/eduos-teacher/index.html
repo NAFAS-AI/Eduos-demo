@@ -714,7 +714,7 @@ tr:hover td{background:var(--surface2)}
 
 <script>
 // ── CONFIG ──
-const SB_URL = (window.EduOS && window.EduOS.SB_URL) || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
 const _k1='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
 const _k2='eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwODgyNDAsImV4cCI6MjA5NDY2NDI0MH0';
 const _k3='FqOUqiR7GfttAEI8NY3bbOwFPnupxBsHMgYJCNT68PI';
@@ -846,7 +846,7 @@ async function loadTeacherProfile() {
   if (!sb || !teacherId) return;
   try {
     const { data } = await sb.from('staff_profiles')
-      .select('name_ar,name_en,role_key,role,homeroom_classes,subject_ar,subjects_en,grades_taught,username,staff_db_id')
+      .select('name_ar,name_en,role_key,department,subject,subjects_en,grades_taught,username,staff_db_id')
       .eq('id', teacherId).single();
     if (!data) return;
     teacherData = data;
@@ -854,10 +854,10 @@ async function loadTeacherProfile() {
     const displayName = data.name_ar || data.name_en || 'المعلم/ة';
     document.getElementById('userName').textContent = displayName;
     document.getElementById('userAvatar').textContent = displayName[0] || 'م';
-    const hClass = data.homeroom_classes || data.grades_taught || '';
+    const hClass = data.department || data.grades_taught || '';
     document.getElementById('greetSub').textContent = 'أهلاً ' + displayName + (hClass ? ' — ' + hClass : '') + ' · يوم موفق إن شاء الله';
     const classSet = new Set();
-    (data.homeroom_classes||'').split(',').map(c=>c.trim()).filter(Boolean).forEach(c=>classSet.add(c));
+    (data.department||'').split(',').map(c=>c.trim()).filter(Boolean).forEach(c=>classSet.add(c));
     if (teacherNumericId) {
       const { data: sc } = await sb.from('schedules').select('class_name').eq('teacher_id', teacherNumericId);
       (sc||[]).forEach(s => s.class_name && classSet.add(s.class_name));

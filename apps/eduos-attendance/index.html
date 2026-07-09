@@ -475,7 +475,7 @@ async function renderClassGrid(classes) {
 async function loadAbsentToday() {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const recs = await get('attendance', `date=eq.${today}&status=eq.A&select=student_id,students(full_name,class_id)&limit=20`);
+    const recs = await get('attendance', `date=eq.${today}&status=eq.A&select=student_id,students(name,class_name)&limit=20`);
     document.getElementById('absentCountBadge').textContent = `${recs.length} غائب/ة`;
     if (recs.length === 0) {
       document.getElementById('absentList').innerHTML = '<div style="padding:20px;text-align:center;color:var(--success)">✅ لا غياب اليوم — ممتاز!</div>';
@@ -484,7 +484,7 @@ async function loadAbsentToday() {
     document.getElementById('absentList').innerHTML = recs.map(r=>`
       <div class="absent-item">
         <div class="absent-dot"></div>
-        <div class="absent-name">${r.students?.full_name || `طالب/ة ${r.student_id}`}</div>
+        <div class="absent-name">${r.students?.name || `طالب/ة ${r.student_id}`}</div>
         <div class="absent-class">${r.students?.class_id || ''}</div>
         <div class="absent-days">غائب/ة اليوم</div>
       </div>`).join('');
@@ -513,7 +513,7 @@ async function loadClassStudents() {
 
   try {
     const date = document.getElementById('attDate').value;
-    const students = await get('students', `class_id=eq.${classId}&select=id,full_name,student_number&order=full_name&limit=60`);
+    const students = await get('students', `class_name=eq.${classId}&select=id,name,student_number&order=name&limit=60`);
     const existing = await get('attendance', `class_id=eq.${classId}&date=eq.${date}&select=student_id,status`);
 
     existing.forEach(r=>{ attendance[r.student_id] = r.status; });
@@ -530,9 +530,9 @@ function renderStudentList(students) {
     ${students.map(s=>`
     <div class="student-row">
       <div class="student-info">
-        <div class="student-avatar">${(s.full_name||'ط')[0]}</div>
+        <div class="student-avatar">${(s.name||'ط')[0]}</div>
         <div>
-          <div class="student-name">${s.full_name||'طالب/ة'}</div>
+          <div class="student-name">${s.name||'طالب/ة'}</div>
           <div class="student-id">${s.student_number||s.id}</div>
         </div>
       </div>

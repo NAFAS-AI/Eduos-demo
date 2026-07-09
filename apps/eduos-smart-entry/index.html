@@ -1093,14 +1093,14 @@ let allClasses = [];
 
 async function loadStudents() {
   try {
-    const rows = await sbSelect('students', 'select=full_name,class_name,student_number&order=full_name&limit=2000');
+    const rows = await sbSelect('students', 'select=name,class_name,student_number&order=name&limit=2000');
     allStudents = rows || [];
 
     const dl = document.getElementById('studentList');
     dl.innerHTML = '';
     allStudents.forEach(s => {
       const opt = document.createElement('option');
-      opt.value = s.full_name;
+      opt.value = s.name;
       dl.appendChild(opt);
     });
 
@@ -1228,7 +1228,7 @@ async function loadNurseData() {
 
     // Set nurse name from session
     const user = JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
-    if (user.full_name) document.getElementById('nurseName').value = user.full_name;
+    if (user.name) document.getElementById('nurseName').value = user.name;
 
     // Set current time
     const now = new Date();
@@ -1342,7 +1342,7 @@ async function loadSocialData() {
     }
 
     const user = JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
-    if (user.full_name) document.getElementById('socialWorker').value = user.full_name;
+    if (user.name) document.getElementById('socialWorker').value = user.name;
   } catch(e) {}
 }
 
@@ -1423,7 +1423,7 @@ async function loadMaintData() {
     }
 
     const user = JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
-    if (user.full_name) document.getElementById('maintReporter').value = user.full_name;
+    if (user.name) document.getElementById('maintReporter').value = user.name;
   } catch(e) {}
 }
 
@@ -1643,17 +1643,17 @@ async function loadClassStudents() {
     // Fallback: fetch from DB
     try {
       const rows = await sbSelect('students',
-        `class_name=eq.${encodeURIComponent(cls)}&select=full_name&order=full_name&limit=50`);
+        `class_name=eq.${encodeURIComponent(cls)}&select=name&order=name&limit=50`);
       classStudents.push(...(rows||[]));
     } catch {}
   }
 
   tbody.innerHTML = classStudents.map((s,i) => `
     <tr>
-      <td><strong>${s.full_name || s.student_name || '–'}</strong></td>
+      <td><strong>${s.name || s.student_name || '–'}</strong></td>
       <td><input type="number" min="0" max="100" step="0.5" 
            style="width:80px;padding:6px 8px;border:2px solid var(--border);border-radius:6px;font-family:inherit;font-size:14px"
-           class="grade-score" data-name="${(s.full_name||s.student_name||'').replace(/"/g,'')}" data-index="${i}"
+           class="grade-score" data-name="${(s.name||s.student_name||'').replace(/"/g,'')}" data-index="${i}"
            placeholder="–"></td>
       <td><input type="number" min="18" max="20" 
            style="width:70px;padding:6px 8px;border:2px solid var(--border);border-radius:6px;font-family:inherit;font-size:14px"
@@ -1713,8 +1713,8 @@ async function submitAllGrades() {
 window.addEventListener('load', async () => {
   // Show user info
   const user = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
-  if (user.full_name) {
-    document.getElementById('hdrUserName').textContent = user.full_name;
+  if (user.name) {
+    document.getElementById('hdrUserName').textContent = user.name;
   }
   const roleIcons = {
     nurse:'🩺', social_worker:'💼', technician:'🔧',

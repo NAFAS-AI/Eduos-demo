@@ -242,7 +242,7 @@ html,body{
 
 <script>
 /* ── Supabase ── */
-const SB_URL = (window.EduOS && window.EduOS.SB_URL) || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
 const KEY = window.EduOS?.SB_KEY;
 if (!KEY) { document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Tajawal,Arial,sans-serif;color:#E11D48">❌ خطأ في مفتاح الاتصال — أعد تحميل الصفحة</div>'; throw new Error('No SB_KEY'); }
 const sb = window.supabase.createClient(SB_URL, KEY);

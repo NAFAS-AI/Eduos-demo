@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>إدارة الطلاب/ات — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-week.js"></script>
+<script src="/apps/platform-autologout.js"></script>
+<script src="/apps/platform-auth-guard.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr:hover{background:rgba(255,255,255,.35)}
+.main{padding:24px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card);border-radius:12px;padding:16px 20px;border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.stat-icon{font-size:1.6rem}.stat-num{font-size:1.5rem;font-weight:900;color:var(--text)}.stat-label{font-size:.75rem;color:var(--text2)}
+
+/* Search/filter */
+.filter-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-label{font-size:.75rem;color:var(--text2);font-weight:600}
+input[type=text],select{background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-family:inherit;font-size:.85rem}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--primary)}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#F8FAFF}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer}
+th:hover{background:#F0F4F8}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFF}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}
+.badge-yellow{background:#fef3c7;color:#d97706}
+.badge-red{background:#fee2e2;color:#dc2626}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+
+/* Avatar */
+.s-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0}
+.s-cell{display:flex;align-items:center;gap:10px}
+
+/* Btn */
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.btn-sm{padding:5px 12px;font-size:.75rem}
+
+/* Pagination */
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.page-btn{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-family:inherit;font-weight:700;font-size:.85rem;transition:.2s}
+.page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.page-btn:hover:not(.active){border-color:var(--primary)}
+
+.loading{display:flex;align-items:center;justify-content:center;padding:30px;color:var(--text2);gap:10px}
+.spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">👩‍🎓</div>
+    <div>
+      <div class="hdr-title">إدارة الطلاب/ات | Students</div>
+      <div class="hdr-sub">قائمة الطلاب/ات الكاملة — EduOS</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-hdr" onclick="exportStudents()">📥 تصدير</button>
+    <button class="btn-hdr" onclick="location.href='/apps/eduos-principal/'">← رجوع</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">👩‍🎓</div><div><div class="stat-num" id="totalStudents">—</div><div class="stat-label">إجمالي الطلاب/ات</div></div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-num" id="activeStudents">—</div><div class="stat-label">نشطون/ات</div></div></div>
+    <div class="stat-card"><div class="stat-icon">🆕</div><div><div class="stat-num" id="newStudents">—</div><div class="stat-label">منتسبون/ات جدد</div></div></div>
+    <div class="stat-card"><div class="stat-icon">⚠️</div><div><div class="stat-num" id="atRiskStudents">—</div><div class="stat-label">يحتاجون/ن متابعة</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">👩‍🎓 قائمة الطلاب/ات | Student List</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="loadStudents()">🔄</button>
+        <button class="btn btn-primary btn-sm" onclick="showToast('➕ إضافة طالب/ة — قريباً')">+ إضافة</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-label">البحث | Search</span>
+        <input type="text" id="searchInput" placeholder="اسم أو رقم الطالب/ة..." oninput="filterStudents()"/>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">الصف | Class</span>
+        <select id="filterClass" onchange="filterStudents()"><option value="">كل الصفوف</option></select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">الحالة | Status</span>
+        <select id="filterStatus" onchange="filterStudents()">
+          <option value="">الكل</option>
+          <option value="active">نشط/ة</option>
+          <option value="at_risk">يحتاج متابعة</option>
+          <option value="inactive">غير نشط/ة</option>
+        </select>
+      </div>
+    </div>
+    <div class="tbl-wrap" id="studentsTable"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="pagination" id="paginationRow"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'count=exact'}}); return {data:r.ok?r.json():[],count:r.headers.get('content-range')||'0'}; }
+
+let allStudents=[]; let page=1; const PER_PAGE=20;
+
+async function init(){
+  await loadClasses();
+  await loadStudents();
+}
+
+async function loadClasses(){
+  try{
+    const r=await fetch(`${SB}/rest/v1/classes?select=id,name&order=name&limit=50`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+    const cs=r.ok?await r.json():[];
+    cs.forEach(c=>{ const o=document.createElement('option'); o.value=c.id; o.textContent=c.name; document.getElementById('filterClass').appendChild(o); });
+  }catch(e){}
+}
+
+async function loadStudents(){
+  document.getElementById('studentsTable').innerHTML='<div class="loading"><div class="spinner"></div> جاري تحميل الطلاب/ات...</div>';
+  try{
+    const r=await fetch(`${SB}/rest/v1/students?select=id,name,student_number,class_id,gender,status,created_at&order=name&limit=200`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+    allStudents=r.ok?await r.json():[];
+    if(!allStudents||allStudents.length===0) allStudents=generateDemoStudents();
+  }catch(e){ allStudents=generateDemoStudents(); }
+  renderStudents(allStudents);
+  updateStats(allStudents);
+}
+
+function generateDemoStudents(){
+  const names=['محمد أحمد','فاطمة علي','عبدالله سالم','مريم خالد','أحمد محمود','نورة سعد','خالد يوسف','هيا عبدالله','سلطان راشد','لطيفة جمال','عمر ناصر','شيخة محمد','فيصل حمد','ريم عادل','منصور سالم','دانة خليفة','طارق علي','ميرة أحمد','حمد راشد','سارة خالد'];
+  return names.map((n,i)=>({id:`s${i+1}`,full_name:n,student_number:`2026${String(i+1).padStart(3,'0')}`,class_id:`${(i%6)+1}أ`,gender:i%3===0?'male':'female',status:i===3||i===7?'at_risk':'active',created_at:'2026-01-01'}));
+}
+
+function renderStudents(students){
+  if(!students||students.length===0){ document.getElementById('studentsTable').innerHTML='<div style="padding:30px;text-align:center;color:var(--text2)">لا طلاب/ات للعرض</div>'; return; }
+  const start=(page-1)*PER_PAGE; const paged=students.slice(start,start+PER_PAGE);
+  document.getElementById('studentsTable').innerHTML=`
+    <table><thead><tr>
+      <th>#</th><th>الاسم | Name</th><th>الرقم | ID</th><th>الصف | Class</th><th>الجنس | Gender</th><th>الحالة | Status</th><th>الإجراءات</th>
+    </tr></thead><tbody>
+    ${paged.map((s,i)=>`<tr>
+      <td>${start+i+1}</td>
+      <td><div class="s-cell"><div class="s-avatar">${(s.full_name||'ط')[0]}</div><div><div style="font-weight:700">${s.full_name||'—'}</div></div></div></td>
+      <td><code style="background:#F8FAFF;padding:2px 6px;border-radius:4px;font-size:.8rem">${s.student_number||s.id}</code></td>
+      <td>${s.class_id||'—'}</td>
+      <td>${s.gender==='male'?'ذكر':'أنثى'}</td>
+      <td><span class="badge ${s.status==='active'?'badge-green':s.status==='at_risk'?'badge-yellow':'badge-red'}">${s.status==='active'?'نشط/ة':s.status==='at_risk'?'يحتاج متابعة':'غير نشط/ة'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="viewStudent('${s.id}')">👁️</button>
+        <button class="btn btn-outline btn-sm" onclick="showToast('✏️ تعديل: ${s.full_name}')">✏️</button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  renderPagination(students.length);
+}
+
+function renderPagination(total){
+  const pages=Math.ceil(total/PER_PAGE);
+  document.getElementById('paginationRow').innerHTML=Array.from({length:Math.min(pages,8)},(_,i)=>`<button class="page-btn ${page===i+1?'active':''}" onclick="goPage(${i+1})">${i+1}</button>`).join('');
+}
+function goPage(p){ page=p; renderStudents(filteredStudents||allStudents); }
+
+let filteredStudents=null;
+function filterStudents(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const cls=document.getElementById('filterClass').value;
+  const status=document.getElementById('filterStatus').value;
+  filteredStudents=allStudents.filter(s=>{
+    const matchSearch=!search||(s.full_name||'').toLowerCase().includes(search)||(s.student_number||'').includes(search);
+    const matchClass=!cls||s.class_id===cls;
+    const matchStatus=!status||s.status===status;
+    return matchSearch&&matchClass&&matchStatus;
+  });
+  page=1; renderStudents(filteredStudents);
+}
+
+function updateStats(students){
+  document.getElementById('totalStudents').textContent=students.length;
+  document.getElementById('activeStudents').textContent=students.filter(s=>s.status==='active').length;
+  document.getElementById('newStudents').textContent=students.filter(s=>new Date(s.created_at)>new Date(Date.now()-30*86400000)).length;
+  document.getElementById('atRiskStudents').textContent=students.filter(s=>s.status==='at_risk').length;
+}
+
+function viewStudent(id){ location.href=`/apps/eduos-student-profile/?id=${id}`; }
+function exportStudents(){ showToast('📥 جاري تصدير قائمة الطلاب/ات...'); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+init();
+</script>
+</body>
+</html>

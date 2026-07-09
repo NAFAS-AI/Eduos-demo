@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 async function loadCounts(){
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/staff_profiles?select=id,role`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
+    const r=await fetch(`${SB_URL}/rest/v1/staff_profiles?select=id`,{headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`}});
     const staff=await r.json();
     if(Array.isArray(staff)){
       document.getElementById('cnt-all').textContent=(staff.length||0)+' شخص';

@@ -135,7 +135,7 @@ tr:hover td{background:#F8FAFF}
 <div class="toast" id="toast"></div>
 
 <script>
-const SB_URL = (window.EduOS?.SB_URL) || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_URL = (window.EduOS?.SB_URL) || '';
 const SB_KEY = (window.EduOS?.SB_KEY) || '';
 const H = () => ({'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json'});
 const q = (t, p='') => fetch(`${SB_URL}/rest/v1/${t}${p}`, {headers: H()}).then(r => r.json());

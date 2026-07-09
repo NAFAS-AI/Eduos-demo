@@ -315,7 +315,7 @@ function switchClass(cls,btn){
 
 async function loadStudents(cls){
   const grid=document.getElementById('studentCards');
-  const data=await sq(`students?select=id,full_name,student_number,emoji&class_name=eq.${encodeURIComponent(cls)}&order=full_name`);
+  const data=await sq(`students?select=id,name,student_number,emoji&class_name=eq.${encodeURIComponent(cls)}&order=name`);
   const kids=Array.isArray(data)?data:[];
   document.getElementById('kpiTotal').textContent=kids.length||'—';
   if(kids.length===0){grid.innerHTML='<div style="color:var(--text3);font-size:15px;grid-column:1/-1;text-align:center;padding:30px;">لا يوجد أطفال مسجلون</div>';return;}

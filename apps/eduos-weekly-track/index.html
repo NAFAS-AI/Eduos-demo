@@ -485,7 +485,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const k1='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
   const k2='.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTU1MjI4MDAsImV4cCI6MjAzMTA5ODgwMH0';
   const k3='.Vf4uGJDwvAg1V3n0h1OAtW35A1FMKbEXRaGzFxXfx48';
-  const SB_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
+  const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
   const SB_KEY  = window.EduOS?.SB_KEY || (k1+k2+k3);
   _supabase = window.supabase.createClient(SB_URL, SB_KEY);
 
