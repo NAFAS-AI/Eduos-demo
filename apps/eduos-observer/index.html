@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة المراقب | Observer Portal — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="/apps/platform-config.js"></script>
+<script src="/apps/platform-shield.js"></script>
+<script src="/apps/platform-week.js"></script>
+<script src="/apps/platform-autologout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #F0F4F8;
+  --card: #ffffff;
+  --border: #E2E8F0;
+  --brand: #6C3DD6;
+  --brand2: #22D3EE;
+  --amber: #D97706;
+  --red: #DC2626;
+  --green: #16A34A;
+  --text: #1E293B;
+  --text2: #475569;
+  --text3: #94A3B8;
+  --sidebar-w: 220px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { direction: rtl; }
+body { font-family: 'Tajawal', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 18px; }
+
+/* HEADER */
+.hdr {
+  background: #fff;
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  height: 66px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.hdr-left { display: flex; align-items: center; gap: 14px; }
+.hdr-logo {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #6C3DD6, #22D3EE);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: #fff;
+}
+.hdr-title { font-size: 18px; font-weight: 800; }
+.hdr-sub { font-size: 13px; color: var(--text3); }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.readonly-pill {
+  background: #FEF3C7; border: 1px solid #FDE68A;
+  color: var(--amber); border-radius: 20px;
+  padding: 6px 14px; font-size: 13px; font-weight: 700;
+}
+.timer-pill {
+  background: #F0FDF4; border: 1px solid #BBF7D0;
+  color: var(--green); border-radius: 20px;
+  padding: 6px 14px; font-size: 13px; font-weight: 700;
+}
+.week-badge {
+  background: linear-gradient(135deg, #EDE9FE, #CFFAFE);
+  border: 1px solid #C4B5FD; color: var(--brand);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 13px; font-weight: 700;
+}
+.btn-logout {
+  background: #FEF2F2; border: 1px solid #FECACA;
+  color: var(--red); padding: 8px 16px;
+  border-radius: 10px; cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px; font-weight: 700;
+}
+.btn-logout:hover { background: var(--red); color: #fff; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: calc(100vh - 66px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  background: #fff;
+  border-left: 2px solid var(--border);
+  position: sticky; top: 66px;
+  height: calc(100vh - 66px);
+  overflow-y: auto; flex-shrink: 0;
+  padding: 16px 0;
+}
+.sb-label {
+  padding: 5px 18px 4px; font-size: 11px;
+  font-weight: 800; color: var(--text3);
+  letter-spacing: .8px; text-transform: uppercase;
+  margin-top: 12px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; cursor: pointer;
+  color: var(--text2); font-size: 15px; font-weight: 600;
+  transition: all .2s;
+  border-right: 3px solid transparent;
+}
+.sb-item:hover { background: #F8FAFC; color: var(--brand); }
+.sb-item.active {
+  background: #FEF3C7; color: var(--amber);
+  border-right-color: var(--amber); font-weight: 800;
+}
+.sb-icon { font-size: 18px; width: 24px; text-align: center; }
+
+/* MAIN */
+.main { flex: 1; padding: 28px; overflow-y: auto; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* READONLY BANNER */
+.readonly-banner {
+  background: #FFFBEB; border: 2px solid #FDE68A;
+  border-radius: 14px; padding: 14px 20px;
+  font-size: 15px; font-weight: 700; color: #92400E;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* PAGE TITLE */
+.page-title {
+  font-size: 22px; font-weight: 800;
+  color: var(--text); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* CARDS */
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card-title {
+  font-size: 17px; font-weight: 800;
+  color: var(--text); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px;
+  display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.kpi-icon { font-size: 28px; }
+.kpi-val { font-size: 26px; font-weight: 900; color: var(--brand); }
+.kpi-lbl { font-size: 13px; color: var(--text3); font-weight: 600; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+thead { background: #F8FAFC; }
+th { padding: 13px 16px; text-align: right; font-size: 13px; font-weight: 800; color: var(--text2); border-bottom: 2px solid var(--border); }
+td { padding: 13px 16px; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #FAFBFC; }
+
+/* BADGE */
+.badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; }
+.badge-green { background: #DCFCE7; color: var(--green); }
+.badge-amber { background: #FEF3C7; color: var(--amber); }
+.badge-red { background: #FEE2E2; color: var(--red); }
+.badge-blue { background: #DBEAFE; color: #1D4ED8; }
+.badge-purple { background: #EDE9FE; color: var(--brand); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 48px; color: var(--text3); font-size: 16px; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-logo">👁</div>
+    <div>
+      <div class="hdr-title">بوابة المراقب | Observer Portal</div>
+      <div class="hdr-sub">بوابة الجود الذكية — EduOS · للقراءة فقط</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="readonly-pill">🔒 للقراءة فقط | Read Only</span>
+    <span class="timer-pill" id="sessionTimer">⏱ —</span>
+    <div class="week-badge" id="weekBadge">— الأسبوع —</div>
+    <button class="btn-logout" onclick="doLogout()">خروج | Logout</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-label">لوحة المراقبة</div>
+    <div class="sb-item active" data-tab="overview" onclick="switchTab('overview', this)">
+      <span class="sb-icon">📊</span> نظرة عامة | Overview
+    </div>
+    <div class="sb-item" data-tab="staff" onclick="switchTab('staff', this)">
+      <span class="sb-icon">👩‍🏫</span> الكوادر | Staff
+    </div>
+    <div class="sb-item" data-tab="students" onclick="switchTab('students', this)">
+      <span class="sb-icon">👨‍🎓</span> الطلاب | Students
+    </div>
+    <div class="sb-item" data-tab="attendance" onclick="switchTab('attendance', this)">
+      <span class="sb-icon">📅</span> الحضور | Attendance
+    </div>
+    <div class="sb-item" data-tab="schedule" onclick="switchTab('schedule', this)">
+      <span class="sb-icon">🗓</span> الجدول | Schedule
+    </div>
+    <div class="sb-label">التقارير</div>
+    <div class="sb-item" data-tab="reports" onclick="switchTab('reports', this)">
+      <span class="sb-icon">📋</span> التقارير | Reports
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="readonly-banner">🔒 وضع المراقبة — القراءة فقط — لا يمكن تعديل أي بيانات | Observer Mode — Read Only</div>
+
+    <!-- TAB: OVERVIEW -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="page-title">📊 نظرة عامة | School Overview</div>
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-icon">👩‍🏫</div><div><div class="kpi-val" id="kpiStaff">—</div><div class="kpi-lbl">الكوادر | Staff</div></div></div>
+        <div class="kpi"><div class="kpi-icon">👨‍🎓</div><div><div class="kpi-val" id="kpiStudents">—</div><div class="kpi-lbl">الطلاب | Students</div></div></div>
+        <div class="kpi"><div class="kpi-icon">🏫</div><div><div class="kpi-val" id="kpiClasses">—</div><div class="kpi-lbl">الفصول | Classes</div></div></div>
+        <div class="kpi"><div class="kpi-icon">✅</div><div><div class="kpi-val" id="kpiAtt">—</div><div class="kpi-lbl">حضور اليوم | Today</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 ملخص المدرسة | School Summary</div>
+        <div id="overviewSummary"><div class="empty"><div class="empty-icon">⏳</div>جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: STAFF -->
+    <div id="tab-staff" class="tab-content">
+      <div class="page-title">👩‍🏫 الكوادر | Staff</div>
+      <div class="card">
+        <div class="card-title">👩‍🏫 قائمة الكوادر | Staff List</div>
+        <div id="staffTable"><div class="empty"><div class="empty-icon">⏳</div>جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: STUDENTS -->
+    <div id="tab-students" class="tab-content">
+      <div class="page-title">👨‍🎓 الطلاب | Students</div>
+      <div class="card">
+        <div class="card-title">👨‍🎓 قائمة الطلاب | Student List</div>
+        <div id="studentsTable"><div class="empty"><div class="empty-icon">⏳</div>جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: ATTENDANCE -->
+    <div id="tab-attendance" class="tab-content">
+      <div class="page-title">📅 الحضور | Attendance</div>
+      <div class="card">
+        <div class="card-title">📅 حضور اليوم | Today's Attendance</div>
+        <div id="attTable"><div class="empty"><div class="empty-icon">⏳</div>جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: SCHEDULE -->
+    <div id="tab-schedule" class="tab-content">
+      <div class="page-title">🗓 الجدول | Schedule</div>
+      <div class="card">
+        <div class="card-title">🗓 الجدول الأسبوعي | Weekly Schedule</div>
+        <div id="schedTable"><div class="empty"><div class="empty-icon">⏳</div>جاري التحميل...</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: REPORTS -->
+    <div id="tab-reports" class="tab-content">
+      <div class="page-title">📋 التقارير | Reports</div>
+      <div class="card">
+        <div class="card-title">📋 التقارير المتاحة | Available Reports</div>
+        <div id="reportsSection">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="card" style="margin:0;cursor:pointer;border:2px solid var(--border);transition:border .2s" onclick="loadStaff()">
+              <div style="font-size:32px;margin-bottom:8px">👩‍🏫</div>
+              <div style="font-weight:800;font-size:16px">تقرير الكوادر | Staff Report</div>
+              <div style="color:var(--text3);font-size:13px;margin-top:4px">قائمة وبيانات جميع الكوادر</div>
+            </div>
+            <div class="card" style="margin:0;cursor:pointer;border:2px solid var(--border);transition:border .2s" onclick="loadStudents()">
+              <div style="font-size:32px;margin-bottom:8px">👨‍🎓</div>
+              <div style="font-weight:800;font-size:16px">تقرير الطلاب | Student Report</div>
+              <div style="color:var(--text3);font-size:13px;margin-top:4px">قائمة وبيانات جميع الطلاب</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const SB_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY = window.EduOS?.SB_KEY;
+
+async function dbGet(table, params = '') {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}?${params}`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    return r.ok ? r.json() : [];
+  } catch(e) { return []; }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('edoos_user');
+  location.href = '/apps/eduos-login/';
+}
+
+function initWeek() {
+  if (window.getPlatformWeek) {
+    const w = window.getPlatformWeek();
+    document.getElementById('weekBadge').textContent = `الأسبوع ${w.week || '—'} · ${w.term || '—'}`;
+  }
+}
+
+// Session timer from observer token
+function startTimer() {
+  const user = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+  const expires = user.expires_at;
+  if (!expires) return;
+  const end = new Date(expires).getTime();
+  setInterval(() => {
+    const now = Date.now();
+    const rem = end - now;
+    if (rem <= 0) { doLogout(); return; }
+    const h = Math.floor(rem / 3600000);
+    const m = Math.floor((rem % 3600000) / 60000);
+    document.getElementById('sessionTimer').textContent = `⏱ ${h}:${String(m).padStart(2,'0')} متبقٍ`;
+  }, 30000);
+}
+
+// --- OVERVIEW ---
+async function loadOverview() {
+  const [staff, students, classes, att] = await Promise.all([
+    dbGet('staff_profiles', 'select=id&limit=1&offset=0'),
+    dbGet('students', 'select=id&limit=1&offset=0'),
+    dbGet('classes', 'select=id&limit=1&offset=0'),
+    dbGet('attendance', `select=status&date=eq.${new Date().toISOString().split('T')[0]}`)
+  ]);
+
+  // Get counts via head
+  const counts = await Promise.all([
+    fetch(`${SB_URL}/rest/v1/staff_profiles?select=id`, { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(`${SB_URL}/rest/v1/students?select=id`, { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact', 'Range': '0-0' } }),
+    fetch(`${SB_URL}/rest/v1/classes?select=id`, { headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact', 'Range': '0-0' } })
+  ]);
+
+  const getCount = async (res) => {
+    const range = res.headers.get('content-range');
+    return range ? range.split('/')[1] : '—';
+  };
+
+  document.getElementById('kpiStaff').textContent = await getCount(counts[0]);
+  document.getElementById('kpiStudents').textContent = await getCount(counts[1]);
+  document.getElementById('kpiClasses').textContent = await getCount(counts[2]);
+
+  const present = att.filter(a => a.status === 'present').length;
+  document.getElementById('kpiAtt').textContent = att.length ? `${Math.round(present/att.length*100)}%` : '—';
+
+  document.getElementById('overviewSummary').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-weight:800;font-size:16px;margin-bottom:12px">🔍 نظرة على المدرسة</div>
+        <div style="color:var(--text2);line-height:2;font-size:15px">
+          هذه لوحة المراقبة — تُتيح لك الاطلاع على جميع بيانات المدرسة بصلاحية القراءة فقط.<br>
+          استخدم القائمة الجانبية للتنقل بين الأقسام.
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:16px;margin-bottom:12px">📅 حضور اليوم</div>
+        <div style="font-size:15px;color:var(--text2)">
+          حاضر/ة: <strong>${present}</strong><br>
+          غائب/ة: <strong>${att.filter(a=>a.status==='absent').length}</strong><br>
+          متأخر/ة: <strong>${att.filter(a=>a.status==='late').length}</strong>
+        </div>
+      </div>
+    </div>`;
+}
+
+// --- STAFF ---
+async function loadStaff() {
+  const rows = await dbGet('staff_profiles', 'select=name_ar,role_key,email&order=name_ar&limit=100');
+  const el = document.getElementById('staffTable');
+  if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">👩‍🏫</div>لا بيانات</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>الاسم | Name</th><th>الدور | Role</th><th>البريد | Email</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td style="font-weight:700">${r.name_ar || '—'}</td>
+      <td><span class="badge badge-purple">${r.role_key || '—'}</span></td>
+      <td style="direction:ltr;text-align:right">${r.email || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// --- STUDENTS ---
+async function loadStudents() {
+  const rows = await dbGet('students', 'select=name,grade,section,gender&order=grade,section,name&limit=200');
+  const el = document.getElementById('studentsTable');
+  if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">👨‍🎓</div>لا بيانات</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>الاسم | Name</th><th>الصف | Grade</th><th>الفصل | Section</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td style="font-weight:700">${r.name || '—'}</td>
+      <td>${r.grade || '—'}</td>
+      <td>${r.section || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// --- ATTENDANCE ---
+async function loadAttendance() {
+  const today = new Date().toISOString().split('T')[0];
+  const rows = await dbGet('attendance', `select=student_id,status,date&date=eq.${today}&order=status&limit=100`);
+  const el = document.getElementById('attTable');
+  if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>لا سجلات اليوم</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>معرف الطالب | Student ID</th><th>الحالة | Status</th></tr></thead>
+    <tbody>${rows.map(r => {
+      const badge = r.status === 'present' ? 'badge-green' : r.status === 'absent' ? 'badge-red' : 'badge-amber';
+      const label = r.status === 'present' ? 'حاضر/ة' : r.status === 'absent' ? 'غائب/ة' : 'متأخر/ة';
+      return `<tr>
+        <td>${r.student_id || '—'}</td>
+        <td><span class="badge ${badge}">${label}</span></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// --- SCHEDULE ---
+async function loadSchedule() {
+  const rows = await dbGet('schedules', 'select=grade,section,day,period,subject&order=grade,day,period&limit=100');
+  const el = document.getElementById('schedTable');
+  if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div>لا بيانات</div>'; return; }
+  el.innerHTML = `<div class="tbl-wrap"><table>
+    <thead><tr><th>الصف | Grade</th><th>الفصل</th><th>اليوم | Day</th><th>الحصة | Period</th><th>المادة | Subject</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td>${r.grade || '—'}</td>
+      <td>${r.section || '—'}</td>
+      <td>${r.day || '—'}</td>
+      <td>${r.period || '—'}</td>
+      <td style="font-weight:700">${r.subject || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+// --- NAV ---
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+
+  if (name === 'staff') loadStaff();
+  if (name === 'students') loadStudents();
+  if (name === 'attendance') loadAttendance();
+  if (name === 'schedule') loadSchedule();
+}
+
+// --- INIT ---
+initWeek();
+startTimer();
+loadOverview();
+</script>
+</body>
+</html>

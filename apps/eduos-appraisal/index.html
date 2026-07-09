@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>تقييم أداء الموظفين — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-week.js"></script>
+<script src="/apps/platform-autologout.js"></script>
+<script src="/apps/platform-auth-guard.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr:hover{background:rgba(255,255,255,.35)}
+.tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.panel{display:none}.panel.active{display:block}
+.main{padding:24px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.staff-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;transition:.2s;cursor:pointer}
+.staff-row:hover{background:#F8FAFF;border-color:var(--primary)}
+.staff-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
+.staff-name{font-weight:700;font-size:.92rem}
+.staff-role{font-size:.75rem;color:var(--text2)}
+.score-bar{width:120px;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
+.score-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6C3DD6,#22D3EE)}
+.score-num{font-size:.82rem;font-weight:700;color:var(--primary)}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}.badge-red{background:#fee2e2;color:#dc2626}.badge-blue{background:#dbeafe;color:#1d4ed8}
+.criterion-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.criterion-label{flex:1;font-size:.88rem;font-weight:600}
+.criterion-score{display:flex;gap:6px}
+.score-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:.85rem;transition:.2s}
+.score-btn:hover{border-color:var(--primary);background:#F8FAFF}
+.score-btn.selected{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-color:var(--primary)}
+input,select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#F8FAFF}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFF}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">📋</div>
+    <div>
+      <div class="hdr-title">تقييم الأداء | Staff Appraisal</div>
+      <div class="hdr-sub">تقييم الكادر التدريسي والإداري — EduOS</div>
+    </div>
+  </div>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-principal/'">← رجوع</button>
+</header>
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('overview')">📊 نظرة عامة</button>
+  <button class="tab" onclick="switchTab('evaluate')">✏️ تقييم جديد</button>
+  <button class="tab" onclick="switchTab('history')">📋 السجل</button>
+  <button class="tab" onclick="switchTab('pdp')">🎯 خطط التطوير</button>
+</div>
+<div class="main">
+  <div id="tab-overview" class="panel active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📊 ملخص أداء الكادر | Staff Overview</div>
+        <span class="badge badge-blue">الفصل الدراسي الثالث 2025-2026</span>
+      </div>
+      <div id="staffList"></div>
+    </div>
+  </div>
+
+  <div id="tab-evaluate" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">✏️ نموذج التقييم | Evaluation Form</div></div>
+      <div class="grid2">
+        <div>
+          <div class="form-group"><label class="form-label">الموظف/ة | Staff</label><select id="evalStaff"><option value="">اختر الموظف/ة...</option></select></div>
+          <div class="form-group"><label class="form-label">نوع التقييم | Type</label>
+            <select id="evalType"><option value="classroom">زيارة صفية | Classroom Visit</option><option value="annual">تقييم سنوي | Annual</option><option value="midterm">منتصف الفصل | Mid-term</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">التاريخ | Date</label><input type="date" id="evalDate"/></div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:12px">معايير التقييم | Criteria (1–5)</div>
+          <div id="criteriaList"></div>
+          <div class="form-group" style="margin-top:14px"><label class="form-label">ملاحظات | Notes</label><textarea id="evalNotes" style="min-height:70px" placeholder="ملاحظات التقييم..."></textarea></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="switchTab('overview')">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveEval()">💾 حفظ التقييم</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-history" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 سجل التقييمات | Evaluation History</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>الموظف/ة</th><th>نوع التقييم</th><th>التاريخ</th><th>الدرجة</th><th>المقيِّم/ة</th><th>الحالة</th></tr></thead>
+        <tbody id="historyBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-pdp" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎯 خطط التطوير المهني | PDP</div></div>
+      <div id="pdpList"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}); return r.ok?r.json():[]; }
+const CRITERIA=[{key:'planning',label:'التخطيط للدرس | Lesson Planning'},{key:'delivery',label:'أساليب التدريس | Teaching Methods'},{key:'classroom_mgmt',label:'إدارة الصف | Classroom Mgmt'},{key:'assessment',label:'التقييم | Assessment'},{key:'professional',label:'السلوك المهني | Professional Conduct'}];
+let scores={};
+
+async function init(){
+  document.getElementById('evalDate').value=new Date().toISOString().split('T')[0];
+  renderCriteria();
+  await Promise.all([loadStaff(),renderStaffOverview(),renderHistory(),renderPDP()]);
+}
+
+function renderCriteria(){
+  document.getElementById('criteriaList').innerHTML=CRITERIA.map(c=>`
+    <div class="criterion-row">
+      <div class="criterion-label">${c.label}</div>
+      <div class="criterion-score">${[1,2,3,4,5].map(n=>`<button class="score-btn ${scores[c.key]===n?'selected':''}" onclick="setScore('${c.key}',${n})">${n}</button>`).join('')}</div>
+    </div>`).join('');
+}
+
+function setScore(key,val){ scores[key]=val; renderCriteria(); }
+
+async function loadStaff(){
+  try{
+    const s=await get('staff_profiles','select=id,full_name,role&order=full_name&limit=100');
+    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=`${st.full_name} — ${st.role||'موظف/ة'}`; document.getElementById('evalStaff').appendChild(o); });
+  }catch(e){}
+}
+
+function renderStaffOverview(){
+  const demo=[{name:'أ. سارة أحمد',role:'معلمة رياضيات',score:92,evals:3},{name:'أ. خالد محمد',role:'معلم لغة عربية',score:88,evals:2},{name:'أ. نورة علي',role:'معلمة علوم',score:95,evals:4},{name:'أ. فاطمة سالم',role:'معلمة إنجليزية',score:84,evals:2},{name:'أ. عمر ناصر',role:'مشرف/ة اجتماعي',score:90,evals:1}];
+  document.getElementById('staffList').innerHTML=demo.map(d=>`
+    <div class="staff-row" onclick="startEval('${d.name}')">
+      <div class="staff-avatar">${d.name[3]}</div>
+      <div style="flex:1">
+        <div class="staff-name">${d.name}</div>
+        <div class="staff-role">${d.role} · ${d.evals} تقييم</div>
+        <div class="score-bar"><div class="score-fill" style="width:${d.score}%"></div></div>
+      </div>
+      <div style="text-align:center">
+        <div class="score-num">${d.score}%</div>
+        <span class="badge ${d.score>=90?'badge-green':d.score>=80?'badge-blue':'badge-yellow'}">${d.score>=90?'ممتاز':d.score>=80?'جيد':'يحتاج تطوير'}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderHistory(){
+  const demo=[{name:'أ. سارة أحمد',type:'زيارة صفية',date:'2026-06-20',score:'91%',by:'المدير/ة',status:'مكتمل'},{name:'أ. خالد محمد',type:'منتصف الفصل',date:'2026-06-10',score:'88%',by:'المدير/ة',status:'مكتمل'},{name:'أ. نورة علي',type:'زيارة صفية',date:'2026-06-22',score:'95%',by:'المدير/ة',status:'مكتمل'}];
+  document.getElementById('historyBody').innerHTML=demo.map(d=>`<tr><td><strong>${d.name}</strong></td><td>${d.type}</td><td>${d.date}</td><td><strong>${d.score}</strong></td><td>${d.by}</td><td><span class="badge badge-green">${d.status}</span></td></tr>`).join('');
+}
+
+function renderPDP(){
+  const demo=[{name:'أ. خالد محمد',goal:'تطوير استخدام التكنولوجيا في الدرس',progress:60,deadline:'2026-07-30'},{name:'أ. فاطمة سالم',goal:'تحسين أساليب التقييم التكويني',progress:35,deadline:'2026-08-15'}];
+  document.getElementById('pdpList').innerHTML=demo.map(d=>`
+    <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700">${d.name}</div>
+        <span class="badge badge-blue">حتى ${d.deadline}</span>
+      </div>
+      <div style="font-size:.85rem;color:var(--text2);margin-bottom:8px">🎯 ${d.goal}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:${d.progress}%;background:linear-gradient(90deg,#6C3DD6,#22D3EE);border-radius:4px"></div></div>
+        <div style="font-weight:700;font-size:.82rem;color:var(--primary)">${d.progress}%</div>
+      </div>
+    </div>`).join('');
+}
+
+function startEval(name){ switchTab('evaluate'); showToast(`✏️ تقييم: ${name}`); }
+
+async function saveEval(){
+  const staff=document.getElementById('evalStaff').value;
+  if(!staff){ showToast('⚠️ اختر/ي الموظف/ة'); return; }
+  const total=Object.values(scores).length>0?Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*20):0;
+  try{
+    await fetch(`${SB}/rest/v1/staff_appraisals`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({staff_id:staff,appraisal_type:document.getElementById('evalType').value,evaluation_date:document.getElementById('evalDate').value,scores,total_score:total,notes:document.getElementById('evalNotes').value})});
+  }catch(e){}
+  showToast('✅ تم حفظ التقييم بنجاح');
+  scores={}; switchTab('history'); renderHistory();
+}
+
+function switchTab(n){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); ['overview','evaluate','history','pdp'].forEach((t,i)=>{ if(t===n) document.querySelectorAll('.tab')[i].classList.add('active'); }); document.getElementById(`tab-${n}`).classList.add('active'); }
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+init();
+</script>
+</body>
+</html>

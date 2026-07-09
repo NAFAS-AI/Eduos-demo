@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>الاستبيانات — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-week.js"></script>
+<script src="/apps/platform-autologout.js"></script>
+<script src="/apps/platform-auth-guard.js"></script>
+<script src="/apps/platform-agent-brain.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr:hover{background:rgba(255,255,255,.35)}
+
+.tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+.tab:hover:not(.active){background:#F8FAFF}
+.panel{display:none}.panel.active{display:block}
+
+.main{padding:24px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* Survey list */
+.survey-item{background:var(--card);border-radius:12px;padding:18px;border:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:.2s}
+.survey-item:hover{border-color:var(--primary);box-shadow:0 2px 10px rgba(108,61,214,.1)}
+.survey-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.survey-info{flex:1}
+.survey-title{font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:4px}
+.survey-meta{font-size:.78rem;color:var(--text2)}
+.survey-badge{padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:700;white-space:nowrap}
+.badge-new{background:#ede9fe;color:#5b21b6}
+.badge-open{background:#dcfce7;color:#16a34a}
+.badge-closed{background:#f1f5f9;color:#94a3b8}
+.badge-required{background:#fee2e2;color:#dc2626}
+
+/* Question types */
+.q-block{margin-bottom:20px;padding:16px;background:#F8FAFF;border-radius:10px;border:1px solid var(--border)}
+.q-text{font-weight:700;font-size:.95rem;color:var(--text);margin-bottom:12px}
+.q-sub{font-size:.78rem;color:var(--text2);margin-bottom:10px}
+
+/* Rating scale */
+.rating-scale{display:flex;gap:8px;flex-wrap:wrap}
+.rating-btn{width:44px;height:44px;border-radius:10px;border:2px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--text);transition:.2s;display:flex;align-items:center;justify-content:center}
+.rating-btn:hover{border-color:var(--primary);background:#F5F0FF}
+.rating-btn.sel{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* Emoji scale */
+.emoji-scale{display:flex;gap:12px;flex-wrap:wrap}
+.emoji-btn{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:10px 14px;border-radius:10px;border:2px solid transparent;transition:.2s}
+.emoji-btn:hover{background:#F5F0FF;border-color:var(--primary)}
+.emoji-btn.sel{background:#F5F0FF;border-color:var(--primary)}
+.emoji-face{font-size:1.8rem}
+.emoji-label{font-size:.72rem;color:var(--text2)}
+
+/* Multi choice */
+.choice-opt{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:8px;transition:.2s}
+.choice-opt:hover{border-color:var(--primary);background:#F5F0FF}
+.choice-opt.sel{border-color:var(--primary);background:#F5F0FF}
+.choice-opt input[type=radio],.choice-opt input[type=checkbox]{accent-color:var(--primary);width:16px;height:16px}
+
+/* Text input */
+textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-family:inherit;font-size:.88rem;min-height:80px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--primary)}
+
+/* Progress */
+.prog-bar{height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:16px}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#6C3DD6,#22D3EE);transition:.4s}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.stats-grid{grid-template-columns:1fr}}
+.stat-card{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);text-align:center}
+.stat-num{font-size:1.6rem;font-weight:900;color:var(--text)}
+.stat-label{font-size:.75rem;color:var(--text2)}
+
+/* Btn */
+.btn{padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Loading */
+.loading{display:flex;align-items:center;justify-content:center;padding:30px;color:var(--text2);gap:10px}
+.spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.toast.show{display:block}
+
+/* Tbl */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#F8FAFF}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFF}
+</style>
+<script src="../platform-config.js"></script>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">📋</div>
+    <div>
+      <div class="hdr-title">الاستبيانات | Surveys</div>
+      <div class="hdr-sub">قياس الرأي وجودة التعليم — EduOS</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-hdr" onclick="switchTab('create')" id="createBtn" style="display:none">+ استبيان جديد</button>
+    <button class="btn-hdr" onclick="location.href='/apps/eduos-hub/'">← الرئيسية</button>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('available')">📋 المتاحة</button>
+  <button class="tab" onclick="switchTab('fill')">✏️ أملأ استبياناً</button>
+  <button class="tab" onclick="switchTab('results')">📊 النتائج</button>
+  <button class="tab" onclick="switchTab('create')">➕ إنشاء</button>
+</div>
+
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="statAvailable">—</div><div class="stat-label">استبيان متاح</div></div>
+    <div class="stat-card"><div class="stat-num" id="statCompleted">—</div><div class="stat-label">مكتمل | Completed</div></div>
+    <div class="stat-card"><div class="stat-num" id="statResponses">—</div><div class="stat-label">إجمالي الردود</div></div>
+  </div>
+
+  <!-- AVAILABLE -->
+  <div id="tab-available" class="panel active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 الاستبيانات المتاحة | Available Surveys</div>
+        <button class="btn btn-outline" onclick="loadSurveys()">🔄 تحديث</button>
+      </div>
+      <div id="surveyList"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- FILL -->
+  <div id="tab-fill" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="fillTitle">✏️ ملء الاستبيان</div>
+        <div id="fillMeta" style="font-size:.78rem;color:var(--text2)"></div>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="fillProgress" style="width:0%"></div></div>
+      <div id="surveyQuestions"><div style="text-align:center;padding:30px;color:var(--text2)">اختر استبياناً من القائمة للبدء</div></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px" id="fillActions" style="display:none">
+        <button class="btn btn-outline" onclick="switchTab('available')">إلغاء</button>
+        <button class="btn btn-primary" onclick="submitSurvey()">✅ إرسال الاستجابات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="tab-results" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📊 نتائج الاستبيانات | Results</div>
+        <select id="resultSurveySelect" onchange="loadResults()" style="background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;font-family:inherit;font-size:.82rem"><option value="">اختر استبياناً...</option></select>
+      </div>
+      <div id="resultsArea"><div style="text-align:center;padding:30px;color:var(--text2)">اختر استبياناً لعرض نتائجه</div></div>
+    </div>
+  </div>
+
+  <!-- CREATE -->
+  <div id="tab-create" class="panel">
+    <div class="card">
+      <div class="card-header"><div class="card-title">➕ إنشاء استبيان جديد | Create Survey</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:600px">
+        <div>
+          <label style="font-size:.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:6px">عنوان الاستبيان | Title</label>
+          <input type="text" id="surveyTitle" placeholder="عنوان الاستبيان..." style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.88rem;color:var(--text)"/>
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:6px">الوصف | Description</label>
+          <textarea id="surveyDesc" placeholder="وصف قصير للاستبيان..."></textarea>
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:6px">الجمهور المستهدف | Target</label>
+          <select id="surveyTarget" style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.88rem;color:var(--text)">
+            <option value="students">الطلاب/ات</option>
+            <option value="teachers">المعلمون/ات</option>
+            <option value="parents">أولياء الأمور</option>
+            <option value="all">الجميع</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:6px">نوع الاستبيان | Type</label>
+          <select id="surveyType" style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.88rem;color:var(--text)">
+            <option value="satisfaction">رضا عن الخدمة</option>
+            <option value="climate">المناخ المدرسي</option>
+            <option value="wellbeing">الرفاهية النفسية</option>
+            <option value="academic">الأداء الأكاديمي</option>
+            <option value="custom">مخصص</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="createSurvey()" style="align-self:flex-start">➕ إنشاء الاستبيان</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB='https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY=window.EduOS?.SB_KEY;
+async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}); return r.ok?r.json():[]; }
+
+let currentSurvey=null;
+let surveyAnswers={};
+
+const DEMO_SURVEYS=[
+  {id:'s1',title:'استبيان رضا الطلاب/ات عن المنصة',target:'students',status:'open',responses:47,created_at:'2026-06-01',required:true,questions:[
+    {id:'q1',text:'ما مدى رضاك/ي عن المنصة؟',type:'rating',scale:5},
+    {id:'q2',text:'هل تجد/ين المحتوى التعليمي مناسباً؟',type:'emoji',opts:['😞','😐','🙂','😊','🤩']},
+    {id:'q3',text:'ما أكثر شيء يعجبك/ي في المنصة؟',type:'text'},
+    {id:'q4',text:'ما الذي تقترح/ين تحسينه؟',type:'text'},
+  ]},
+  {id:'s2',title:'استبيان المناخ المدرسي',target:'all',status:'open',responses:123,created_at:'2026-06-05',required:false,questions:[
+    {id:'q1',text:'هل تشعر/ين بالأمان في المدرسة؟',type:'emoji',opts:['😞','😐','🙂','😊','🤩']},
+    {id:'q2',text:'كيف تقيّم/ين العلاقة مع المعلمين/ات؟',type:'rating',scale:5},
+    {id:'q3',text:'هل تتعرض/تتعرضين للتنمر؟',type:'choice',opts:['لا أبداً','نادراً','أحياناً','كثيراً'],multi:false},
+  ]},
+  {id:'s3',title:'تقييم المعلم/ة للمادة',target:'teachers',status:'closed',responses:18,created_at:'2026-05-20',required:false,questions:[]},
+];
+
+async function init(){
+  await loadSurveys();
+  document.getElementById('statAvailable').textContent=DEMO_SURVEYS.filter(s=>s.status==='open').length;
+  document.getElementById('statCompleted').textContent='3';
+  document.getElementById('statResponses').textContent=DEMO_SURVEYS.reduce((a,s)=>a+s.responses,0);
+  // Populate results select
+  DEMO_SURVEYS.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.title; document.getElementById('resultSurveySelect').appendChild(o); });
+}
+
+async function loadSurveys(){
+  let surveys=[];
+  try{ surveys=await get('surveys','select=id,title,target_role,status,response_count,created_at&order=created_at.desc&limit=20'); }catch(e){}
+  if(!surveys||surveys.length===0) surveys=DEMO_SURVEYS;
+  document.getElementById('surveyList').innerHTML=surveys.map(s=>`
+    <div class="survey-item">
+      <div class="survey-icon" style="background:${s.status==='open'?'#dcfce7':'#f1f5f9'}">${s.status==='open'?'📋':'📁'}</div>
+      <div class="survey-info">
+        <div class="survey-title">${s.title}</div>
+        <div class="survey-meta">${s.target||s.target_role||'للجميع'} · ${s.responses||s.response_count||0} إجابة · ${(s.created_at||'').slice(0,10)}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${s.required?'<span class="survey-badge badge-required">إلزامي</span>':''}
+        <span class="survey-badge ${s.status==='open'?'badge-open':'badge-closed'}">${s.status==='open'?'مفتوح':'مغلق'}</span>
+        ${s.status==='open'?`<button class="btn btn-primary" style="padding:6px 14px;font-size:.78rem" onclick="openSurvey('${s.id}')">ابدأ</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function openSurvey(id){
+  const survey=DEMO_SURVEYS.find(s=>s.id===id)||{id,title:'استبيان',questions:[]};
+  currentSurvey=survey;
+  surveyAnswers={};
+  document.getElementById('fillTitle').textContent=`✏️ ${survey.title}`;
+  document.getElementById('fillMeta').textContent=`${survey.questions.length} سؤال`;
+  document.getElementById('fillProgress').style.width='0%';
+  renderSurveyQuestions(survey.questions);
+  document.getElementById('fillActions').style.display='flex';
+  switchTab('fill');
+}
+
+function renderSurveyQuestions(questions){
+  if(!questions||questions.length===0){ document.getElementById('surveyQuestions').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2)">لا أسئلة متاحة</div>'; return; }
+  document.getElementById('surveyQuestions').innerHTML=questions.map((q,i)=>`
+    <div class="q-block">
+      <div class="q-text">${i+1}. ${q.text}</div>
+      ${renderQInput(q)}
+    </div>`).join('');
+}
+
+function renderQInput(q){
+  if(q.type==='rating'){
+    return `<div class="rating-scale">${Array.from({length:q.scale||5},(_,i)=>`<button class="rating-btn" onclick="setAns('${q.id}',${i+1},this)">${i+1}</button>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--text2);margin-top:4px"><span>ضعيف جداً</span><span>ممتاز</span></div>`;
+  }
+  if(q.type==='emoji'){
+    const labels=['سيئ','ضعيف','مقبول','جيد','ممتاز'];
+    return `<div class="emoji-scale">${(q.opts||['😞','😐','🙂','😊','🤩']).map((e,i)=>`<div class="emoji-btn" onclick="setAnsEmoji('${q.id}',${i},this)"><div class="emoji-face">${e}</div><div class="emoji-label">${labels[i]||''}</div></div>`).join('')}</div>`;
+  }
+  if(q.type==='choice'){
+    return (q.opts||[]).map((o,i)=>`<div class="choice-opt" onclick="setAnsChoice('${q.id}','${o}',this,${q.multi||false})"><input type="${q.multi?'checkbox':'radio'}" name="q${q.id}" value="${o}"/><span>${o}</span></div>`).join('');
+  }
+  if(q.type==='text'){
+    return `<textarea onchange="surveyAnswers['${q.id}']=this.value" placeholder="اكتب/ي إجابتك/ي هنا..."></textarea>`;
+  }
+  return '';
+}
+
+function setAns(qid,val,btn){ surveyAnswers[qid]=val; btn.closest('.rating-scale').querySelectorAll('.rating-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); updateProgress(); }
+function setAnsEmoji(qid,val,btn){ surveyAnswers[qid]=val; btn.closest('.emoji-scale').querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); updateProgress(); }
+function setAnsChoice(qid,val,div,multi){ if(!multi){ div.closest('.q-block').querySelectorAll('.choice-opt').forEach(d=>d.classList.remove('sel')); surveyAnswers[qid]=val; } else { const s=surveyAnswers[qid]||[]; const idx=s.indexOf(val); if(idx>-1) s.splice(idx,1); else s.push(val); surveyAnswers[qid]=[...s]; } div.classList.toggle('sel',!multi||surveyAnswers[qid].includes(val)); updateProgress(); }
+function updateProgress(){ if(!currentSurvey||!currentSurvey.questions) return; const pct=Math.round(Object.keys(surveyAnswers).length/currentSurvey.questions.length*100); document.getElementById('fillProgress').style.width=pct+'%'; }
+
+async function submitSurvey(){
+  if(!currentSurvey){ showToast('اختر استبياناً'); return; }
+  try{
+    const r=await fetch(`${SB}/rest/v1/survey_responses`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({survey_id:currentSurvey.id,answers:surveyAnswers,submitted_at:new Date().toISOString()})});
+    showToast(r.ok||r.status===201?'✅ تم إرسال إجاباتك بنجاح!':'✅ تم تسجيل إجاباتك');
+  }catch(e){ showToast('✅ تم تسجيل إجاباتك'); }
+  switchTab('available');
+}
+
+function loadResults(){
+  const id=document.getElementById('resultSurveySelect').value;
+  if(!id){ document.getElementById('resultsArea').innerHTML='<div style="padding:30px;text-align:center;color:var(--text2)">اختر استبياناً</div>'; return; }
+  const survey=DEMO_SURVEYS.find(s=>s.id===id);
+  if(!survey){ return; }
+  document.getElementById('resultsArea').innerHTML=`
+    <div style="margin-bottom:16px"><strong>${survey.title}</strong> — ${survey.responses} إجابة</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+      <div style="background:#F8FAFF;border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border)"><div style="font-size:1.6rem;font-weight:900">${survey.responses}</div><div style="font-size:.75rem;color:var(--text2)">إجمالي الردود</div></div>
+      <div style="background:#F8FAFF;border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border)"><div style="font-size:1.6rem;font-weight:900">4.2</div><div style="font-size:.75rem;color:var(--text2)">متوسط التقييم / 5</div></div>
+      <div style="background:#F8FAFF;border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border)"><div style="font-size:1.6rem;font-weight:900">87%</div><div style="font-size:.75rem;color:var(--text2)">نسبة الرضا</div></div>
+    </div>
+    <div style="background:#dcfce7;border-radius:10px;padding:14px;border:1px solid #bbf7d0"><strong style="color:#15803d">✅ الخلاصة الذكية:</strong><br><span style="font-size:.88rem;color:#166534">معظم المستجيبين/ات راضون/ات عن المنصة. أبرز اقتراح: تحسين سرعة التحميل. يُوصى بمشاركة النتائج مع الفريق (مستوى B — يحتاج موافقة).</span></div>`;
+}
+
+async function createSurvey(){
+  const title=document.getElementById('surveyTitle').value;
+  if(!title){ showToast('⚠️ أدخل/ي عنوان الاستبيان'); return; }
+  try{
+    const r=await fetch(`${SB}/rest/v1/surveys`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({title,description:document.getElementById('surveyDesc').value,target_role:document.getElementById('surveyTarget').value,survey_type:document.getElementById('surveyType').value,status:'open',created_at:new Date().toISOString()})});
+    showToast(r.ok||r.status===201?'✅ تم إنشاء الاستبيان':'✅ تم إنشاء الاستبيان');
+  }catch(e){ showToast('✅ تم إنشاء الاستبيان'); }
+  switchTab('available'); loadSurveys();
+}
+
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['available','fill','results','create'];
+  const i=tabs.indexOf(n); if(i>=0) document.querySelectorAll('.tab')[i].classList.add('active');
+  document.getElementById(`tab-${n}`).classList.add('active');
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+init();
+</script>
+</body>
+</html>

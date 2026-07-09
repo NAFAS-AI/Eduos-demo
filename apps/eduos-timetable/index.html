@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>الجدول الدراسي — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-week.js"></script>
+<script src="/apps/platform-motd.js"></script>
+<script src="/apps/platform-autologout.js"></script>
+<script src="/apps/platform-auth-guard.js"></script>
+<script src="/apps/platform-agent-brain.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--bg:#F0F4F8;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+
+.hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
+.hdr-brand{display:flex;align-items:center;gap:12px}
+.hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
+.hdr-title{color:#fff;font-size:1rem;font-weight:700}
+.hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
+.hdr-meta{text-align:center;color:rgba(255,255,255,.9);font-size:.78rem}
+.hdr-actions{display:flex;gap:8px}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr:hover{background:rgba(255,255,255,.35)}
+
+.tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700}
+.tab:hover:not(.active){color:var(--text);background:#F8FAFF}
+.panel{display:none}.panel.active{display:block}
+
+.main{padding:24px;max-width:1400px;margin:0 auto}
+.card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:20px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+
+/* Timetable grid */
+.tt-outer{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+.tt-table{border-collapse:collapse;width:100%;min-width:700px;font-size:.82rem}
+.tt-table th{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;padding:12px 10px;text-align:center;font-weight:700;white-space:nowrap}
+.tt-table td{border:1px solid #e2e8f0;padding:6px 4px;text-align:center;vertical-align:top;min-width:100px;background:#fff}
+.tt-table tr:hover td{background:#F8FAFF}
+.tt-day-hdr{background:#F0F4F8!important;font-weight:700;color:var(--text)!important;font-size:.85rem}
+.tt-time{background:#F8FAFF!important;color:var(--text2);font-size:.78rem;white-space:nowrap;padding:10px 6px!important}
+.slot{border-radius:8px;padding:6px 8px;font-size:.78rem;line-height:1.4;cursor:pointer;transition:.2s;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.slot:hover{opacity:.85;transform:scale(1.02)}
+.slot.arabic{background:#EDE9FE;border:1px solid #c4b5fd;color:#5b21b6}
+.slot.math{background:#DBEAFE;border:1px solid #93c5fd;color:#1d4ed8}
+.slot.science{background:#D1FAE5;border:1px solid #6ee7b7;color:#065f46}
+.slot.english{background:#FEF3C7;border:1px solid #fcd34d;color:#92400e}
+.slot.islamic{background:#FEE2E2;border:1px solid #fca5a5;color:#991b1b}
+.slot.pe{background:#E0F2FE;border:1px solid #7dd3fc;color:#075985}
+.slot.art{background:#FCE7F3;border:1px solid #f9a8d4;color:#9d174d}
+.slot.social{background:#F3F4F6;border:1px solid #d1d5db;color:#374151}
+.slot.empty{background:#F8FAFF;border:1px dashed #e2e8f0;color:#94a3b8;cursor:default}
+.slot.break{background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;cursor:default}
+.slot-subj{font-weight:700;font-size:.8rem}
+.slot-teacher{font-size:.7rem;opacity:.8}
+.slot-room{font-size:.68rem;opacity:.7}
+.slot.current-slot{box-shadow:0 0 0 2px #6C3DD6;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 2px #6C3DD6}50%{box-shadow:0 0 0 4px rgba(108,61,214,.4)}}
+
+/* Today's schedule */
+.today-slots{display:flex;flex-direction:column;gap:10px}
+.today-slot{display:flex;align-items:center;gap:14px;background:#fff;border-radius:12px;padding:14px 18px;border:1px solid var(--border);transition:.2s}
+.today-slot:hover{border-color:var(--primary);box-shadow:0 2px 8px rgba(108,61,214,.1)}
+.today-slot.current{border-color:var(--primary);background:#F5F0FF;box-shadow:0 2px 12px rgba(108,61,214,.15)}
+.slot-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0}
+.slot-info{flex:1}
+.slot-name{font-weight:700;font-size:.95rem;color:var(--text)}
+.slot-details{font-size:.78rem;color:var(--text2);margin-top:2px}
+.slot-time{font-size:.82rem;color:var(--text2);text-align:left}
+.slot-badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+.badge-now{background:#dcfce7;color:#16a34a}
+.badge-next{background:#dbeafe;color:#1d4ed8}
+.badge-done{background:#f1f5f9;color:#94a3b8}
+.badge-free{background:#fef3c7;color:#d97706}
+
+/* Controls */
+.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px}
+.ctrl-group{display:flex;flex-direction:column;gap:4px}
+.ctrl-label{font-size:.75rem;color:var(--text2);font-weight:600}
+select,input{background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-family:inherit;font-size:.85rem;cursor:pointer}
+select:focus,input:focus{outline:none;border-color:var(--primary)}
+.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card);border-radius:12px;padding:16px 20px;border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.stat-icon{font-size:1.8rem}
+.stat-num{font-size:1.5rem;font-weight:900;color:var(--text)}
+.stat-label{font-size:.75rem;color:var(--text2)}
+
+/* Sub alert */
+.sub-alert{background:#fffbeb;border:2px solid #f59e0b;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:none}
+.sub-alert.show{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* Loading */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text2);gap:10px}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">🎓</div>
+    <div>
+      <div class="hdr-title">الجدول الدراسي | Timetable</div>
+      <div class="hdr-sub">الجدول الأسبوعي الذكي — EduOS</div>
+    </div>
+  </div>
+  <div class="hdr-meta" id="hdrMeta">جاري التحميل...</div>
+  <div class="hdr-actions">
+    <button class="btn-hdr" onclick="printTimetable()">🖨️ طباعة</button>
+    <button class="btn-hdr" onclick="location.href='/apps/eduos-teacher/'">← الرئيسية</button>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab active" onclick="switchTab('today')">📅 جدولي اليوم</button>
+  <button class="tab" onclick="switchTab('week')">📆 الجدول الأسبوعي</button>
+  <button class="tab" onclick="switchTab('class')">🏫 جدول الصف</button>
+  <button class="tab" onclick="switchTab('teacher')">👩‍🏫 جدول المعلم/ة</button>
+  <button class="tab" onclick="switchTab('conflicts')">⚠️ التعارضات</button>
+</div>
+
+<div class="main">
+
+  <!-- Sub alert -->
+  <div class="sub-alert" id="subAlert">
+    <div style="font-size:.9rem;font-weight:600;color:#92400e">⚠️ معلم/ة غائب/ة — تم اقتراح بديل تلقائياً (مستوى B)</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="approveSubstitute()">✅ اعتماد البديل</button>
+      <button class="btn btn-outline" onclick="document.getElementById('subAlert').classList.remove('show')">تجاهل</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">📚</div><div><div class="stat-num" id="statSubjects">—</div><div class="stat-label">مادة هذا الأسبوع</div></div></div>
+    <div class="stat-card"><div class="stat-icon">⏰</div><div><div class="stat-num" id="statHours">—</div><div class="stat-label">حصة درسية</div></div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-num" id="statDone">—</div><div class="stat-label">مكتملة اليوم</div></div></div>
+    <div class="stat-card"><div class="stat-icon">⚠️</div><div><div class="stat-num" id="statConflicts">—</div><div class="stat-label">تعارض</div></div></div>
+  </div>
+
+  <!-- TODAY -->
+  <div id="tab-today" class="panel active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📅 جدول اليوم <span id="todayLabel" style="font-weight:400;color:var(--text2);font-size:.85rem"></span></div>
+        <button class="btn btn-outline" onclick="loadTodaySlots()">🔄 تحديث</button>
+      </div>
+      <div class="today-slots" id="todaySlots"><div class="loading"><div class="spinner"></div> جاري التحميل...</div></div>
+    </div>
+  </div>
+
+  <!-- WEEK -->
+  <div id="tab-week" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📆 الجدول الأسبوعي الكامل</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" onclick="loadWeekTable()">🔄 تحديث</button>
+          <button class="btn btn-primary" onclick="printTimetable()">🖨️ طباعة</button>
+        </div>
+      </div>
+      <div class="tt-outer" id="weekTableWrap"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+  </div>
+
+  <!-- CLASS -->
+  <div id="tab-class" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🏫 جدول الصف | Class Timetable</div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">الصف | Class</span>
+          <select id="selClass" onchange="loadClassTable()"><option value="">اختر الصف...</option></select>
+        </div>
+      </div>
+      <div class="tt-outer" id="classTableWrap"><div style="text-align:center;padding:30px;color:var(--text2)">اختر صفاً لعرض جدوله</div></div>
+    </div>
+  </div>
+
+  <!-- TEACHER -->
+  <div id="tab-teacher" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👩‍🏫 جدول المعلم/ة | Teacher Timetable</div>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">المعلم/ة | Teacher</span>
+          <select id="selTeacher" onchange="loadTeacherTable()"><option value="">اختر المعلم/ة...</option></select>
+        </div>
+      </div>
+      <div class="tt-outer" id="teacherTableWrap"><div style="text-align:center;padding:30px;color:var(--text2)">اختر معلماً/ة لعرض جدوله</div></div>
+    </div>
+  </div>
+
+  <!-- CONFLICTS -->
+  <div id="tab-conflicts" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚠️ تعارضات الجدول | Conflicts</div>
+        <button class="btn btn-primary" onclick="detectConflicts()">🔍 فحص التعارضات</button>
+      </div>
+      <div id="conflictsList"><div class="loading"><div class="spinner"></div> جاري الفحص...</div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB = 'https://zuyizaiugpmhmeycqton.supabase.co';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3NTYxNzcsImV4cCI6MjAyNTMzMjE3N30.LSbSGlMPy8TGlGDDFVaVWGYnZ-N_9schRKPD69FQNPU';
+
+const DAYS = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+const DAYS_EN = ['Sun','Mon','Tue','Wed','Thu'];
+const COLORS = {arabic:'arabic',math:'math',science:'science',english:'english',islamic:'islamic',pe:'pe',art:'art',social:'social'};
+
+function colorClass(subj='') {
+  const s = subj.toLowerCase();
+  if(s.includes('عرب')||s.includes('arab')) return 'arabic';
+  if(s.includes('رياض')||s.includes('math')) return 'math';
+  if(s.includes('علوم')||s.includes('sci')) return 'science';
+  if(s.includes('إنجل')||s.includes('eng')) return 'english';
+  if(s.includes('إسلام')||s.includes('islam')) return 'islamic';
+  if(s.includes('ترب')||s.includes('pe')) return 'pe';
+  if(s.includes('فن')||s.includes('art')) return 'art';
+  return 'social';
+}
+
+async function get(table, params='') {
+  const r = await fetch(`${SB}/rest/v1/${table}?${params}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+  return r.ok?r.json():[];
+}
+
+async function init() {
+  const now = new Date();
+  const dayNames=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  document.getElementById('hdrMeta').textContent = `${dayNames[now.getDay()]} ${now.toLocaleDateString('ar-AE')}`;
+  document.getElementById('todayLabel').textContent = `— ${dayNames[now.getDay()]}`;
+
+  await Promise.all([loadClasses(), loadTeachers(), loadTodaySlots(), loadWeekTable()]);
+  checkSubstituteAlerts();
+  detectConflicts();
+}
+
+async function loadClasses() {
+  try {
+    const classes = await get('classes','select=id,name,grade_level&order=grade_level,name&limit=50');
+    const sel = document.getElementById('selClass');
+    classes.forEach(c=>{
+      const o=document.createElement('option'); o.value=c.id; o.textContent=c.name||`الصف ${c.grade_level}`; sel.appendChild(o);
+    });
+  } catch(e){}
+}
+
+async function loadTeachers() {
+  try {
+    const teachers = await get('staff_profiles','select=id,full_name&role=eq.teacher&order=full_name&limit=60');
+    const sel = document.getElementById('selTeacher');
+    teachers.forEach(t=>{
+      const o=document.createElement('option'); o.value=t.id; o.textContent=t.full_name||'معلم/ة'; sel.appendChild(o);
+    });
+  } catch(e){}
+}
+
+async function loadTodaySlots() {
+  const now = new Date();
+  const dayIndex = now.getDay(); // 0=Sun
+  const currentHour = now.getHours()*60 + now.getMinutes();
+  document.getElementById('todaySlots').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+
+  try {
+    const slots = await get('timetable_slots',`day_of_week=eq.${dayIndex}&select=period_number,subject_name,teacher_name,room,start_time,end_time,class_id&order=period_number&limit=12`);
+
+    if (!slots || slots.length===0) { document.getElementById('statSubjects').textContent='0'; document.getElementById('statHours').textContent='0'; document.getElementById('statDone').textContent='0'; document.getElementById('todaySlots').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">لا حصص مجدولة اليوم</div>'; return; }
+
+    document.getElementById('statSubjects').textContent = [...new Set(slots.map(s=>s.subject_name))].length;
+    document.getElementById('statHours').textContent = slots.length;
+
+    const html = slots.map(s=>{
+      const [sh,sm] = (s.start_time||'07:15').split(':').map(Number);
+      const [eh,em] = (s.end_time||'07:55').split(':').map(Number);
+      const startMin = sh*60+sm, endMin = eh*60+em;
+      const isCurrent = currentHour>=startMin && currentHour<endMin;
+      const isDone = currentHour>=endMin;
+      const badge = isCurrent?'<span class="slot-badge badge-now">🔴 الآن</span>':isDone?'<span class="slot-badge badge-done">✅ انتهت</span>':'<span class="slot-badge badge-next">⏳ قادمة</span>';
+      return `<div class="today-slot ${isCurrent?'current':''}">
+        <div class="slot-num">${s.period_number||'•'}</div>
+        <div class="slot-info">
+          <div class="slot-name">${s.subject_name||'—'}</div>
+          <div class="slot-details">${s.teacher_name||''} ${s.room?'· '+s.room:''} ${s.class_id?'· '+s.class_id:''}</div>
+        </div>
+        <div class="slot-time">${s.start_time||''}–${s.end_time||''}</div>
+        ${badge}
+      </div>`;
+    }).join('');
+
+    const done = slots.filter(s=>{ const [h,m]=(s.end_time||'00:00').split(':').map(Number); return currentHour>=(h*60+m); }).length;
+    document.getElementById('statDone').textContent = done;
+    document.getElementById('todaySlots').innerHTML = html;
+  } catch(e) { document.getElementById('todaySlots').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">⚠️ تعذّر تحميل الجدول</div>'; }
+}
+
+// renderDemoToday removed — no fake data allowed
+
+async function loadWeekTable() {
+  document.getElementById('weekTableWrap').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const slots = await get('timetable_slots','select=day_of_week,period_number,subject_name,teacher_name,room,class_id&order=day_of_week,period_number&limit=200');
+    if(!slots||slots.length===0){ document.getElementById('weekTableWrap').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">لا جدول أسبوعي مُدخَل حتى الآن</div>'; return; }
+
+    const periods = [...new Set(slots.map(s=>s.period_number))].sort();
+    const byDayPeriod = {};
+    slots.forEach(s=>{ const k=`${s.day_of_week}_${s.period_number}`; if(!byDayPeriod[k]) byDayPeriod[k]=[]; byDayPeriod[k].push(s); });
+
+    let html = `<table class="tt-table"><thead><tr><th>الحصة</th>${DAYS.map((d,i)=>`<th>${d}<br><span style="font-size:.7rem;opacity:.8">${DAYS_EN[i]}</span></th>`).join('')}</tr></thead><tbody>`;
+    periods.forEach(p=>{
+      html += `<tr><td class="tt-time">الحصة ${p}</td>`;
+      [0,1,2,3,4].forEach(d=>{
+        const key=`${d}_${p}`; const s=byDayPeriod[key]?.[0];
+        if(s) html+=`<td><div class="slot ${colorClass(s.subject_name)}"><div class="slot-subj">${s.subject_name}</div><div class="slot-teacher">${s.teacher_name||''}</div><div class="slot-room">${s.room||''}</div></div></td>`;
+        else html+=`<td><div class="slot empty">—</div></td>`;
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    document.getElementById('weekTableWrap').innerHTML=html;
+  } catch(e){ document.getElementById('weekTableWrap').innerHTML='<div style="padding:40px;text-align:center;color:var(--text2)">⚠️ تعذّر تحميل الجدول</div>'; }
+}
+
+// renderDemoWeek removed — no fake data
+
+async function loadClassTable() {
+  const classId=document.getElementById('selClass').value;
+  if(!classId) return;
+  document.getElementById('classTableWrap').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const slots=await get('timetable_slots',`class_id=eq.${classId}&select=day_of_week,period_number,subject_name,teacher_name,room,start_time,end_time&order=day_of_week,period_number&limit=60`);
+    renderTimetableHTML(slots,'classTableWrap');
+  } catch(e){ document.getElementById('classTableWrap').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2)">لا بيانات</div>'; }
+}
+
+async function loadTeacherTable() {
+  const tid=document.getElementById('selTeacher').value;
+  if(!tid) return;
+  document.getElementById('teacherTableWrap').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  try {
+    const slots=await get('timetable_slots',`teacher_id=eq.${tid}&select=day_of_week,period_number,subject_name,class_id,room,start_time,end_time&order=day_of_week,period_number&limit=60`);
+    renderTimetableHTML(slots,'teacherTableWrap',true);
+  } catch(e){ document.getElementById('teacherTableWrap').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2)">لا بيانات</div>'; }
+}
+
+function renderTimetableHTML(slots, containerId, showClass=false) {
+  if(!slots||slots.length===0){ document.getElementById(containerId).innerHTML='<div style="padding:30px;text-align:center;color:var(--text2)">لا بيانات لهذا الاختيار</div>'; return; }
+  const periods=[...new Set(slots.map(s=>s.period_number))].sort();
+  const byDP={};
+  slots.forEach(s=>{ const k=`${s.day_of_week}_${s.period_number}`; byDP[k]=s; });
+  let html=`<table class="tt-table"><thead><tr><th>الحصة</th>${DAYS.map((d,i)=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
+  periods.forEach(p=>{
+    html+=`<tr><td class="tt-time">الحصة ${p}</td>`;
+    [0,1,2,3,4].forEach(d=>{ const s=byDP[`${d}_${p}`]; html+=s?`<td><div class="slot ${colorClass(s.subject_name)}"><div class="slot-subj">${s.subject_name}</div>${showClass?`<div class="slot-teacher">${s.class_id||''}</div>`:''}<div class="slot-room">${s.room||''}</div></div></td>`:`<td><div class="slot empty">—</div></td>`; });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById(containerId).innerHTML=html;
+}
+
+async function detectConflicts() {
+  document.getElementById('statConflicts').textContent='—';
+  try {
+    const slots=await get('timetable_slots','select=day_of_week,period_number,teacher_id,class_id&limit=500');
+    const seen={}; const conflicts=[];
+    slots.forEach(s=>{
+      ['teacher','class'].forEach(type=>{
+        const key=`${type}_${type==='teacher'?s.teacher_id:s.class_id}_${s.day_of_week}_${s.period_number}`;
+        if(seen[key]) conflicts.push({type,id:type==='teacher'?s.teacher_id:s.class_id,day:DAYS[s.day_of_week],period:s.period_number});
+        else seen[key]=s;
+      });
+    });
+    document.getElementById('statConflicts').textContent=conflicts.length;
+    if(conflicts.length===0){ document.getElementById('conflictsList').innerHTML='<div style="padding:30px;text-align:center;color:#22c55e;font-size:1rem">✅ لا تعارضات في الجدول</div>'; return; }
+    document.getElementById('conflictsList').innerHTML=`
+      <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+        ${conflicts.map(c=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:#fffbeb">
+          <span style="font-size:1.2rem">⚠️</span>
+          <div style="flex:1"><strong>${c.type==='teacher'?'معلم/ة':'صف'}: ${c.id}</strong><br><span style="font-size:.78rem;color:var(--text2)">${c.day} — الحصة ${c.period}</span></div>
+          <button class="btn btn-outline" style="padding:5px 12px;font-size:.75rem" onclick="showToast('🤖 الذكاء يقترح حلاً — يحتاج موافقة (B)')">🤖 حل مقترح</button>
+        </div>`).join('')}
+      </div>`;
+  } catch(e){ document.getElementById('conflictsList').innerHTML='<div style="padding:20px;text-align:center;color:var(--text2)">لا يمكن الفحص الآن</div>'; }
+}
+
+async function checkSubstituteAlerts() {
+  try {
+    const today=new Date().toISOString().split('T')[0];
+    const absences=await get('staff_leaves',`date=eq.${today}&status=eq.approved&select=staff_id&limit=5`);
+    if(absences&&absences.length>0) document.getElementById('subAlert').classList.add('show');
+  } catch(e){}
+}
+function approveSubstitute(){ showToast('✅ تم اعتماد جدول البديل'); document.getElementById('subAlert').classList.remove('show'); }
+
+function printTimetable(){ window.print(); }
+function switchTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const tabs=['today','week','class','teacher','conflicts'];
+  const i=tabs.indexOf(n); if(i>=0) document.querySelectorAll('.tab')[i].classList.add('active');
+  document.getElementById(`tab-${n}`).classList.add('active');
+}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+init();
+</script>
+</body>
+</html>

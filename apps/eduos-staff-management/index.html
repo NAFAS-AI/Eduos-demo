@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة الكوادر — بوابة الجود</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F5F0;--white:#FFFFFF;--card:#FFFFFF;--border:#E8E0D5;
+  --gold:#D4A84B;--gold-light:#FDF3DC;
+  --teal:#0D3333;--teal2:#1C5C5C;--teal-light:#E8F4F4;
+  --text:#1C2A2A;--text2:#4A5A5A;--text3:#7A8A8A;
+  --green:#16A34A;--green-bg:#DCFCE7;
+  --red:#DC2626;--red-bg:#FEE2E2;
+  --blue:#2563EB;--blue-bg:#DBEAFE;
+  --orange:#D97706;--orange-bg:#FEF3C7;
+  --purple:#7C3AED;--purple-bg:#EDE9FE;
+  --radius:12px;--shadow:0 2px 12px rgba(0,0,0,.08);
+}
+body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+
+/* HEADER */
+.header{background:var(--teal);color:#fff;padding:0 28px;height:64px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:38px;height:38px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.header-title{font-size:18px;font-weight:700}
+.header-sub{font-size:12px;opacity:.7;display:block}
+.header-spacer{flex:1}
+.header-user{display:flex;align-items:center;gap:10px;font-size:13px}
+.header-clock{font-size:13px;opacity:.8;font-feature-settings:'tnum'}
+.btn-back{background:rgba(255,255,255,.12);border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:.2s}
+.btn-back:hover{background:rgba(255,255,255,.22)}
+
+/* LAYOUT */
+.page{display:flex;height:calc(100vh - 64px)}
+.sidebar{width:220px;background:var(--white);border-left:1px solid var(--border);padding:16px 0;flex-shrink:0;overflow-y:auto}
+.main{flex:1;overflow-y:auto;padding:24px}
+
+/* SIDEBAR NAV */
+.nav-section{padding:4px 12px;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-radius:0;font-size:14px;color:var(--text2);transition:.15s;border-right:3px solid transparent;margin:1px 0}
+.nav-item:hover{background:var(--teal-light);color:var(--teal)}
+.nav-item.active{background:var(--teal-light);color:var(--teal);border-right-color:var(--teal);font-weight:600}
+.nav-item .icon{font-size:17px;width:20px;text-align:center}
+.nav-badge{margin-right:auto;background:var(--teal);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%;border-radius:0 var(--radius) var(--radius) 0}
+.kpi-card.teal::before{background:var(--teal)}
+.kpi-card.gold::before{background:var(--gold)}
+.kpi-card.green::before{background:var(--green)}
+.kpi-card.blue::before{background:var(--blue)}
+.kpi-card.purple::before{background:var(--purple)}
+.kpi-card.orange::before{background:var(--orange)}
+.kpi-icon{font-size:24px;margin-bottom:8px}
+.kpi-value{font-size:28px;font-weight:900;color:var(--teal);line-height:1}
+.kpi-label{font-size:12px;color:var(--text3);margin-top:4px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* SECTION HEADER */
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.section-title{font-size:17px;font-weight:700;color:var(--teal)}
+.section-spacer{flex:1}
+
+/* SEARCH & FILTER BAR */
+.filter-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.search-box{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:0 14px;height:40px}
+.search-box input{border:none;background:none;font-family:inherit;font-size:14px;color:var(--text);width:100%;outline:none}
+.search-box span{color:var(--text3)}
+select.filter-select{height:40px;padding:0 12px;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;color:var(--text);background:var(--white);cursor:pointer;outline:none}
+.btn{padding:9px 18px;border-radius:10px;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal2)}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{filter:brightness(1.1)}
+.btn-outline{background:var(--white);color:var(--teal);border:1.5px solid var(--teal)}
+.btn-outline:hover{background:var(--teal-light)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:8px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid var(--red)}
+.btn-danger:hover{background:var(--red);color:#fff}
+
+/* STAFF TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.staff-table{width:100%;border-collapse:collapse;font-size:13px}
+.staff-table th{background:#F0EDE8;padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:12px;white-space:nowrap;border-bottom:1px solid var(--border)}
+.staff-table td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+.staff-table tr:last-child td{border-bottom:none}
+.staff-table tr:hover td{background:#FAFAF8}
+.staff-table [dir=ltr]{direction:ltr;text-align:left}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.badge-teacher{background:#E0F2FE;color:#0369A1}
+.badge-principal{background:var(--purple-bg);color:var(--purple)}
+.badge-social_worker{background:#FEF3C7;color:#92400E}
+.badge-special_ed{background:#FCE7F3;color:#9D174D}
+.badge-coach{background:#DCFCE7;color:#166534}
+.badge-nurse{background:#FEE2E2;color:#991B1B}
+.badge-technician{background:#E0E7FF;color:#3730A3}
+.badge-secretary{background:#F3F4F6;color:#374151}
+.badge-admin{background:var(--gold-light);color:#92400E}
+.badge-sub_teacher{background:#F0FDF4;color:#166534}
+.badge-librarian{background:#EDE9FE;color:#5B21B6}
+.badge-specialist{background:#FFF7ED;color:#9A3412}
+.badge-assistant{background:#F9FAFB;color:#6B7280}
+.badge-default{background:#F3F4F6;color:#374151}
+.badge-active{background:var(--green-bg);color:var(--green)}
+.badge-inactive{background:var(--red-bg);color:var(--red)}
+.badge-emirati{background:var(--gold-light);color:#7B5E00}
+
+/* AVATAR */
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:min(800px,95vw);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{background:var(--teal);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:12px}
+.modal-title{font-size:16px;font-weight:700;flex:1}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+.modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-label{font-size:12px;font-weight:600;color:var(--text2)}
+.form-label .req{color:var(--red)}
+.form-input,.form-select,.form-textarea{border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:14px;color:var(--text);background:var(--white);outline:none;transition:.2s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,51,51,.1)}
+.form-textarea{resize:vertical;min-height:80px}
+.form-divider{grid-column:1/-1;border:none;border-top:1px solid var(--border);margin:4px 0}
+.form-section-title{grid-column:1/-1;font-size:13px;font-weight:700;color:var(--teal);padding-bottom:4px;border-bottom:2px solid var(--teal-light)}
+
+/* PROFILE VIEW */
+.profile-hero{background:linear-gradient(135deg,var(--teal),#1C5C5C);color:#fff;border-radius:var(--radius);padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;border:3px solid rgba(255,255,255,.3)}
+.profile-name{font-size:22px;font-weight:900}
+.profile-role{font-size:14px;opacity:.8;margin-top:4px}
+.profile-id{font-size:12px;opacity:.6;margin-top:4px;direction:ltr}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.info-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.info-card-title{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:var(--text3);font-size:12px}
+.info-value{font-weight:500;color:var(--text);text-align:left;direction:ltr}
+.info-value.ar{direction:rtl;text-align:right}
+
+/* PAGINATION */
+.pagination{display:flex;align-items:center;gap:8px;justify-content:center;padding:16px;flex-wrap:wrap}
+.page-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--white);cursor:pointer;font-family:inherit;font-size:13px;color:var(--text2);transition:.15s}
+.page-btn:hover{background:var(--teal-light);color:var(--teal)}
+.page-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.page-info{font-size:12px;color:var(--text3)}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:60px;flex-direction:column;gap:12px;color:var(--text3)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:#F0EDE8;border-radius:10px;padding:4px;margin-bottom:20px}
+.tab-btn{flex:1;padding:8px 16px;border:none;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);background:none;transition:.2s;text-align:center}
+.tab-btn.active{background:var(--white);color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:24px;background:var(--teal);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(100px);opacity:0;transition:.3s}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* STATS CHART */
+.role-chart{display:flex;flex-direction:column;gap:8px}
+.role-bar-row{display:flex;align-items:center;gap:10px;font-size:13px}
+.role-bar-label{width:140px;color:var(--text2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.role-bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.role-bar-fill{height:100%;border-radius:5px;background:var(--teal);transition:.6s}
+.role-bar-count{width:30px;text-align:left;font-size:12px;font-weight:700;color:var(--teal)}
+
+/* Alerts panel */
+.alerts-panel{display:flex;flex-direction:column;gap:10px}
+.alert-item{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.alert-icon{font-size:20px;width:28px;text-align:center}
+.alert-text{flex:1;font-size:13px;color:var(--text)}
+.alert-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.alert-item.warning{border-right:3px solid var(--orange)}
+.alert-item.danger{border-right:3px solid var(--red)}
+.alert-item.info{border-right:3px solid var(--blue)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-box">🎓</div>
+    <div>
+      <div class="header-title">إدارة الكوادر</div>
+      <span class="header-sub">Staff Management — بوابة الجود الذكية</span>
+    </div>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="header-clock" id="headerClock"></div>
+  <button class="btn-back" onclick="history.back()">← الرئيسية</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">القائمة الرئيسية</div>
+    <div class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+      <span class="icon">📊</span> لوحة التحكم
+    </div>
+    <div class="nav-item" onclick="showSection('directory')" id="nav-directory">
+      <span class="icon">👥</span> دليل الكوادر
+      <span class="nav-badge" id="navBadgeTotal">—</span>
+    </div>
+    <div class="nav-section">بحسب الدور</div>
+    <div class="nav-item" onclick="filterByRole('teacher')">
+      <span class="icon">📚</span> معلمون
+    </div>
+    <div class="nav-item" onclick="filterByRole('principal')">
+      <span class="icon">🏫</span> إدارة
+    </div>
+    <div class="nav-item" onclick="filterByRole('social_worker')">
+      <span class="icon">🤝</span> أخصائيون اجتماعيون
+    </div>
+    <div class="nav-item" onclick="filterByRole('special_ed')">
+      <span class="icon">💙</span> تربية خاصة
+    </div>
+    <div class="nav-item" onclick="filterByRole('coach')">
+      <span class="icon">🥋</span> مدربون
+    </div>
+    <div class="nav-item" onclick="filterByRole('nurse')">
+      <span class="icon">🏥</span> الصحة المدرسية
+    </div>
+    <div class="nav-item" onclick="filterByRole('secretary')">
+      <span class="icon">📋</span> السكرتارية
+    </div>
+    <div class="nav-item" onclick="filterByRole('technician')">
+      <span class="icon">🔧</span> فنيون
+    </div>
+    <div class="nav-item" onclick="filterByRole('librarian')">
+      <span class="icon">📖</span> مكتبة
+    </div>
+    <div class="nav-section">إجراءات</div>
+    <div class="nav-item" onclick="openAddModal()">
+      <span class="icon">➕</span> إضافة موظف
+    </div>
+    <div class="nav-item" onclick="showSection('alerts')" id="nav-alerts">
+      <span class="icon">🔔</span> تنبيهات
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="section-dashboard">
+      <div class="section-head">
+        <div class="section-title">📊 لوحة التحكم — Staff Dashboard</div>
+        <div class="section-spacer"></div>
+        <button class="btn btn-primary" onclick="openAddModal()">➕ إضافة موظف جديد</button>
+      </div>
+
+      <!-- KPI -->
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card teal"><div class="kpi-icon">👥</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-label">إجمالي الكوادر</div><div class="kpi-sub">Total Staff</div></div>
+        <div class="kpi-card green"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpiActive">—</div><div class="kpi-label">موظفون نشطون</div><div class="kpi-sub">Active Staff</div></div>
+        <div class="kpi-card gold"><div class="kpi-icon">🇦🇪</div><div class="kpi-value" id="kpiEmirati">—</div><div class="kpi-label">إماراتيون</div><div class="kpi-sub">Emirati Staff</div></div>
+        <div class="kpi-card blue"><div class="kpi-icon">📚</div><div class="kpi-value" id="kpiTeachers">—</div><div class="kpi-label">معلمون</div><div class="kpi-sub">Teachers</div></div>
+        <div class="kpi-card purple"><div class="kpi-icon">🌐</div><div class="kpi-value" id="kpiOnline">—</div><div class="kpi-label">متصلون الآن</div><div class="kpi-sub">Online Now</div></div>
+        <div class="kpi-card orange"><div class="kpi-icon">⏰</div><div class="kpi-value" id="kpiExpiring">—</div><div class="kpi-label">عقود تنتهي قريباً</div><div class="kpi-sub">Contracts Expiring</div></div>
+      </div>
+
+      <!-- TWO COLUMNS -->
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
+        <!-- ROLE BREAKDOWN -->
+        <div class="table-wrap" style="padding:20px">
+          <div class="info-card-title">📊 توزيع الكوادر بحسب الدور — Breakdown by Role</div>
+          <div class="role-chart" id="roleChart">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+
+        <!-- ALERTS PANEL -->
+        <div class="table-wrap" style="padding:20px">
+          <div class="info-card-title">🔔 تنبيهات — Alerts</div>
+          <div class="alerts-panel" id="alertsPanel">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIRECTORY -->
+    <div id="section-directory" style="display:none">
+      <div class="section-head">
+        <div class="section-title">👥 دليل الكوادر — Staff Directory</div>
+        <div class="section-spacer"></div>
+        <button class="btn btn-primary" onclick="openAddModal()">➕ إضافة</button>
+        <button class="btn btn-outline" onclick="exportCSV()">📥 تصدير CSV</button>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="ابحث بالاسم أو المعرف أو البريد... Search" oninput="applyFilter()">
+        </div>
+        <select class="filter-select" id="filterRole" onchange="applyFilter()">
+          <option value="">جميع الأدوار — All Roles</option>
+          <option value="teacher">📚 معلم</option>
+          <option value="principal">🏫 إدارة</option>
+          <option value="social_worker">🤝 أخصائي اجتماعي</option>
+          <option value="special_ed">💙 تربية خاصة</option>
+          <option value="coach">🥋 مدرب</option>
+          <option value="nurse">🏥 تمريض</option>
+          <option value="secretary">📋 سكرتارية</option>
+          <option value="technician">🔧 فني</option>
+          <option value="librarian">📖 مكتبة</option>
+          <option value="specialist">🧠 أخصائي نفسي</option>
+          <option value="admin">⚙️ إداري</option>
+          <option value="sub_teacher">📝 معلم احتياط</option>
+        </select>
+        <select class="filter-select" id="filterStatus" onchange="applyFilter()">
+          <option value="">جميع الحالات</option>
+          <option value="active">✅ نشط</option>
+          <option value="inactive">❌ غير نشط</option>
+        </select>
+        <select class="filter-select" id="filterEmirati" onchange="applyFilter()">
+          <option value="">الجنسية — All</option>
+          <option value="emirati">🇦🇪 إماراتي</option>
+          <option value="expat">🌍 وافد</option>
+        </select>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table class="staff-table">
+          <thead>
+            <tr>
+              <th>الموظف — Staff</th>
+              <th>المعرف — ID</th>
+              <th>الدور — Role</th>
+              <th>القسم — Dept</th>
+              <th>المادة — Subject</th>
+              <th>الحالة</th>
+              <th>البريد — Email</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody">
+            <tr><td colspan="8"><div class="loading"><div class="spinner"></div><span>جاري التحميل...</span></div></td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- ALERTS SECTION -->
+    <div id="section-alerts" style="display:none">
+      <div class="section-head">
+        <div class="section-title">🔔 التنبيهات — Alerts</div>
+      </div>
+      <div class="alerts-panel" id="alertsPanelFull">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="staffModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="modalTitleIcon">➕</span>
+      <div class="modal-title" id="modalTitle">إضافة موظف جديد — Add New Staff</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('basic',this)">المعلومات الأساسية</button>
+        <button class="tab-btn" onclick="switchTab('academic',this)">الأكاديمي</button>
+        <button class="tab-btn" onclick="switchTab('contract',this)">العقد والبيانات</button>
+        <button class="tab-btn" onclick="switchTab('emergency',this)">الطوارئ</button>
+      </div>
+
+      <!-- BASIC TAB -->
+      <div id="tab-basic">
+        <div class="form-grid">
+          <div class="form-section-title">🪪 البيانات الشخصية — Personal Info</div>
+          <div class="form-group">
+            <label class="form-label">الاسم بالعربي <span class="req">*</span></label>
+            <input class="form-input" id="f_name_ar" placeholder="الاسم الكامل بالعربي">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Name in English <span class="req">*</span></label>
+            <input class="form-input" id="f_name_en" placeholder="Full name in English" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الموظف — Staff ID <span class="req">*</span></label>
+            <input class="form-input" id="f_staff_id" placeholder="مثال: T045" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم المستخدم — Username <span class="req">*</span></label>
+            <input class="form-input" id="f_username" placeholder="اسم الدخول" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الدور — Role <span class="req">*</span></label>
+            <select class="form-select" id="f_role_key" onchange="updateRoleTitle()">
+              <option value="">اختر الدور...</option>
+              <option value="teacher">📚 معلم — Teacher</option>
+              <option value="principal">🏫 مدير — Principal</option>
+              <option value="social_worker">🤝 أخصائي اجتماعي — Social Worker</option>
+              <option value="special_ed">💙 تربية خاصة — Special Ed</option>
+              <option value="coach">🥋 مدرب — Coach</option>
+              <option value="nurse">🏥 ممرضة — Nurse</option>
+              <option value="secretary">📋 سكرتير — Secretary</option>
+              <option value="technician">🔧 فني — Technician</option>
+              <option value="librarian">📖 أمين مكتبة — Librarian</option>
+              <option value="specialist">🧠 أخصائي نفسي — Specialist</option>
+              <option value="admin">⚙️ إداري — Admin</option>
+              <option value="sub_teacher">📝 معلم احتياط — Sub Teacher</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المسمى الوظيفي بالعربي</label>
+            <input class="form-input" id="f_role_title_ar" placeholder="المسمى الرسمي">
+          </div>
+          <div class="form-group">
+            <label class="form-label">البريد الإلكتروني — Email</label>
+            <input class="form-input" id="f_email" placeholder="example@aljood.ae" dir="ltr" type="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الهاتف — Phone</label>
+            <input class="form-input" id="f_phone" placeholder="+971 50 000 0000" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الجنسية — Nationality</label>
+            <input class="form-input" id="f_nationality" placeholder="مثال: إماراتي، مصري...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الهوية — National ID</label>
+            <input class="form-input" id="f_national_id" placeholder="784-..." dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الحالة — Status</label>
+            <select class="form-select" id="f_is_active">
+              <option value="true">✅ نشط — Active</option>
+              <option value="false">❌ غير نشط — Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">إماراتي؟ — Emirati?</label>
+            <select class="form-select" id="f_is_emirati">
+              <option value="false">لا — No</option>
+              <option value="true">نعم 🇦🇪 — Yes</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACADEMIC TAB -->
+      <div id="tab-academic" style="display:none">
+        <div class="form-grid">
+          <div class="form-section-title">📚 المعلومات الأكاديمية — Academic Info</div>
+          <div class="form-group">
+            <label class="form-label">المادة بالعربي — Subject AR</label>
+            <input class="form-input" id="f_subject_ar" placeholder="مثال: اللغة العربية">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject in English</label>
+            <input class="form-input" id="f_subjects_en" placeholder="e.g. Arabic Language" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">القسم — Department</label>
+            <input class="form-input" id="f_department" placeholder="مثال: قسم اللغة العربية">
+          </div>
+          <div class="form-group">
+            <label class="form-label">التخصص — Specialization</label>
+            <input class="form-input" id="f_subject_specialization" placeholder="التخصص الأكاديمي">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الصفوف المُدرَّسة — Grades Taught</label>
+            <input class="form-input" id="f_grades_taught" placeholder="مثال: 1,2,3 أو KG1,KG2">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الفصل الرئيسي — Homeroom</label>
+            <input class="form-input" id="f_homeroom_classes" placeholder="مثال: 4A">
+          </div>
+          <div class="form-group">
+            <label class="form-label">سنوات الخبرة — Years Experience</label>
+            <input class="form-input" id="f_years_experience" type="number" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المؤهل — Qualification</label>
+            <input class="form-input" id="f_qualification" placeholder="مثال: بكالوريوس تربية">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ساعات التدريب هذا العام</label>
+            <input class="form-input" id="f_training_hours_ytd" type="number" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الحد الأقصى للحصص/أسبوع</label>
+            <input class="form-input" id="f_weekly_max_periods" type="number" min="0" placeholder="22">
+          </div>
+          <div class="form-group">
+            <label class="form-label">مسجل في نافس؟</label>
+            <select class="form-select" id="f_nafis_registered">
+              <option value="false">لا</option>
+              <option value="true">نعم ✅</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم نافس — NAFIS ID</label>
+            <input class="form-input" id="f_nafis_id" placeholder="رقم التسجيل في نافس" dir="ltr">
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTRACT TAB -->
+      <div id="tab-contract" style="display:none">
+        <div class="form-grid">
+          <div class="form-section-title">📄 بيانات العقد — Contract Data</div>
+          <div class="form-group">
+            <label class="form-label">تاريخ الالتحاق — Employment Start</label>
+            <input class="form-input" id="f_employment_start_date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تاريخ العقد — Contract Start</label>
+            <input class="form-input" id="f_contract_start_date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">انتهاء العقد — Contract End</label>
+            <input class="form-input" id="f_contract_end_date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">مصدر العقد — Contract Source</label>
+            <input class="form-input" id="f_contract_source" placeholder="مثال: وزارة التربية، خاص">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الموظف — Employee No.</label>
+            <input class="form-input" id="f_employee_number" placeholder="الرقم الوظيفي الرسمي" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">يغطي التعليم الوطني؟</label>
+            <select class="form-select" id="f_covers_national_edu">
+              <option value="false">لا</option>
+              <option value="true">نعم</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label class="form-label">ملاحظات — Notes</label>
+            <textarea class="form-textarea" id="f_notes" placeholder="أي ملاحظات إضافية..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMERGENCY TAB -->
+      <div id="tab-emergency" style="display:none">
+        <div class="form-grid">
+          <div class="form-section-title">🚨 بيانات الطوارئ — Emergency Info</div>
+          <div class="form-group">
+            <label class="form-label">اسم جهة الاتصال</label>
+            <input class="form-input" id="f_emergency_name" placeholder="الاسم الكامل">
+          </div>
+          <div class="form-group">
+            <label class="form-label">هاتف الطوارئ</label>
+            <input class="form-input" id="f_emergency_phone" placeholder="+971 50 000 0000" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">هاتف ثانوي</label>
+            <input class="form-input" id="f_phone_secondary" placeholder="+971 50 000 0000" dir="ltr">
+          </div>
+          <div class="form-group">
+            <label class="form-label">العنوان — Address</label>
+            <input class="form-input" id="f_address" placeholder="العنوان السكني">
+          </div>
+          <div class="form-group full">
+            <label class="form-label">السيرة الذاتية — Bio</label>
+            <textarea class="form-textarea" id="f_bio" placeholder="نبذة مختصرة عن الموظف..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">إلغاء — Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaff()" id="saveBtn">💾 حفظ — Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <span>👤</span>
+      <div class="modal-title" id="profileModalTitle">بروفايل الموظف — Staff Profile</div>
+      <button class="modal-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="modal-body" id="profileModalBody">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeProfileModal()">إغلاق</button>
+      <button class="btn btn-primary" id="editProfileBtn">✏️ تعديل — Edit</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== CONFIG ======
+const SB_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY = window.EduOS?.SB_KEY || (() => {
+  // split-key pattern fallback
+  const _k1 = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTk0MjA4MDAsImV4cCI6MjAzNDk5NjgwMH0';
+  return window.EduOS?._k1 ? window.EduOS._k1 + '.' + window.EduOS._k2 + '.' + window.EduOS._k3 : _k1 + '.placeholder';
+})();
+
+// ====== STATE ======
+let allStaff = [];
+let filteredStaff = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+let editingId = null;
+let viewingStaff = null;
+
+// ====== INIT ======
+document.addEventListener('DOMContentLoaded', () => {
+  startClock();
+  loadDashboard();
+  loadStaff();
+});
+
+// ====== CLOCK ======
+function startClock() {
+  function tick() {
+    const now = new Date();
+    document.getElementById('headerClock').textContent =
+      now.toLocaleTimeString('ar-AE', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
+  tick(); setInterval(tick, 1000);
+}
+
+// ====== API ======
+async function sbQuery(query) {
+  const r = await fetch(SB_URL + '/rest/v1/rpc/query_staff', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY},
+    body: JSON.stringify({q: query})
+  });
+  // Fall back to direct table query
+  return null;
+}
+
+async function sbFetch(table, params = '') {
+  const r = await fetch(SB_URL + '/rest/v1/' + table + '?' + params, {
+    headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY}
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function sbPost(table, data) {
+  const r = await fetch(SB_URL + '/rest/v1/' + table, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'},
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+async function sbPatch(table, id, data) {
+  const r = await fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'},
+    body: JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ====== LOAD DATA ======
+async function loadStaff() {
+  try {
+    const data = await sbFetch('staff_profiles',
+      'select=id,staff_id,name_ar,name_en,role_key,role_title_ar,department,subject_ar,subjects_en,email,phone,is_active,is_emirati,is_online,nafis_registered,contract_end_date,employment_start_date,years_experience,homeroom_classes,national_id,employee_number,training_hours_ytd,created_at&order=name_ar.asc&limit=500'
+    );
+    allStaff = data || [];
+    filteredStaff = [...allStaff];
+    document.getElementById('navBadgeTotal').textContent = allStaff.length;
+    renderTable();
+    renderPagination();
+  } catch(e) {
+    document.getElementById('staffTableBody').innerHTML =
+      '<tr><td colspan="8"><div class="empty"><div class="empty-icon">⚠️</div><div>خطأ في تحميل البيانات<br><small>' + e.message + '</small></div></div></td></tr>';
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const data = await sbFetch('staff_profiles',
+      'select=role_key,is_active,is_emirati,is_online,contract_end_date&limit=500'
+    );
+    if (!data) return;
+
+    const total = data.length;
+    const active = data.filter(s => s.is_active !== false).length;
+    const emirati = data.filter(s => s.is_emirati === true).length;
+    const teachers = data.filter(s => s.role_key === 'teacher').length;
+    const online = data.filter(s => s.is_online === true).length;
+
+    // Contracts expiring in 90 days
+    const now = new Date();
+    const in90 = new Date(now.getTime() + 90*24*60*60*1000);
+    const expiring = data.filter(s => {
+      if (!s.contract_end_date) return false;
+      const d = new Date(s.contract_end_date);
+      return d >= now && d <= in90;
+    }).length;
+
+    document.getElementById('kpiTotal').textContent = total;
+    document.getElementById('kpiActive').textContent = active;
+    document.getElementById('kpiEmirati').textContent = emirati;
+    document.getElementById('kpiTeachers').textContent = teachers;
+    document.getElementById('kpiOnline').textContent = online;
+    document.getElementById('kpiExpiring').textContent = expiring;
+
+    // Role breakdown
+    const roleCounts = {};
+    const roleLabels = {
+      teacher:'معلم',principal:'إدارة',social_worker:'أخصائي اجتماعي',
+      special_ed:'تربية خاصة',coach:'مدرب',nurse:'تمريض',
+      secretary:'سكرتارية',technician:'فني',librarian:'مكتبة',
+      specialist:'أخصائي نفسي',admin:'إداري',sub_teacher:'احتياط',
+      assistant:'مساعد'
+    };
+    data.forEach(s => {
+      const k = s.role_key || 'other';
+      roleCounts[k] = (roleCounts[k] || 0) + 1;
+    });
+    const sorted = Object.entries(roleCounts).sort((a,b) => b[1]-a[1]);
+    const maxVal = sorted[0]?.[1] || 1;
+    document.getElementById('roleChart').innerHTML = sorted.map(([k,v]) =>
+      '<div class="role-bar-row">' +
+      '<div class="role-bar-label">' + (roleLabels[k] || k) + '</div>' +
+      '<div class="role-bar-track"><div class="role-bar-fill" style="width:' + Math.round(v/maxVal*100) + '%"></div></div>' +
+      '<div class="role-bar-count">' + v + '</div>' +
+      '</div>'
+    ).join('');
+
+    // Alerts
+    const alerts = [];
+    if (expiring > 0) alerts.push({icon:'📄',text:'عقود تنتهي خلال 90 يوماً',sub: expiring + ' موظف(ة)',cls:'warning'});
+    const noEmail = data.filter(s => !s.email).length;
+    if (noEmail > 0) alerts.push({icon:'📧',text:'موظفون بدون بريد إلكتروني',sub: noEmail + ' موظف(ة)',cls:'info'});
+    const inactive = data.filter(s => s.is_active === false).length;
+    if (inactive > 0) alerts.push({icon:'⚠️',text:'موظفون غير نشطين',sub: inactive + ' موظف(ة)',cls:'danger'});
+    if (alerts.length === 0) alerts.push({icon:'✅',text:'لا تنبيهات — All Clear',sub:'جميع البيانات مكتملة',cls:'info'});
+
+    const alertsHtml = alerts.map(a =>
+      '<div class="alert-item ' + a.cls + '">' +
+      '<div class="alert-icon">' + a.icon + '</div>' +
+      '<div><div class="alert-text">' + a.text + '</div><div class="alert-sub">' + a.sub + '</div></div>' +
+      '</div>'
+    ).join('');
+    document.getElementById('alertsPanel').innerHTML = alertsHtml;
+    document.getElementById('alertsPanelFull').innerHTML = alertsHtml;
+
+  } catch(e) {
+    console.error('Dashboard error:', e);
+  }
+}
+
+// ====== TABLE RENDER ======
+function renderTable() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filteredStaff.slice(start, start + PAGE_SIZE);
+  const tbody = document.getElementById('staffTableBody');
+  if (filteredStaff.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">🔍</div><div>لا نتائج — No results</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = slice.map(s => {
+    const initials = (s.name_ar || '؟').charAt(0);
+    const badge = getRoleBadge(s.role_key, s.role_title_ar);
+    const status = s.is_active !== false
+      ? '<span class="badge badge-active">✅ نشط</span>'
+      : '<span class="badge badge-inactive">❌ غير نشط</span>';
+    const emirati = s.is_emirati ? ' <span class="badge badge-emirati" style="font-size:10px">🇦🇪</span>' : '';
+    return '<tr>' +
+      '<td><div style="display:flex;align-items:center;gap:10px">' +
+        '<div class="avatar">' + initials + '</div>' +
+        '<div><div style="font-weight:600;font-size:13px">' + (s.name_ar || '—') + emirati + '</div>' +
+        '<div style="font-size:11px;color:#7A8A8A;direction:ltr">' + (s.name_en || '') + '</div></div>' +
+      '</div></td>' +
+      '<td dir="ltr" style="font-size:12px;color:#4A5A5A">' + (s.staff_id || '—') + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td style="font-size:12px">' + (s.department || '—') + '</td>' +
+      '<td style="font-size:12px">' + (s.subject_ar || '—') + '</td>' +
+      '<td>' + status + '</td>' +
+      '<td style="font-size:12px;direction:ltr">' + (s.email || '—') + '</td>' +
+      '<td><div style="display:flex;gap:6px">' +
+        '<button class="btn btn-outline btn-sm" onclick="viewProfile(\'' + s.id + '\')">👤 عرض</button>' +
+        '<button class="btn btn-outline btn-sm" onclick="openEditModal(\'' + s.id + '\')">✏️</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function getRoleBadge(key, titleAr) {
+  const labels = {
+    teacher:'معلم',principal:'إدارة',social_worker:'أخصائي اجتماعي',
+    special_ed:'تربية خاصة',coach:'مدرب',nurse:'تمريض',
+    secretary:'سكرتارية',technician:'فني',librarian:'مكتبة',
+    specialist:'أخصائي نفسي',admin:'إداري',sub_teacher:'احتياط',assistant:'مساعد'
+  };
+  const cls = 'badge badge-' + (key || 'default');
+  const label = titleAr || labels[key] || key || '—';
+  return '<span class="' + cls + '">' + label + '</span>';
+}
+
+function renderPagination() {
+  const total = filteredStaff.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (pages <= 1) { el.innerHTML = '<div class="page-info">' + total + ' موظف(ة)</div>'; return; }
+  let html = '<div class="page-info">' + total + ' موظف(ة) — صفحة ' + currentPage + ' من ' + pages + '</div>';
+  const start = Math.max(1, currentPage - 2);
+  const end = Math.min(pages, start + 4);
+  if (currentPage > 1) html += '<button class="page-btn" onclick="goPage(' + (currentPage-1) + ')">‹</button>';
+  for (let i = start; i <= end; i++) {
+    html += '<button class="page-btn' + (i===currentPage?' active':'') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+  }
+  if (currentPage < pages) html += '<button class="page-btn" onclick="goPage(' + (currentPage+1) + ')">›</button>';
+  el.innerHTML = html;
+}
+
+function goPage(p) { currentPage = p; renderTable(); renderPagination(); window.scrollTo(0,0); }
+
+// ====== FILTER ======
+function applyFilter() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const role = document.getElementById('filterRole').value;
+  const status = document.getElementById('filterStatus').value;
+  const emirati = document.getElementById('filterEmirati').value;
+
+  filteredStaff = allStaff.filter(s => {
+    if (q && !((s.name_ar||'').toLowerCase().includes(q) ||
+               (s.name_en||'').toLowerCase().includes(q) ||
+               (s.staff_id||'').toLowerCase().includes(q) ||
+               (s.email||'').toLowerCase().includes(q) ||
+               (s.role_title_ar||'').toLowerCase().includes(q))) return false;
+    if (role && s.role_key !== role) return false;
+    if (status === 'active' && s.is_active === false) return false;
+    if (status === 'inactive' && s.is_active !== false) return false;
+    if (emirati === 'emirati' && !s.is_emirati) return false;
+    if (emirati === 'expat' && s.is_emirati) return false;
+    return true;
+  });
+  currentPage = 1;
+  renderTable();
+  renderPagination();
+}
+
+function filterByRole(role) {
+  showSection('directory');
+  document.getElementById('filterRole').value = role;
+  applyFilter();
+}
+
+// ====== SECTIONS ======
+function showSection(name) {
+  ['dashboard','directory','alerts'].forEach(s => {
+    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+    const nav = document.getElementById('nav-' + s);
+    if (nav) nav.classList.toggle('active', s === name);
+  });
+}
+
+// ====== TABS ======
+function switchTab(name, btn) {
+  ['basic','academic','contract','emergency'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? '' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ====== ADD MODAL ======
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'إضافة موظف جديد — Add New Staff';
+  document.getElementById('modalTitleIcon').textContent = '➕';
+  clearForm();
+  switchTab('basic', document.querySelector('.tab-btn'));
+  document.getElementById('staffModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('staffModal').classList.remove('open');
+}
+
+function clearForm() {
+  const ids = ['name_ar','name_en','staff_id','username','role_key','role_title_ar','email','phone',
+    'nationality','national_id','is_active','is_emirati','subject_ar','subjects_en','department',
+    'subject_specialization','grades_taught','homeroom_classes','years_experience','qualification',
+    'training_hours_ytd','weekly_max_periods','nafis_registered','nafis_id',
+    'employment_start_date','contract_start_date','contract_end_date','contract_source',
+    'employee_number','covers_national_edu','notes','emergency_name','emergency_phone',
+    'phone_secondary','address','bio'];
+  ids.forEach(id => {
+    const el = document.getElementById('f_' + id);
+    if (!el) return;
+    if (el.tagName === 'SELECT') el.value = el.options[0]?.value || '';
+    else el.value = '';
+  });
+}
+
+function updateRoleTitle() {
+  const m = {teacher:'معلم',principal:'مدير',social_worker:'أخصائي اجتماعي',
+    special_ed:'معلم تربية خاصة',coach:'مدرب',nurse:'ممرضة',secretary:'سكرتير',
+    technician:'فني',librarian:'أمين مكتبة',specialist:'أخصائي نفسي',
+    admin:'إداري',sub_teacher:'معلم احتياط'};
+  const key = document.getElementById('f_role_key').value;
+  if (m[key]) document.getElementById('f_role_title_ar').value = m[key];
+}
+
+// ====== EDIT MODAL ======
+function openEditModal(id) {
+  const s = allStaff.find(x => x.id === id);
+  if (!s) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'تعديل: ' + (s.name_ar || s.name_en || '');
+  document.getElementById('modalTitleIcon').textContent = '✏️';
+  // Reload full record
+  sbFetch('staff_profiles', 'select=*&id=eq.' + id).then(data => {
+    if (!data || !data[0]) return;
+    const r = data[0];
+    const fields = {
+      name_ar:r.name_ar,name_en:r.name_en,staff_id:r.staff_id,username:r.username,
+      role_key:r.role_key,role_title_ar:r.role_title_ar,email:r.email,phone:r.phone,
+      nationality:r.nationality,national_id:r.national_id,
+      is_active:String(r.is_active !== false),is_emirati:String(!!r.is_emirati),
+      subject_ar:r.subject_ar,subjects_en:r.subjects_en,department:r.department,
+      subject_specialization:r.subject_specialization,grades_taught:r.grades_taught,
+      homeroom_classes:r.homeroom_classes,years_experience:r.years_experience,
+      qualification:r.qualification,training_hours_ytd:r.training_hours_ytd,
+      weekly_max_periods:r.weekly_max_periods,nafis_registered:String(!!r.nafis_registered),
+      nafis_id:r.nafis_id,employment_start_date:r.employment_start_date,
+      contract_start_date:r.contract_start_date,contract_end_date:r.contract_end_date,
+      contract_source:r.contract_source,employee_number:r.employee_number,
+      covers_national_edu:String(!!r.covers_national_edu),notes:r.notes,
+      emergency_name:r.emergency_name,emergency_phone:r.emergency_phone,
+      phone_secondary:r.phone_secondary,address:r.address,bio:r.bio
+    };
+    Object.entries(fields).forEach(([k,v]) => {
+      const el = document.getElementById('f_' + k);
+      if (el && v != null) el.value = v;
+    });
+  });
+  switchTab('basic', document.querySelector('.tab-btn'));
+  document.getElementById('staffModal').classList.add('open');
+}
+
+// ====== SAVE ======
+async function saveStaff() {
+  const name_ar = document.getElementById('f_name_ar').value.trim();
+  const name_en = document.getElementById('f_name_en').value.trim();
+  const staff_id = document.getElementById('f_staff_id').value.trim();
+  const role_key = document.getElementById('f_role_key').value;
+
+  if (!name_ar && !name_en) { showToast('⚠️ أدخل الاسم أولاً'); return; }
+  if (!staff_id) { showToast('⚠️ أدخل رقم المعرف أولاً'); return; }
+  if (!role_key) { showToast('⚠️ اختر الدور أولاً'); return; }
+
+  const payload = {
+    name_ar: name_ar || null,
+    name_en: name_en || null,
+    staff_id,
+    username: document.getElementById('f_username').value.trim() || null,
+    role_key,
+    role: role_key,
+    role_title_ar: document.getElementById('f_role_title_ar').value.trim() || null,
+    email: document.getElementById('f_email').value.trim() || null,
+    phone: document.getElementById('f_phone').value.trim() || null,
+    nationality: document.getElementById('f_nationality').value.trim() || null,
+    national_id: document.getElementById('f_national_id').value.trim() || null,
+    is_active: document.getElementById('f_is_active').value === 'true',
+    is_emirati: document.getElementById('f_is_emirati').value === 'true',
+    subject_ar: document.getElementById('f_subject_ar').value.trim() || null,
+    subjects_en: document.getElementById('f_subjects_en').value.trim() || null,
+    department: document.getElementById('f_department').value.trim() || null,
+    subject_specialization: document.getElementById('f_subject_specialization').value.trim() || null,
+    grades_taught: document.getElementById('f_grades_taught').value.trim() || null,
+    homeroom_classes: document.getElementById('f_homeroom_classes').value.trim() || null,
+    years_experience: parseInt(document.getElementById('f_years_experience').value) || 0,
+    qualification: document.getElementById('f_qualification').value.trim() || null,
+    training_hours_ytd: parseInt(document.getElementById('f_training_hours_ytd').value) || 0,
+    weekly_max_periods: parseInt(document.getElementById('f_weekly_max_periods').value) || 22,
+    nafis_registered: document.getElementById('f_nafis_registered').value === 'true',
+    nafis_id: document.getElementById('f_nafis_id').value.trim() || null,
+    employment_start_date: document.getElementById('f_employment_start_date').value || null,
+    contract_start_date: document.getElementById('f_contract_start_date').value || null,
+    contract_end_date: document.getElementById('f_contract_end_date').value || null,
+    contract_source: document.getElementById('f_contract_source').value.trim() || null,
+    employee_number: document.getElementById('f_employee_number').value.trim() || null,
+    covers_national_edu: document.getElementById('f_covers_national_edu').value === 'true',
+    notes: document.getElementById('f_notes').value.trim() || null,
+    emergency_name: document.getElementById('f_emergency_name').value.trim() || null,
+    emergency_phone: document.getElementById('f_emergency_phone').value.trim() || null,
+    phone_secondary: document.getElementById('f_phone_secondary').value.trim() || null,
+    address: document.getElementById('f_address').value.trim() || null,
+    bio: document.getElementById('f_bio').value.trim() || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ جاري الحفظ...';
+  btn.disabled = true;
+
+  try {
+    if (editingId) {
+      await sbPatch('staff_profiles', editingId, payload);
+      showToast('✅ تم تحديث بيانات الموظف');
+      const idx = allStaff.findIndex(s => s.id === editingId);
+      if (idx !== -1) allStaff[idx] = {...allStaff[idx], ...payload};
+    } else {
+      const res = await sbPost('staff_profiles', payload);
+      if (res && res[0]) allStaff.unshift(res[0]);
+      showToast('✅ تمت إضافة الموظف بنجاح');
+    }
+    filteredStaff = [...allStaff];
+    applyFilter();
+    closeModal();
+    loadDashboard();
+  } catch(e) {
+    showToast('❌ خطأ: ' + e.message);
+  } finally {
+    btn.textContent = '💾 حفظ — Save';
+    btn.disabled = false;
+  }
+}
+
+// ====== VIEW PROFILE ======
+async function viewProfile(id) {
+  viewingStaff = allStaff.find(s => s.id === id);
+  document.getElementById('profileModal').classList.add('open');
+  document.getElementById('profileModalBody').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  document.getElementById('editProfileBtn').onclick = () => { closeProfileModal(); openEditModal(id); };
+
+  try {
+    const data = await sbFetch('staff_profiles', 'select=*&id=eq.' + id);
+    const s = data?.[0];
+    if (!s) throw new Error('لم يتم العثور على الموظف');
+
+    document.getElementById('profileModalTitle').textContent = (s.name_ar || s.name_en || 'موظف');
+
+    const initials = (s.name_ar || '؟').charAt(0);
+    const expiryWarning = s.contract_end_date && new Date(s.contract_end_date) < new Date(Date.now()+90*24*60*60*1000)
+      ? '<span class="badge" style="background:#FEF3C7;color:#92400E;margin-right:8px">⚠️ العقد ينتهي قريباً</span>' : '';
+
+    document.getElementById('profileModalBody').innerHTML =
+      '<div class="profile-hero">' +
+        '<div class="profile-avatar">' + initials + '</div>' +
+        '<div>' +
+          '<div class="profile-name">' + (s.name_ar || '—') + '</div>' +
+          '<div class="profile-role">' + (s.name_en || '') + '</div>' +
+          '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">' +
+            getRoleBadge(s.role_key, s.role_title_ar) +
+            (s.is_emirati ? '<span class="badge badge-emirati">🇦🇪 إماراتي</span>' : '') +
+            (s.nafis_registered ? '<span class="badge" style="background:#DCFCE7;color:#166534">NAFIS ✅</span>' : '') +
+            expiryWarning +
+          '</div>' +
+          '<div class="profile-id">' + (s.staff_id || '') + (s.employee_number ? ' · ' + s.employee_number : '') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="profile-grid">' +
+
+      infoCard('📞 بيانات التواصل', [
+        ['البريد الإلكتروني', s.email || '—'],
+        ['الهاتف', s.phone || '—'],
+        ['هاتف ثانوي', s.phone_secondary || '—'],
+        ['تيليغرام', s.telegram_chat_id || '—'],
+      ]) +
+
+      infoCard('🎓 الأكاديمي', [
+        ['المادة', s.subject_ar || s.subjects_en || '—', true],
+        ['القسم', s.department || '—', true],
+        ['الصفوف', s.grades_taught || '—'],
+        ['الفصل الرئيسي', s.homeroom_classes || '—'],
+        ['سنوات الخبرة', (s.years_experience || 0) + ' سنة'],
+        ['المؤهل', s.qualification || '—', true],
+        ['ساعات التدريب', (s.training_hours_ytd || 0) + ' ساعة'],
+      ]) +
+
+      infoCard('📄 العقد', [
+        ['تاريخ الالتحاق', formatDate(s.employment_start_date)],
+        ['بداية العقد', formatDate(s.contract_start_date)],
+        ['نهاية العقد', formatDate(s.contract_end_date)],
+        ['مصدر العقد', s.contract_source || '—', true],
+        ['الجنسية', s.nationality || '—', true],
+        ['رقم الهوية', s.national_id || '—'],
+        ['نافس', s.nafis_registered ? 'مسجل ✅' : 'غير مسجل'],
+      ]) +
+
+      infoCard('🚨 الطوارئ', [
+        ['جهة الاتصال', s.emergency_name || '—', true],
+        ['هاتف الطوارئ', s.emergency_phone || '—'],
+        ['العنوان', s.address || '—', true],
+      ]) +
+
+      '</div>' +
+      (s.notes ? '<div class="info-card" style="margin-top:14px"><div class="info-card-title">📝 ملاحظات</div><div style="font-size:13px;color:var(--text2)">' + s.notes + '</div></div>' : '') +
+      (s.bio ? '<div class="info-card" style="margin-top:14px"><div class="info-card-title">👤 السيرة الذاتية</div><div style="font-size:13px;color:var(--text2)">' + s.bio + '</div></div>' : '');
+
+  } catch(e) {
+    document.getElementById('profileModalBody').innerHTML = '<div class="empty"><div class="empty-icon">❌</div><div>' + e.message + '</div></div>';
+  }
+}
+
+function infoCard(title, rows) {
+  return '<div class="info-card">' +
+    '<div class="info-card-title">' + title + '</div>' +
+    rows.map(([l, v, ar]) =>
+      '<div class="info-row"><span class="info-label">' + l + '</span><span class="info-value' + (ar ? ' ar' : '') + '">' + (v || '—') + '</span></div>'
+    ).join('') +
+    '</div>';
+}
+
+function closeProfileModal() {
+  document.getElementById('profileModal').classList.remove('open');
+}
+
+// ====== HELPERS ======
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('ar-AE', {year:'numeric',month:'short',day:'numeric'});
+}
+
+function showToast(msg, dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+function exportCSV() {
+  const headers = ['الاسم بالعربي','الاسم بالإنجليزي','المعرف','الدور','القسم','المادة','البريد','الهاتف','الحالة','إماراتي'];
+  const rows = filteredStaff.map(s => [
+    s.name_ar||'', s.name_en||'', s.staff_id||'',
+    s.role_key||'', s.department||'', s.subject_ar||'',
+    s.email||'', s.phone||'',
+    s.is_active !== false ? 'نشط' : 'غير نشط',
+    s.is_emirati ? 'نعم' : 'لا'
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'staff-aljood-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// Close modal on overlay click
+document.getElementById('staffModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.getElementById('profileModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeProfileModal(); });
+</script>
+</body>
+</html>
