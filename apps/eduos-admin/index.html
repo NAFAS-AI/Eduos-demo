@@ -430,8 +430,8 @@ tr:hover td{background:#F8FAFC;}
 </div>
 
 <script>
-const SB_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
-const SB_KEY = window.EduOS && window.EduOS.SB_KEY;
+const SB_URL = (window.EduOS && window.EduOS.SB_URL) || 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
 
 // ── Auth ──
 const sess = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
