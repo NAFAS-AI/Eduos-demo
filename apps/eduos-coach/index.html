@@ -393,9 +393,8 @@ body{
 
 <!-- ═══════════ SCRIPT ═══════════ -->
 <script>
-const SB_URL  = 'https://zuyizaiugpmhmeycqton.supabase.co';
-const SB_ANON = window.EduOS?.SB_KEY || '';
-const sb = window.supabase?.createClient(SB_URL, SB_ANON);
+const SB_ANON = window.EduOS?.(window.EduOS?window.EduOS.SB_KEY:'') || '';
+const sb = window.supabase?.createClient((window.EduOS?window.EduOS.SB_URL:''), SB_ANON);
 
 // ─── State ───
 let COACH = null;
