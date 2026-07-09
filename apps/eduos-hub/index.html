@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduOS Hub — مركز المنظومة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-theme.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<script src="/apps/platform-week.js" defer></script>
+<script src="/apps/platform-motd.js" defer></script>
+<style>
+:root {
+  --bg: #F0F4F8; --surface: #F8FAFC; --card: #ffffff; --card2: #F1F5F9;
+  --border: #E2E8F0; --brand: #6C3DD6; --brand2: #8B5CF6;
+  --accent: #22D3EE; --green: #10B981; --gold: #F59E0B; --red: #EF4444;
+  --orange: #F97316; --pink: #F472B6;
+  --text: #1E293B; --text2: #475569; --text3: #64748B; --radius: 18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    margin: 0;
+    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.header-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;gap:16px;}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand-logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.brand-text{display:flex;flex-direction:column;}
+.brand-title{font-size:18px;font-weight:900;background:linear-gradient(135deg,var(--brand2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2;}
+.brand-sub{font-size:12px;color:var(--text3);}
+.header-meta{display:flex;align-items:center;gap:12px;}
+.meta-chip{background:rgba(108,61,214,0.04);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:12px;color:var(--text2);text-align:center;line-height:1.3;}
+.meta-chip span{display:block;font-weight:700;color:var(--text);}
+.user-btn{display:flex;align-items:center;gap:10px;background:rgba(108,61,214,0.12);border:1px solid rgba(108,61,214,0.3);border-radius:12px;padding:8px 16px;cursor:pointer;transition:all 0.2s;}
+.user-btn:hover{background:rgba(108,61,214,0.22);}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.user-name{font-size:14px;font-weight:700;color:var(--text);}
+.user-role{font-size:11px;color:var(--text3);}
+.logout-btn{width:36px;height:36px;border-radius:10px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);color:var(--red);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.logout-btn:hover{background:var(--red);color:#fff;}
+
+/* ── HERO WELCOME ── */
+.hero{max-width:1600px;margin:0 auto;padding:28px 24px 0;}
+.welcome-card{background:linear-gradient(135deg,rgba(108,61,214,0.2),rgba(34,211,238,0.1));border:1px solid rgba(108,61,214,0.25);border-radius:var(--radius);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.welcome-text h2{font-size:26px;font-weight:900;color:var(--text);margin-bottom:6px;}
+.welcome-text p{font-size:15px;color:var(--text2);line-height:1.6;}
+.welcome-stats{display:flex;gap:16px;flex-wrap:wrap;}
+.w-stat{background:#ffffff;border:1px solid var(--border);border-radius:14px;padding:14px 20px;text-align:center;min-width:90px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.w-stat-num{font-size:28px;font-weight:900;line-height:1;}
+.w-stat-lbl{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* ── ALERTS ── */
+.alerts-bar{max-width:1600px;margin:0 auto;padding:16px 24px 0;}
+.alert-item{display:flex;align-items:center;gap:12px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:12px;padding:12px 18px;margin-bottom:10px;cursor:pointer;transition:all 0.2s;}
+.alert-item:hover{background:rgba(251,191,36,0.14);}
+.alert-item.danger{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.25);}
+.alert-item.info{background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.25);}
+.alert-icon{font-size:22px;flex-shrink:0;}
+.alert-text{flex:1;font-size:14px;color:var(--text2);}
+.alert-text strong{color:var(--text);font-weight:700;}
+.alert-action{font-size:12px;color:var(--accent);font-weight:700;white-space:nowrap;}
+
+/* ── MODULES GRID ── */
+.section{max-width:1600px;margin:0 auto;padding:24px 24px 0;}
+.section-title{font-size:14px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+
+/* ── MODULE CARD ── */
+.module-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.22s;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--module-color,var(--brand));opacity:0;transition:opacity 0.2s;}
+.module-card:hover{transform:translateY(-4px);border-color:var(--module-color,var(--brand));box-shadow:0 8px 24px rgba(108,61,214,0.15);}
+.module-card:hover::before{opacity:1;}
+.module-icon{width:60px;height:60px;border-radius:16px;background:var(--module-bg,rgba(108,61,214,0.15));display:flex;align-items:center;justify-content:center;font-size:28px;transition:transform 0.2s;flex-shrink:0;}
+.module-card:hover .module-icon{transform:scale(1.08);}
+.module-name{font-size:15px;font-weight:700;color:var(--text);line-height:1.3;}
+.module-sub{font-size:12px;color:var(--text3);line-height:1.4;}
+.module-badge{position:absolute;top:10px;left:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.module-badge.green{background:var(--green);}
+.module-badge.gold{background:var(--gold);color:#1a1a1a;}
+.module-new{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;font-size:10px;font-weight:700;border-radius:50px;padding:2px 8px;}
+.module-locked{opacity:0.4;cursor:not-allowed;}
+.module-locked:hover{transform:none;border-color:var(--border);box-shadow:none;}
+
+/* ── QUICK ACTIONS ── */
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.quick-btn{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s;text-decoration:none;color:var(--text);}
+.quick-btn:hover{background:var(--card);border-color:rgba(108,61,214,0.4);transform:translateX(-3px);}
+.quick-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.quick-label{font-size:15px;font-weight:700;}
+.quick-sub{font-size:12px;color:var(--text3);}
+
+/* ── ACTIVITY FEED ── */
+.activity-feed{display:flex;flex-direction:column;gap:10px;}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--card);border-radius:12px;border:1px solid var(--border);}
+.activity-dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.activity-text{font-size:14px;color:var(--text2);flex:1;line-height:1.5;}
+.activity-text strong{color:var(--text);}
+.activity-time{font-size:12px;color:var(--text3);flex-shrink:0;}
+
+/* ── BOTTOM NAV (mobile) ── */
+@media(max-width:768px){
+  .header-meta{display:none;}
+  .modules-grid{grid-template-columns:repeat(3,1fr);}
+  .welcome-stats{display:none;}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:1px solid #E2E8F0;border-top:1px solid var(--border);z-index:99;padding:8px 0 max(8px,env(safe-area-inset-bottom));}
+  .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--text3);text-decoration:none;padding:6px;}
+  .bottom-nav a.active,.bottom-nav a:hover{color:var(--brand2);}
+  .bottom-nav a span{font-size:22px;}
+  body{padding-bottom:70px;}
+}
+@media(min-width:769px){.bottom-nav{display:none;}}
+
+/* ── FOOTER ── */
+.footer{max-width:1600px;margin:0 auto;padding:24px;text-align:center;color:var(--text3);font-size:12px;border-top:1px solid var(--border);margin-top:32px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">🎓</div>
+      <div class="brand-text">
+        <span class="brand-title">بوابة الجود الذكية</span>
+        <span class="brand-sub">EduOS — مدرسة الجود</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-chip" id="week-chip">
+        <span>جاري التحميل...</span>
+        الأسبوع الدراسي
+      </div>
+      <div class="meta-chip" id="term-chip">
+        <span>—</span>
+        الفصل الدراسي
+      </div>
+      <div class="meta-chip" id="time-chip">
+        <span id="live-time">—</span>
+        الوقت
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="user-btn" id="userBtn">
+        <div class="user-avatar" id="userAvatarIcon">👤</div>
+        <div>
+          <div class="user-name" id="userName">جاري التحميل</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="تسجيل الخروج">⏻</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="welcome-card">
+    <div class="welcome-text">
+      <h2 id="welcomeText">أهلاً وسهلاً 👋</h2>
+      <p id="welcomeSub">مرحباً بك في بوابة الجود الذكية — منصتك الشاملة للإدارة التعليمية.</p>
+    </div>
+    <div class="welcome-stats" id="welcomeStats">
+      <div class="w-stat">
+        <div class="w-stat-num" style="color:var(--accent)" id="statStudents">—</div>
+        <div class="w-stat-lbl">طالب/ة</div>
+      </div>
+      <div class="w-stat">
+        <div class="w-stat-num" style="color:var(--green)" id="statAttendance">—</div>
+        <div class="w-stat-lbl">حضور اليوم</div>
+      </div>
+      <div class="w-stat">
+        <div class="w-stat-num" style="color:var(--gold)" id="statAlerts">—</div>
+        <div class="w-stat-lbl">تنبيهات</div>
+      </div>
+      <div class="w-stat">
+        <div class="w-stat-num" style="color:var(--brand2)" id="statWeek">—</div>
+        <div class="w-stat-lbl">أسبوع</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALERTS -->
+<div class="alerts-bar" id="alertsBar"></div>
+
+<!-- MODULES — TEACHER -->
+<section class="section" id="sec-teacher" style="display:none;">
+  <div class="section-title">🧑‍🏫 أدواتي اليومية</div>
+  <div class="modules-grid">
+    <a href="/apps/eduos-class-session/" class="module-card" style="--module-color:#6C3DD6;--module-bg:rgba(108,61,214,0.15)">
+      <div class="module-icon">📡</div>
+      <div class="module-name">الجلسة الصفية الحية</div>
+      <div class="module-sub">ابدأ درسك الآن</div>
+    </a>
+    <a href="/apps/eduos-exit-ticket/" class="module-card" style="--module-color:#34D399;--module-bg:rgba(52,211,153,0.12)">
+      <div class="module-icon">🎯</div>
+      <div class="module-name">بطاقة الخروج</div>
+      <div class="module-sub">قيّم فهم الطلاب</div>
+    </a>
+    <a href="/apps/eduos-teacher/" class="module-card" style="--module-color:#22D3EE;--module-bg:rgba(34,211,238,0.12)">
+      <div class="module-icon">📊</div>
+      <div class="module-name">لوحة الدرجات</div>
+      <div class="module-sub">كشوف + تقارير</div>
+    </a>
+    <a href="/apps/eduos-exam-calendar/" class="module-card" style="--module-color:#FBBF24;--module-bg:rgba(251,191,36,0.12)">
+      <div class="module-icon">📅</div>
+      <div class="module-name">تقويم الاختبارات</div>
+      <div class="module-sub">احجز + تنسيق</div>
+    </a>
+    <a href="/apps/eduos-reinforcement/" class="module-card" style="--module-color:#F472B6;--module-bg:rgba(244,114,182,0.12)">
+      <div class="module-icon">⭐</div>
+      <div class="module-name">نظام التعزيز</div>
+      <div class="module-sub">نجوم + مكافآت</div>
+    </a>
+    <a href="/apps/eduos-observation/" class="module-card" style="--module-color:#FB923C;--module-bg:rgba(251,146,60,0.12)">
+      <div class="module-icon">👁️</div>
+      <div class="module-name">المشاهدات الصفية</div>
+      <div class="module-sub">الجدول + الملاحظات</div>
+    </a>
+    <a href="/apps/eduos-pdp/" class="module-card" style="--module-color:#8B5CF6;--module-bg:rgba(139,92,246,0.12)">
+      <div class="module-icon">📈</div>
+      <div class="module-name">خطة التطوير المهني</div>
+      <div class="module-sub">PDP — أهدافي</div>
+    </a>
+    <a href="/apps/eduos-meetings/" class="module-card" style="--module-color:#06B6D4;--module-bg:rgba(6,182,212,0.12)">
+      <div class="module-icon">🤝</div>
+      <div class="module-name">الاجتماعات</div>
+      <div class="module-sub">احجز + تابع</div>
+    </a>
+    <a href="/apps/eduos-drive/" class="module-card" style="--module-color:#10B981;--module-bg:rgba(16,185,129,0.12)">
+      <div class="module-icon">📁</div>
+      <div class="module-name">مستنداتي</div>
+      <div class="module-sub">ملفات + مشاركة</div>
+    </a>
+    <a href="/apps/eduos-atheer/" class="module-card" style="--module-color:#A78BFA;--module-bg:rgba(167,139,250,0.12)">
+      <div class="module-icon">🌟</div>
+      <div class="module-name">أثير</div>
+      <div class="module-sub">الذكاء الاجتماعي</div>
+      <span class="module-new">جديد</span>
+    </a>
+  </div>
+</section>
+
+<!-- MODULES — PRINCIPAL -->
+<section class="section" id="sec-principal" style="display:none;">
+  <div class="section-title">🏫 إدارة المدرسة</div>
+  <div class="modules-grid">
+    <a href="/apps/eduos-analytics/" class="module-card" style="--module-color:#22D3EE;--module-bg:rgba(34,211,238,0.12)">
+      <div class="module-icon">📊</div>
+      <div class="module-name">مركز الذكاء التحليلي</div>
+      <div class="module-sub">تقارير + رؤى AI</div>
+    </a>
+    <a href="/apps/eduos-principal/" class="module-card" style="--module-color:#6C3DD6;--module-bg:rgba(108,61,214,0.15)">
+      <div class="module-icon">🎛️</div>
+      <div class="module-name">لوحة المدير</div>
+      <div class="module-sub">إشراف شامل</div>
+    </a>
+    <a href="/apps/eduos-exam-calendar/" class="module-card" style="--module-color:#FBBF24;--module-bg:rgba(251,191,36,0.12)">
+      <div class="module-icon">📅</div>
+      <div class="module-name">تقويم الاختبارات</div>
+      <div class="module-sub">جدولة + موافقة</div>
+    </a>
+    <a href="/apps/eduos-observation/" class="module-card" style="--module-color:#FB923C;--module-bg:rgba(251,146,60,0.12)">
+      <div class="module-icon">👁️</div>
+      <div class="module-name">المشاهدات</div>
+      <div class="module-sub">احجز زيارات الفصول</div>
+    </a>
+    <a href="/apps/eduos-meetings/" class="module-card" style="--module-color:#06B6D4;--module-bg:rgba(6,182,212,0.12)">
+      <div class="module-icon">🤝</div>
+      <div class="module-name">تقويم الاجتماعات</div>
+      <div class="module-sub">إدارة جميع الاجتماعات</div>
+    </a>
+    <a href="/apps/eduos-broadcasting/" class="module-card" style="--module-color:#F472B6;--module-bg:rgba(244,114,182,0.12)">
+      <div class="module-icon">📢</div>
+      <div class="module-name">غرفة البث</div>
+      <div class="module-sub">إعلانات + بلاغات</div>
+    </a>
+    <a href="/apps/eduos-timetable/" class="module-card" style="--module-color:#34D399;--module-bg:rgba(52,211,153,0.12)">
+      <div class="module-icon">🗓️</div>
+      <div class="module-name">الجدول الدراسي</div>
+      <div class="module-sub">إنشاء + تعديل</div>
+    </a>
+    <a href="/apps/eduos-staff-leaves/" class="module-card" style="--module-color:#8B5CF6;--module-bg:rgba(139,92,246,0.12)">
+      <div class="module-icon">🏖️</div>
+      <div class="module-name">إجازات الكادر</div>
+      <div class="module-sub">طلبات + موافقات</div>
+    </a>
+    <a href="/apps/eduos-appraisal/" class="module-card" style="--module-color:#F87171;--module-bg:rgba(248,113,113,0.12)">
+      <div class="module-icon">🏆</div>
+      <div class="module-name">التقييم الوظيفي</div>
+      <div class="module-sub">تقييم الأداء</div>
+    </a>
+    <a href="/apps/eduos-atheer/teacher.html" class="module-card" style="--module-color:#A78BFA;--module-bg:rgba(167,139,250,0.12)">
+      <div class="module-icon">🌟</div>
+      <div class="module-name">أثير — مدير</div>
+      <div class="module-sub">رصد الرفاه المدرسي</div>
+      <span class="module-new">جديد</span>
+    </a>
+  </div>
+</section>
+
+<!-- MODULES — STUDENT -->
+<section class="section" id="sec-student" style="display:none;">
+  <div class="section-title">📚 صفحتي</div>
+  <div class="modules-grid">
+    <a href="/apps/eduos-student-portal/" class="module-card" style="--module-color:#6C3DD6;--module-bg:rgba(108,61,214,0.15)">
+      <div class="module-icon">🏠</div>
+      <div class="module-name">بوابتي</div>
+      <div class="module-sub">ملفي + درجاتي</div>
+    </a>
+    <a href="/apps/eduos-exit-ticket/" class="module-card" style="--module-color:#34D399;--module-bg:rgba(52,211,153,0.12)">
+      <div class="module-icon">🎯</div>
+      <div class="module-name">بطاقة الخروج</div>
+      <div class="module-sub">أجب على أسئلة الدرس</div>
+    </a>
+    <a href="/apps/eduos-store/" class="module-card" style="--module-color:#FBBF24;--module-bg:rgba(251,191,36,0.12)">
+      <div class="module-icon">🛒</div>
+      <div class="module-name">المتجر</div>
+      <div class="module-sub">استبدل نجومك</div>
+    </a>
+    <a href="/apps/eduos-achievements/" class="module-card" style="--module-color:#FB923C;--module-bg:rgba(251,146,60,0.12)">
+      <div class="module-icon">🏅</div>
+      <div class="module-name">إنجازاتي</div>
+      <div class="module-sub">شهاداتي + جوائزي</div>
+    </a>
+    <a href="/apps/eduos-atheer/" class="module-card" style="--module-color:#A78BFA;--module-bg:rgba(167,139,250,0.12)">
+      <div class="module-icon">🌟</div>
+      <div class="module-name">أثير</div>
+      <div class="module-sub">رفيقي الذكي</div>
+    </a>
+    <a href="/apps/eduos-vark/" class="module-card" style="--module-color:#22D3EE;--module-bg:rgba(34,211,238,0.12)">
+      <div class="module-icon">🧠</div>
+      <div class="module-name">أسلوب تعلّمي</div>
+      <div class="module-sub">اكتشف VARK الخاص بك</div>
+    </a>
+  </div>
+</section>
+
+<!-- MODULES — PARENT -->
+<section class="section" id="sec-parent" style="display:none;">
+  <div class="section-title">👨‍👩‍👧 متابعة طفلك/ي</div>
+  <div class="modules-grid">
+    <a href="/apps/eduos-parent-portal/" class="module-card" style="--module-color:#6C3DD6;--module-bg:rgba(108,61,214,0.15)">
+      <div class="module-icon">💛</div>
+      <div class="module-name">بطاقة طفلك/ي</div>
+      <div class="module-sub">الدرجات + الحضور + التنبيهات</div>
+    </a>
+    <a href="/apps/eduos-messaging/" class="module-card" style="--module-color:#34D399;--module-bg:rgba(52,211,153,0.12)">
+      <div class="module-icon">💬</div>
+      <div class="module-name">التواصل مع المعلم/ة</div>
+      <div class="module-sub">رسائل مباشرة</div>
+    </a>
+    <a href="/apps/eduos-calendar/" class="module-card" style="--module-color:#FBBF24;--module-bg:rgba(251,191,36,0.12)">
+      <div class="module-icon">📅</div>
+      <div class="module-name">التقويم المدرسي</div>
+      <div class="module-sub">فعاليات + اختبارات</div>
+    </a>
+    <a href="/apps/eduos-parent/" class="module-card" style="--module-color:#22D3EE;--module-bg:rgba(34,211,238,0.12)">
+      <div class="module-icon">📊</div>
+      <div class="module-name">التقارير الدراسية</div>
+      <div class="module-sub">تقارير دورية بالذكاء الاصطناعي</div>
+    </a>
+  </div>
+</section>
+
+<!-- MODULES — SPECIALIST/OBSERVER/ADMIN -->
+<section class="section" id="sec-specialist" style="display:none;">
+  <div class="section-title">🔬 أدوات الاختصاصي/ة</div>
+  <div class="modules-grid">
+    <a href="/apps/eduos-social-worker/" class="module-card" style="--module-color:#6C3DD6;--module-bg:rgba(108,61,214,0.15)">
+      <div class="module-icon">🫂</div>
+      <div class="module-name">لوحة الاختصاصي/ة</div>
+      <div class="module-sub">متابعة الحالات</div>
+    </a>
+    <a href="/apps/eduos-inclusion/" class="module-card" style="--module-color:#34D399;--module-bg:rgba(52,211,153,0.12)">
+      <div class="module-icon">♿</div>
+      <div class="module-name">الدمج التربوي</div>
+      <div class="module-sub">خطط + تقارير</div>
+    </a>
+    <a href="/apps/eduos-atheer/teacher.html" class="module-card" style="--module-color:#A78BFA;--module-bg:rgba(167,139,250,0.12)">
+      <div class="module-icon">🌟</div>
+      <div class="module-name">أثير — رفاه الطلاب</div>
+      <div class="module-sub">الإشارات + التدخل</div>
+    </a>
+    <a href="/apps/eduos-analytics/" class="module-card" style="--module-color:#22D3EE;--module-bg:rgba(34,211,238,0.12)">
+      <div class="module-icon">📊</div>
+      <div class="module-name">التحليلات</div>
+      <div class="module-sub">بيانات المدرسة</div>
+    </a>
+  </div>
+</section>
+
+<!-- QUICK ACTIONS + ACTIVITY -->
+<section class="section" id="sec-quick">
+  <div class="section-title">⚡ إجراءات سريعة</div>
+  <div class="quick-grid" id="quickGrid"></div>
+</section>
+
+<section class="section" style="padding-bottom:32px;" id="sec-activity">
+  <div class="section-title">🕐 آخر الأنشطة</div>
+  <div class="activity-feed" id="activityFeed">
+    <div class="activity-item">
+      <div class="activity-dot" style="background:var(--text3)"></div>
+      <div class="activity-text">جاري تحميل الأنشطة...</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM NAV (Mobile) -->
+<nav class="bottom-nav">
+  <a href="/apps/eduos-hub/" class="active"><span>🏠</span>الرئيسية</a>
+  <a href="/apps/eduos-class-session/"><span>📡</span>الجلسة</a>
+  <a href="/apps/eduos-messaging/"><span>💬</span>الرسائل</a>
+  <a href="/apps/eduos-broadcasting/"><span>📢</span>الإعلانات</a>
+  <a href="#" onclick="logout()"><span>⏻</span>خروج</a>
+</nav>
+
+<footer class="footer">
+  <span>بوابة الجود الذكية • Powered by EduOS</span><br>
+  <span>© 2026 NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712 · أبوظبي</span>
+</footer>
+
+<script>
+const SUPABASE_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1eWl6YWl1Z3BtaG1leWNxdG9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk3MjM4NTAsImV4cCI6MjAyNTI5OTg1MH0.FMx54LKZYNsBSBOhFNLZl5k-QXdVIE8PNqeFvFgVZos';
+
+function sq(q){return fetch(`${SUPABASE_URL}/rest/v1/${q}`,{headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON}}).then(r=>r.json());}
+function sqp(path,body){return fetch(`${SUPABASE_URL}/rest/v1/${path}`,{method:'POST',headers:{'apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());}
+
+// Live time
+function tick(){const n=new Date();document.getElementById('live-time').textContent=n.toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit'});}
+tick();setInterval(tick,1000);
+
+// Session
+const user = JSON.parse(sessionStorage.getItem('edoos_user')||'{}');
+const role = user.role||'teacher';
+
+function initUser(){
+  const names={teacher:'معلم/ة',principal:'مدير/ة',student:'طالب/ة',parent:'ولي/ة أمر',specialist:'اختصاصي/ة',observer:'مراقب/ة',admin:'إداري/ة'};
+  const avatars={teacher:'👩‍🏫',principal:'🏫',student:'👨‍🎓',parent:'👨‍👩‍👧',specialist:'🔬',observer:'🔭',admin:'⚙️'};
+  document.getElementById('userName').textContent = user.name || names[role] || 'مستخدم';
+  document.getElementById('userRole').textContent = names[role] || role;
+  document.getElementById('userAvatarIcon').textContent = avatars[role] || '👤';
+  document.getElementById('welcomeText').textContent = `أهلاً يا ${user.name||names[role]} 👋`;
+
+  // Show role sections
+  const map={teacher:['sec-teacher'],principal:['sec-principal','sec-teacher'],student:['sec-student'],parent:['sec-parent'],specialist:['sec-specialist'],observer:['sec-specialist'],admin:['sec-principal','sec-specialist']};
+  const secs = map[role]||['sec-teacher'];
+  secs.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='block';});
+}
+
+function logout(){
+  sessionStorage.clear();
+  window.location.href='/apps/eduos-login/';
+}
+
+// Fetch platform stats
+async function loadStats(){
+  try{
+    const [students,att] = await Promise.all([
+      sq('students?select=id&limit=1&count=exact').catch(()=>null),
+      sq('attendance?select=id&status=eq.present&limit=1&count=exact').catch(()=>null)
+    ]);
+    // Try to get count from headers would need different approach; use fallback
+    document.getElementById('statStudents').textContent='—';
+    document.getElementById('statAttendance').textContent='—';
+  }catch(e){}
+
+  // Week from platform-week.js
+  setTimeout(()=>{
+    if(window.PlatformWeek){
+      const w=PlatformWeek.getCurrent();
+      document.getElementById('statWeek').textContent=w?.week||'—';
+      const wc=document.getElementById('week-chip');
+      if(wc){wc.querySelector('span').textContent=`أسبوع ${w?.week||'—'}`;}
+      const tc=document.getElementById('term-chip');
+      if(tc){tc.querySelector('span').textContent=`الفصل ${w?.term||'—'}`;}
+    }
+  },800);
+}
+
+// Alerts
+async function loadAlerts(){
+  const bar=document.getElementById('alertsBar');
+  const alerts=[];
+  // Check bug_reports for critical issues
+  try{
+    const bugs=await sq('bug_reports?select=id,title,severity&severity=eq.critical&resolved=eq.false&limit=3');
+    if(Array.isArray(bugs)&&bugs.length>0){
+      bugs.forEach(b=>{
+        alerts.push({type:'danger',icon:'🚨',text:`<strong>خلل حرج:</strong> ${b.title||'تقرير خلل جديد'}`,action:'فتح Shield →',url:'/apps/eduos-shield/'});
+      });
+    }
+  }catch(e){}
+  // Staff leaves pending
+  try{
+    const leaves=await sq('staff_leaves?select=id&status=eq.pending&limit=1');
+    if(Array.isArray(leaves)&&leaves.length>0&&(role==='principal'||role==='admin')){
+      alerts.push({type:'warn',icon:'📋',text:`<strong>${leaves.length} طلب إجازة</strong> بانتظار الموافقة`,action:'مراجعة →',url:'/apps/eduos-staff-leaves/'});
+    }
+  }catch(e){}
+
+  if(alerts.length===0){
+    bar.innerHTML='';
+    document.getElementById('statAlerts').textContent='✓';
+    return;
+  }
+  document.getElementById('statAlerts').textContent=alerts.length;
+  bar.innerHTML=alerts.map(a=>`
+    <div class="alert-item ${a.type}" onclick="window.location='${a.url}'">
+      <div class="alert-icon">${a.icon}</div>
+      <div class="alert-text">${a.text}</div>
+      <div class="alert-action">${a.action}</div>
+    </div>
+  `).join('');
+}
+
+// Quick actions per role
+function loadQuickActions(){
+  const grid=document.getElementById('quickGrid');
+  const byRole={
+    teacher:[
+      {icon:'📡',color:'rgba(108,61,214,0.15)',label:'ابدأ جلسة صفية',sub:'الآن فوراً',url:'/apps/eduos-class-session/'},
+      {icon:'📊',color:'rgba(34,211,238,0.12)',label:'كشف الدرجات',sub:'عرض + تعديل',url:'/apps/eduos-teacher/'},
+      {icon:'📢',color:'rgba(244,114,182,0.12)',label:'إرسال إعلان',sub:'للطلاب أو الأهل',url:'/apps/eduos-broadcasting/'},
+      {icon:'⭐',color:'rgba(251,191,36,0.12)',label:'منح تعزيز',sub:'نجمة أو مكافأة',url:'/apps/eduos-reinforcement/'},
+    ],
+    principal:[
+      {icon:'📊',color:'rgba(34,211,238,0.12)',label:'التقارير والتحليلات',sub:'رؤية شاملة',url:'/apps/eduos-analytics/'},
+      {icon:'📢',color:'rgba(244,114,182,0.12)',label:'بث إعلان للمدرسة',sub:'فوري لكل الفصول',url:'/apps/eduos-broadcasting/'},
+      {icon:'🏖️',color:'rgba(139,92,246,0.12)',label:'طلبات الإجازات',sub:'موافقة + رفض',url:'/apps/eduos-staff-leaves/'},
+      {icon:'📅',color:'rgba(251,191,36,0.12)',label:'جدولة اختبارات',sub:'تنسيق وموافقة',url:'/apps/eduos-exam-calendar/'},
+    ],
+    student:[
+      {icon:'🎯',color:'rgba(52,211,153,0.12)',label:'بطاقة الخروج',sub:'أجب الآن',url:'/apps/eduos-exit-ticket/'},
+      {icon:'🛒',color:'rgba(251,191,36,0.12)',label:'المتجر',sub:'استبدل نجومك',url:'/apps/eduos-store/'},
+      {icon:'🏅',color:'rgba(251,146,60,0.12)',label:'إنجازاتي',sub:'شهاداتي',url:'/apps/eduos-achievements/'},
+      {icon:'🌟',color:'rgba(167,139,250,0.12)',label:'أثير — تحدث معي',sub:'رفيقك الذكي',url:'/apps/eduos-atheer/'},
+    ],
+    parent:[
+      {icon:'💛',color:'rgba(108,61,214,0.15)',label:'بطاقة طفلك/ي',sub:'درجات + حضور',url:'/apps/eduos-parent-portal/'},
+      {icon:'💬',color:'rgba(52,211,153,0.12)',label:'رسالة للمعلم/ة',sub:'تواصل مباشر',url:'/apps/eduos-messaging/'},
+    ],
+  };
+  const actions=(byRole[role]||byRole.teacher);
+  grid.innerHTML=actions.map(a=>`
+    <a href="${a.url}" class="quick-btn">
+      <div class="quick-ico" style="background:${a.color}">${a.icon}</div>
+      <div>
+        <div class="quick-label">${a.label}</div>
+        <div class="quick-sub">${a.sub}</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+// Activity feed
+async function loadActivity(){
+  const feed=document.getElementById('activityFeed');
+  const items=[];
+  try{
+    const sessions=await sq('lesson_sessions?select=id,class_name,subject,started_at&order=started_at.desc&limit=5');
+    if(Array.isArray(sessions)){
+      sessions.forEach(s=>{
+        items.push({color:'#6C3DD6',text:`<strong>جلسة صفية</strong> — ${s.class_name||''} · ${s.subject||''}`,time:fmtTime(s.started_at)});
+      });
+    }
+  }catch(e){}
+  try{
+    const msgs=await sq('messages?select=id,title,created_at&order=created_at.desc&limit=3');
+    if(Array.isArray(msgs)){
+      msgs.forEach(m=>{
+        items.push({color:'#22D3EE',text:`<strong>إعلان:</strong> ${m.title||'رسالة جديدة'}`,time:fmtTime(m.created_at)});
+      });
+    }
+  }catch(e){}
+
+  if(items.length===0){
+    feed.innerHTML='<div class="activity-item"><div class="activity-dot" style="background:#64748B"></div><div class="activity-text">لا توجد أنشطة حديثة</div></div>';
+    return;
+  }
+  items.sort((a,b)=>b.rawTime-a.rawTime);
+  feed.innerHTML=items.slice(0,6).map(i=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${i.color}"></div>
+      <div class="activity-text">${i.text}</div>
+      <div class="activity-time">${i.time}</div>
+    </div>
+  `).join('');
+}
+
+function fmtTime(ts){
+  if(!ts)return'الآن';
+  const d=new Date(ts);const now=new Date();
+  const diff=Math.floor((now-d)/60000);
+  if(diff<1)return'الآن';if(diff<60)return`منذ ${diff} د`;
+  if(diff<1440)return`منذ ${Math.floor(diff/60)} س`;
+  return d.toLocaleDateString('ar-AE',{month:'short',day:'numeric'});
+}
+
+// Init
+initUser();
+loadStats();
+loadAlerts();
+loadQuickActions();
+loadActivity();
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>بوابة الفني — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../platform-config.js"></script>
+<script src="../platform-shield.js" defer></script>
+<script src="../platform-week.js" defer></script>
+<script src="../platform-lang.js" defer></script>
+<script src="../platform-agent-brain.js" defer></script>
+<script src="../platform-live-clock.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F2F4F7;--surface:#fff;--surface2:#F8FAFB;--brand:#0284C7;--brand2:#0EA5E9;--brand-lt:rgba(2,132,199,0.08);--emerald:#059669;--rose:#E11D48;--rose-lt:rgba(225,29,72,0.08);--amber:#D97706;--text:#1E293B;--text2:#475569;--text3:#94A3B8;--border:#E2E8F0;--shadow:0 1px 4px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04)}
+body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);font-size:18px;min-height:100vh;overflow:hidden}
+.app-shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:10;box-shadow:-2px 0 12px rgba(0,0,0,0.04)}
+.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.brand-logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;font-weight:900;margin-bottom:8px}
+.brand-name{font-size:14px;font-weight:900;color:var(--brand)}.brand-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sidebar-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.snav{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;border:1px solid transparent;background:transparent;cursor:pointer;font-family:'Tajawal',Arial,sans-serif;text-align:right;direction:rtl;transition:all .15s;width:100%}
+.snav:hover{background:var(--brand-lt)}.snav.active{background:var(--brand-lt);border-color:rgba(2,132,199,0.2)}.snav.active .snav-label{color:var(--brand)}
+.snav-icon{font-size:20px;min-width:24px;text-align:center}.snav-text{flex:1}
+.snav-label{font-size:14px;font-weight:700;color:var(--text);display:block;line-height:1.2}.snav-sub{font-size:11px;color:var(--text3);display:block;margin-top:1px}
+.snav-badge{background:var(--rose);color:#fff;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:800}
+.sidebar-footer{padding:10px 8px;border-top:1px solid var(--border)}
+.logout-btn{width:100%;padding:10px 14px;border-radius:10px;background:var(--rose-lt);border:1px solid rgba(225,29,72,0.15);color:var(--rose);font-family:'Tajawal',Arial,sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}.logout-btn:hover{background:var(--rose);color:#fff}
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0}
+.top-bar-right,.top-bar-left{display:flex;align-items:center;gap:10px}
+.context-pill{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--emerald)}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:24px;padding:4px 14px 4px 4px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff}
+.user-name{font-size:14px;font-weight:700;color:var(--text)}.user-role{font-size:11px;color:var(--brand)}
+.panels-area{flex:1;overflow-y:auto;padding:24px}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.greeting-card{background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);border-radius:16px;padding:22px 28px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(2,132,199,0.25)}
+.greeting-name{font-size:22px;font-weight:900;margin-bottom:4px}.greeting-sub{font-size:14px;opacity:.9;margin-bottom:14px}
+.greeting-stats{display:flex;gap:12px;flex-wrap:wrap}
+.g-stat{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 16px;text-align:center}
+.g-stat-num{font-size:22px;font-weight:900}.g-stat-label{font-size:11px;opacity:.85;margin-top:2px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--surface);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.kpi-icon{font-size:28px;margin-bottom:10px}.kpi-num{font-size:28px;font-weight:900;color:var(--text)}.kpi-label{font-size:13px;color:var(--text2);margin-top:4px}
+.card{background:var(--surface);border-radius:14px;padding:22px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:18px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.card-title{font-size:16px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:8px}
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:15px}thead{background:var(--surface2)}
+th{padding:12px 16px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}tr:last-child td{border-bottom:none}tr:hover td{background:var(--surface2)}
+.badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#15803d}.badge-amber{background:#fef3c7;color:#92400e}.badge-red{background:#fee2e2;color:#b91c1c}.badge-blue{background:#dbeafe;color:#1d4ed8}
+.btn-action{padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-family:'Tajawal',Arial,sans-serif;font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s}
+.btn-action:hover{border-color:var(--brand);color:var(--brand)}.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn-primary:hover{opacity:.9;color:#fff}
+.spinner-wrap{display:flex;align-items:center;justify-content:center;padding:36px;color:var(--text2);gap:12px;font-size:15px}
+.spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text2)}.empty-icon{font-size:40px;margin-bottom:12px}.empty-text{font-size:16px;font-weight:600}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:10px;padding:12px 24px;font-size:15px;font-weight:600;z-index:999;display:none}.toast.show{display:block}
+select.field,input.field{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:9px 14px;font-family:'Tajawal',Arial,sans-serif;font-size:15px;color:var(--text);width:100%}
+select.field:focus,input.field:focus{outline:none;border-color:var(--brand)}
+textarea.field{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:12px;font-family:'Tajawal',Arial,sans-serif;font-size:15px;color:var(--text);resize:vertical;min-height:80px}
+textarea.field:focus{outline:none;border-color:var(--brand)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}@media(max-width:700px){.form-grid{grid-template-columns:1fr}}
+label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.req-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:.15s}
+.req-card:hover{border-color:var(--brand)}
+.req-icon{font-size:24px;min-width:32px;text-align:center}.req-info{flex:1}
+.req-title{font-weight:700;font-size:15px;color:var(--text)}.req-sub{font-size:13px;color:var(--text2);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">🔧</div>
+      <div class="brand-name">بوابة الجود الذكية</div>
+      <div class="brand-sub">EduOS · Technician</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="snav active" data-panel="home"><span class="snav-icon">🏠</span><span class="snav-text"><span class="snav-label">الرئيسية | Home</span><span class="snav-sub">ملخص اليوم</span></span></button>
+      <button class="snav" data-panel="requests"><span class="snav-icon">📋</span><span class="snav-text"><span class="snav-label">طلبات الصيانة | Requests</span><span class="snav-sub">جميع الطلبات</span></span><span class="snav-badge" id="reqBadge" style="display:none">0</span></button>
+      <button class="snav" data-panel="new-request"><span class="snav-icon">➕</span><span class="snav-text"><span class="snav-label">طلب جديد | New</span><span class="snav-sub">تسجيل طلب</span></span></button>
+      <button class="snav" data-panel="inventory"><span class="snav-icon">📦</span><span class="snav-text"><span class="snav-label">المخزون | Inventory</span><span class="snav-sub">قطع الغيار</span></span></button>
+      <button class="snav" data-panel="schedule"><span class="snav-icon">📅</span><span class="snav-text"><span class="snav-label">الجدول | Schedule</span><span class="snav-sub">مواعيد الصيانة</span></span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" id="logoutBtn">🚪 تسجيل الخروج | Logout</button>
+    </div>
+  </aside>
+  <div class="main-area">
+    <div class="top-bar">
+      <div class="top-bar-right">
+        <div class="context-pill"><span class="dot"></span><span id="weekPill">الأسبوع الدراسي</span></div>
+        <div class="context-pill" data-live-clock="time">--:--</div>
+      </div>
+      <div class="top-bar-left">
+        <div class="user-chip">
+          <div class="user-avatar" id="topAvatar">ف</div>
+          <div><div class="user-name" id="topName">الفني</div><div class="user-role">Technician | فني</div></div>
+        </div>
+        <button class="btn-action" id="langBtn">EN</button>
+      </div>
+    </div>
+    <div class="panels-area">
+
+      <!-- HOME -->
+      <div class="tab-panel active" id="panel-home">
+        <div class="greeting-card">
+          <div>
+            <div class="greeting-name">أهلاً، <span id="greetName">الفني</span> 🔧</div>
+            <div class="greeting-sub">لوحة الصيانة المدرسية | Maintenance Dashboard</div>
+            <div class="greeting-stats">
+              <div class="g-stat"><div class="g-stat-num" id="statPending">—</div><div class="g-stat-label">طلبات معلّقة</div></div>
+              <div class="g-stat"><div class="g-stat-num" id="statUrgent">—</div><div class="g-stat-label">عاجلة</div></div>
+              <div class="g-stat"><div class="g-stat-num" id="statDone">—</div><div class="g-stat-label">مكتملة</div></div>
+            </div>
+          </div>
+          <div style="font-size:60px;opacity:.3">🔧</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-num" id="kpiPending">—</div><div class="kpi-label">طلبات معلّقة | Pending</div></div>
+          <div class="kpi-card"><div class="kpi-icon">🔴</div><div class="kpi-num" id="kpiUrgent">—</div><div class="kpi-label">عاجلة | Urgent</div></div>
+          <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-num" id="kpiDone">—</div><div class="kpi-label">مكتملة | Done</div></div>
+          <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-num" id="kpiItems">—</div><div class="kpi-label">مخزون | Inventory</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">⚠️ الطلبات العاجلة | Urgent Requests</div><button class="btn-action" data-panel="requests">الكل | All</button></div>
+          <div id="urgentReqs"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- REQUESTS -->
+      <div class="tab-panel" id="panel-requests">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 طلبات الصيانة | Maintenance Requests</div>
+            <select class="field" id="reqFilter" style="width:auto">
+              <option value="">الكل | All</option>
+              <option value="pending">معلّقة | Pending</option>
+              <option value="in_progress">جاري | In Progress</option>
+              <option value="completed">مكتملة | Done</option>
+            </select>
+          </div>
+          <div id="requestsList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- NEW REQUEST -->
+      <div class="tab-panel" id="panel-new-request">
+        <div class="card">
+          <div class="card-header"><div class="card-title">➕ طلب صيانة جديد | New Request</div></div>
+          <div class="form-grid">
+            <div><label class="lbl">نوع المشكلة | Issue Type</label>
+              <select class="field" id="nrType">
+                <option value="electrical">كهرباء | Electrical</option>
+                <option value="plumbing">سباكة | Plumbing</option>
+                <option value="ac">تكييف | AC</option>
+                <option value="furniture">أثاث | Furniture</option>
+                <option value="it">تقنية | IT</option>
+                <option value="other">أخرى | Other</option>
+              </select>
+            </div>
+            <div><label class="lbl">الأولوية | Priority</label>
+              <select class="field" id="nrPriority"><option value="normal">عادية | Normal</option><option value="urgent">عاجلة | Urgent</option></select>
+            </div>
+            <div><label class="lbl">الموقع | Location</label><input class="field" id="nrLocation" placeholder="الفصل / المبنى | Room/Building"/></div>
+            <div><label class="lbl">المبلّغ | Reported By</label><input class="field" id="nrReporter" placeholder="الاسم | Name"/></div>
+          </div>
+          <div style="margin-bottom:14px"><label class="lbl">وصف المشكلة | Description</label><textarea class="field" id="nrDesc" placeholder="صف المشكلة بالتفصيل..."></textarea></div>
+          <button class="btn-action btn-primary" id="saveReqBtn">💾 حفظ الطلب | Save</button>
+        </div>
+      </div>
+
+      <!-- INVENTORY -->
+      <div class="tab-panel" id="panel-inventory">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📦 المخزون | Inventory</div></div>
+          <div id="inventoryList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="tab-panel" id="panel-schedule">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📅 جدول الصيانة | Maintenance Schedule</div></div>
+          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">الجدول الدوري قيد الإعداد | Periodic schedule coming soon</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SB=window.EduOS?.SB_URL||'https://zuyizaiugpmhmeycqton.supabase.co';const KEY=window.EduOS?.SB_KEY||'';let user=null;
+async function dbGet(t,p){try{const r=await fetch(SB+'/rest/v1/'+t+'?'+p,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});return r.ok?r.json():[]}catch(e){return[];}}
+async function dbPost(t,b){try{const r=await fetch(SB+'/rest/v1/'+t,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(b)});return r.ok}catch(e){return false;}}
+async function dbPatch(t,p,b){try{const r=await fetch(SB+'/rest/v1/'+t+'?'+p,{method:'PATCH',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(b)});return r.ok}catch(e){return false;}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function empty(id,msg){document.getElementById(id).innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">'+(msg||'لا بيانات | No data')+'</div></div>';}
+document.querySelectorAll('[data-panel]').forEach(btn=>btn.addEventListener('click',()=>switchPanel(btn.getAttribute('data-panel'))));
+function switchPanel(name){
+  document.querySelectorAll('.snav').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const nav=document.querySelector('.snav[data-panel="'+name+'"]');if(nav)nav.classList.add('active');
+  const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');
+  if(name==='requests')loadRequests();if(name==='inventory')loadInventory();
+}
+async function init(){
+  try{user=JSON.parse(sessionStorage.getItem('edoos_user'));}catch(e){}
+  if(!user){location.href='../eduos-login/';return;}
+  document.getElementById('topName').textContent=user.name||'الفني';document.getElementById('topAvatar').textContent=(user.name||'ف')[0];document.getElementById('greetName').textContent=user.name||'الفني';
+  if(window.EduOSWeek)document.getElementById('weekPill').textContent='الأسبوع '+(window.EduOSWeek.week||'—');
+  document.getElementById('logoutBtn').addEventListener('click',()=>{if(window.eduosLogout)window.eduosLogout();else{sessionStorage.clear();location.href='../eduos-login/';}});
+  document.getElementById('langBtn').addEventListener('click',()=>{const isEN=document.documentElement.lang==='en';document.documentElement.lang=isEN?'ar':'en';document.documentElement.dir=isEN?'rtl':'ltr';document.getElementById('langBtn').textContent=isEN?'EN':'ع';});
+  document.getElementById('saveReqBtn').addEventListener('click',saveRequest);
+  document.getElementById('reqFilter').addEventListener('change',loadRequests);
+  await loadKPIs();
+}
+async function loadKPIs(){
+  const data=await dbGet('maintenance_requests','select=id,issue_type,status,priority,created_at&order=created_at.desc&limit=200');
+  if(!data||data.length===0){['kpiPending','kpiUrgent','kpiDone','statPending','statUrgent','statDone'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});empty('urgentReqs','لا طلبات | No requests');return;}
+  const pending=data.filter(d=>d.status==='pending'||d.status==='open').length;
+  const urgent=data.filter(d=>d.priority==='urgent').length;
+  const done=data.filter(d=>d.status==='completed').length;
+  document.getElementById('kpiPending').textContent=pending;document.getElementById('kpiUrgent').textContent=urgent;document.getElementById('kpiDone').textContent=done;document.getElementById('kpiItems').textContent='—';
+  document.getElementById('statPending').textContent=pending;document.getElementById('statUrgent').textContent=urgent;document.getElementById('statDone').textContent=done;
+  if(pending>0){document.getElementById('reqBadge').textContent=pending;document.getElementById('reqBadge').style.display='inline-block';}
+  const urgData=data.filter(d=>d.priority==='urgent'&&d.status!=='completed').slice(0,5);
+  if(urgData.length===0){empty('urgentReqs','لا طلبات عاجلة | No urgent requests');return;}
+  document.getElementById('urgentReqs').innerHTML=urgData.map(d=>
+    '<div class="req-card"><div class="req-icon">🔴</div><div class="req-info"><div class="req-title">طلب #'+d.id+' — '+(d.issue_type||'—')+'</div><div class="req-sub">'+(d.created_at?new Date(d.created_at).toLocaleDateString('ar-AE'):'')+'</div></div>'+
+    '<button class="btn-action btn-primary" data-id="'+d.id+'">إنجاز</button></div>'
+  ).join('');
+  document.querySelectorAll('.req-card [data-id]').forEach(btn=>btn.addEventListener('click',async()=>{const ok=await dbPatch('maintenance_requests','id=eq.'+btn.getAttribute('data-id'),{status:'completed'});if(ok){toast('✅ تم الإنجاز | Completed');await loadKPIs();}else toast('❌ خطأ | Error');}));
+}
+async function loadRequests(){
+  document.getElementById('requestsList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+  let params='select=id,issue_type,description,location,priority,status,reported_by,created_at&order=created_at.desc&limit=100';
+  const f=document.getElementById('reqFilter').value;if(f)params+='&status=eq.'+f;
+  const data=await dbGet('maintenance_requests',params);
+  if(!data||data.length===0){empty('requestsList','لا طلبات | No requests');return;}
+  document.getElementById('requestsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>#</th><th>النوع</th><th>الموقع</th><th>الأولوية</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead><tbody>'+
+  data.map(d=>'<tr><td>'+d.id+'</td><td><strong>'+(d.issue_type||'—')+'</strong></td><td>'+(d.location||'—')+'</td>'+
+  '<td><span class="badge '+(d.priority==='urgent'?'badge-red':'badge-amber')+'">'+(d.priority||'—')+'</span></td>'+
+  '<td><span class="badge '+(d.status==='completed'?'badge-green':d.status==='in_progress'?'badge-blue':'badge-amber')+'">'+(d.status||'—')+'</span></td>'+
+  '<td>'+(d.created_at?new Date(d.created_at).toLocaleDateString('ar-AE'):'—')+'</td>'+
+  '<td>'+(d.status!=='completed'?'<button class="btn-action" onclick="markDone('+d.id+')">✅ إنجاز</button>':'—')+'</td></tr>').join('')+
+  '</tbody></table></div>';
+}
+async function markDone(id){const ok=await dbPatch('maintenance_requests','id=eq.'+id,{status:'completed'});if(ok){toast('✅ تم | Done');loadRequests();await loadKPIs();}else toast('❌ خطأ | Error');}
+async function loadInventory(){
+  document.getElementById('inventoryList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
+  const data=await dbGet('maintenance_inventory','select=item_name,quantity,unit,location,last_updated&order=item_name&limit=100');
+  if(!data||data.length===0){empty('inventoryList','لا بنود مخزون | No inventory items');return;}
+  document.getElementById('inventoryList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>العنصر</th><th>الكمية</th><th>الوحدة</th><th>الموقع</th></tr></thead><tbody>'+
+  data.map(i=>'<tr><td><strong>'+(i.item_name||'—')+'</strong></td>'+
+  '<td><span style="font-weight:900;font-size:17px;color:'+(i.quantity<=2?'var(--rose)':i.quantity<=10?'var(--amber)':'var(--emerald)')+'">'+i.quantity+'</span></td>'+
+  '<td>'+(i.unit||'—')+'</td><td>'+(i.location||'—')+'</td></tr>').join('')+
+  '</tbody></table></div>';
+}
+async function saveRequest(){
+  const desc=document.getElementById('nrDesc').value.trim();if(!desc){toast('⚠️ أدخل الوصف | Enter description');return;}
+  const ok=await dbPost('maintenance_requests',{issue_type:document.getElementById('nrType').value,priority:document.getElementById('nrPriority').value,description:desc,location:document.getElementById('nrLocation').value,reported_by:document.getElementById('nrReporter').value,status:'pending',created_at:new Date().toISOString()});
+  if(ok){toast('✅ تم حفظ الطلب | Saved');document.getElementById('nrDesc').value='';document.getElementById('nrLocation').value='';await loadKPIs();}
+  else toast('❌ خطأ | Error');
+}
+init();
+</script>
+</body>
+</html>

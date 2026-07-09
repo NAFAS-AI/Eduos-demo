@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>مركز الإدارة — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="../platform-lang.js" defer></script>
+<script src="/apps/platform-shield.js" defer></script>
+<script src="/apps/platform-autologout.js" defer></script>
+<script src="/apps/platform-week.js" defer></script>
+<script src="../platform-config.js"></script>
+<style>
+:root{
+  --bg:#F0F4F8;--surface:#FFFFFF;--card:#FFFFFF;--card2:#F1F5F9;
+  --border:#E2E8F0;--brand:#6C3DD6;--brand2:#8B5CF6;--accent:#22D3EE;
+  --green:#10B981;--gold:#F59E0B;--red:#EF4444;--orange:#F97316;
+  --text:#1E293B;--text2:#475569;--text3:#64748B;--radius:18px;
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:0 20px;position:sticky;top:0;z-index:200;height:62px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 12px rgba(108,61,214,.22);}
+.h-logo{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.h-title{font-size:18px;font-weight:900;color:#fff;}
+.h-sub{font-size:11px;color:rgba(255,255,255,.75);margin-top:2px;}
+.h-week{margin-right:auto;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:5px 14px;font-size:12px;color:#fff;text-align:center;line-height:1.5;}
+.h-user{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:5px 14px;font-size:13px;color:#fff;}
+.h-av{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+.btn-logout{background:rgba(239,68,68,.22);border:1px solid rgba(239,68,68,.4);color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit;}
+.btn-logout:hover{background:rgba(239,68,68,.4);}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 62px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;flex-shrink:0;}
+.snav{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;border:none;background:transparent;width:100%;text-align:right;font-family:inherit;font-size:14px;color:var(--text2);transition:all .18s;border-right:3px solid transparent;position:relative;}
+.snav:hover{background:var(--card2);color:var(--brand);}
+.snav.active{background:linear-gradient(90deg,rgba(108,61,214,.07),transparent);color:var(--brand);border-right-color:var(--brand);font-weight:700;}
+.snav-icon{width:36px;height:36px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.snav.active .snav-icon{background:rgba(108,61,214,.12);}
+.snav-label{font-size:14px;}
+.snav-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.snav-badge{position:absolute;left:14px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;border-radius:10px;font-size:11px;font-weight:700;padding:2px 7px;}
+.sidebar-divider{height:1px;background:var(--border);margin:6px 16px;}
+
+/* ── MAIN ── */
+.main{flex:1;padding:28px;overflow:auto;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:16px;margin-bottom:24px;}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.kpi-val{font-size:30px;font-weight:900;color:var(--text);}
+.kpi-label{font-size:13px;color:var(--text2);font-weight:600;}
+.kpi-sub{font-size:12px;color:var(--text3);}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:20px;overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.card-title{font-size:15px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.card-body{padding:20px;}
+
+/* ── TABLE ── */
+.tbl-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--card2);padding:12px 16px;text-align:right;font-size:13px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 16px;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#F8FAFC;}
+
+/* ── SEARCH ── */
+.search-box{border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:13px;font-family:inherit;width:220px;background:var(--bg);color:var(--text);}
+.search-box:focus{outline:none;border-color:var(--brand);}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.b-green{background:#D1FAE5;color:#065F46;}
+.b-blue{background:#DBEAFE;color:#1E40AF;}
+.b-purple{background:#EDE9FE;color:#5B21B6;}
+.b-orange{background:#FEF3C7;color:#92400E;}
+.b-red{background:#FEE2E2;color:#991B1B;}
+.b-gray{background:#F1F5F9;color:#475569;}
+.b-gold{background:#FFFBEB;color:#92400E;}
+
+/* ── BUTTONS ── */
+.btn{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .18s;}
+.btn-primary{background:var(--brand);color:#fff;}
+.btn-primary:hover{background:var(--brand2);}
+.btn-outline{background:transparent;color:var(--brand);border:1px solid var(--border);}
+.btn-outline:hover{background:var(--card2);}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:8px;}
+.btn-danger{background:transparent;color:var(--red);border:1px solid #FEE2E2;}
+.btn-danger:hover{background:#FEF2F2;}
+
+/* ── PROGRESS ── */
+.prog-bar{background:var(--card2);border-radius:6px;height:8px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--brand),var(--accent));transition:width .5s;}
+
+/* ── SETTINGS ── */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
+.setting-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.setting-card h3{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);gap:8px;}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:13px;color:var(--text2);}
+.setting-val{font-size:13px;font-weight:600;color:var(--brand);}
+
+/* ── STATUS ── */
+.status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:20px;}
+.status-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;}
+.status-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.dot-ok{background:var(--green);}
+.dot-warn{background:var(--gold);}
+.dot-err{background:var(--red);}
+.status-label{font-size:13px;font-weight:600;}
+.status-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:var(--radius);padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.modal h2{font-size:17px;font-weight:700;margin-bottom:16px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;}
+.form-control{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);}
+.form-control:focus{outline:none;border-color:var(--brand);}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;}
+.alert.show{display:block;}
+.alert-ok{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0;}
+.alert-err{background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;}
+
+/* ── EMPTY ── */
+.empty{padding:48px;text-align:center;color:var(--text3);}
+.empty-icon{font-size:48px;margin-bottom:12px;}
+
+/* ── 2-COL ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:900px){.grid-2{grid-template-columns:1fr;}.sidebar{display:none;}.main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="h-logo">⚙️</div>
+  <div>
+    <div class="h-title">مركز الإدارة · Admin Center</div>
+    <div class="h-sub">لوحة التحكم الإدارية الشاملة</div>
+  </div>
+  <div class="h-week" id="hWeek">— · —</div>
+  <div class="h-user">
+    <div class="h-av" id="hAv">م</div>
+    <span id="hUser">—</span>
+  </div>
+  <button class="btn-logout" onclick="doLogout()">خروج · Exit</button>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <button class="snav active" data-panel="overview">
+      <div class="snav-icon">📊</div>
+      <div><div class="snav-label">نظرة عامة | Overview</div><div class="snav-sub">مؤشرات المنصة</div></div>
+    </button>
+    <button class="snav" data-panel="staff">
+      <div class="snav-icon">👥</div>
+      <div><div class="snav-label">إدارة الكادر | Staff</div><div class="snav-sub">الموظفون والأدوار</div></div>
+      <span class="snav-badge" id="staffBadge" style="display:none">0</span>
+    </button>
+    <button class="snav" data-panel="students">
+      <div class="snav-icon">🎓</div>
+      <div><div class="snav-label">الطلاب | Students</div><div class="snav-sub">إحصاءات حسب الصف</div></div>
+    </button>
+    <div class="sidebar-divider"></div>
+    <button class="snav" data-panel="roles">
+      <div class="snav-icon">🔐</div>
+      <div><div class="snav-label">الأدوار | Roles</div><div class="snav-sub">صلاحيات وخريطة الأدوار</div></div>
+    </button>
+    <button class="snav" data-panel="settings">
+      <div class="snav-icon">⚙️</div>
+      <div><div class="snav-label">الإعدادات | Settings</div><div class="snav-sub">إعدادات المنصة</div></div>
+    </button>
+    <div class="sidebar-divider"></div>
+    <button class="snav" data-panel="audit">
+      <div class="snav-icon">📋</div>
+      <div><div class="snav-label">سجل المراجعة | Audit</div><div class="snav-sub">تتبع الأحداث</div></div>
+    </button>
+    <button class="snav" data-panel="system">
+      <div class="snav-icon">🛡️</div>
+      <div><div class="snav-label">حالة النظام | System</div><div class="snav-sub">صحة المنصة</div></div>
+    </button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ═══ PANEL: OVERVIEW ═══ -->
+    <div class="panel active" id="panel-overview">
+      <div class="kpi-grid" id="kpiGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text3)">⏳ جاري التحميل…</div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">🏷️ توزيع الكادر حسب الدور</div></div>
+          <div class="card-body" id="roleDistribution"><div style="text-align:center;padding:20px;color:var(--text3)">⏳</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📚 توزيع الطلاب حسب الصف</div></div>
+          <div class="card-body" id="gradeDistribution"><div style="text-align:center;padding:20px;color:var(--text3)">⏳</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: STAFF ═══ -->
+    <div class="panel" id="panel-staff">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👥 قائمة الكادر · Staff List</div>
+          <input class="search-box" type="text" id="staffSearch" placeholder="بحث بالاسم أو الدور أو المادة…" oninput="filterStaff()">
+          <button class="btn btn-primary btn-sm" onclick="openAddStaff()">+ إضافة موظف/ة</button>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>الاسم · Name</th>
+                <th>اسم المستخدم · Username</th>
+                <th>الدور · Role</th>
+                <th>المادة · Subject</th>
+                <th>الفصل · Class</th>
+                <th>الحالة · Status</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="staffBody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text3)">⏳ تحميل…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:12px 20px;border-top:1px solid var(--border);font-size:13px;color:var(--text3)" id="staffCount">—</div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: STUDENTS ═══ -->
+    <div class="panel" id="panel-students">
+      <div class="kpi-grid" id="stuKpi" style="margin-bottom:20px">
+        <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text3)">⏳</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📚 الطلاب حسب الصف · Students by Class</div>
+          <button class="btn btn-outline btn-sm" onclick="loadStudents()">🔄 تحديث</button>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>الصف · Class</th>
+                <th>عدد الطلاب</th>
+                <th>لديهم رقم</th>
+                <th>بدون رقم</th>
+                <th>ولي أمر</th>
+              </tr>
+            </thead>
+            <tbody id="stuBody">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">⏳</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: ROLES ═══ -->
+    <div class="panel" id="panel-roles">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">🔐 خريطة الأدوار · Role Map</div>
+        </div>
+        <div class="card-body">
+          <div id="roleMap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px">
+            <div style="text-align:center;padding:24px;color:var(--text3)">⏳</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⚠️ الكادر بدون role_key محدد</div>
+          <span class="badge b-orange" id="noRoleCount">—</span>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr><th>الاسم</th><th>اسم المستخدم</th><th>role الحالي</th><th>تعيين</th></tr>
+            </thead>
+            <tbody id="noRoleBody">
+              <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3)">⏳</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: SETTINGS ═══ -->
+    <div class="panel" id="panel-settings">
+      <div class="settings-grid" id="settingsGrid">
+        <div style="text-align:center;padding:32px;color:var(--text3)">⏳</div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: AUDIT ═══ -->
+    <div class="panel" id="panel-audit">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 سجل المراجعة · Audit Log</div>
+          <button class="btn btn-outline btn-sm" onclick="loadAudit()">🔄 تحديث</button>
+        </div>
+        <div class="card-body" id="auditBody">
+          <div style="text-align:center;padding:24px;color:var(--text3)">⏳</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PANEL: SYSTEM ═══ -->
+    <div class="panel" id="panel-system">
+      <div class="status-grid" id="statusGrid">
+        <div style="text-align:center;padding:32px;color:var(--text3)">⏳</div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📊 إحصاءات قاعدة البيانات</div></div>
+        <div class="card-body" id="dbStats">
+          <div style="text-align:center;padding:24px;color:var(--text3)">⏳</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: ADD STAFF -->
+<div class="modal-overlay" id="addStaffModal">
+  <div class="modal">
+    <h2>➕ إضافة موظف/ة جديد/ة · Add Staff</h2>
+    <div class="form-group">
+      <label>الاسم بالعربي · Name AR</label>
+      <input class="form-control" type="text" id="newNameAr" placeholder="مثال: فاطمة محمد العلي">
+    </div>
+    <div class="form-group">
+      <label>الاسم بالإنجليزي · Name EN</label>
+      <input class="form-control" type="text" id="newNameEn" placeholder="e.g. Fatima Mohammed">
+    </div>
+    <div class="form-group">
+      <label>اسم المستخدم · Username</label>
+      <input class="form-control" type="text" id="newUsername" placeholder="fatima.mohammed" dir="ltr">
+    </div>
+    <div class="form-group">
+      <label>كلمة المرور · Password</label>
+      <input class="form-control" type="password" id="newPassword" placeholder="AJ@2026">
+    </div>
+    <div class="form-group">
+      <label>الدور · Role</label>
+      <select class="form-control" id="newRole">
+        <option value="teacher">معلم/ة · Teacher</option>
+        <option value="principal">مدير/ة · Principal</option>
+        <option value="specialist">أخصائي/ة · Specialist</option>
+        <option value="nurse">ممرضة · Nurse</option>
+        <option value="technician">فني/ة تقنية · Technician</option>
+        <option value="secretary">سكرتير/ة · Secretary</option>
+        <option value="security">أمن · Security</option>
+        <option value="sub_teacher">معلم/ة احتياط · Sub Teacher</option>
+        <option value="coach">مدرب/ة رياضي/ة · Coach</option>
+        <option value="admin">مسؤول/ة إدارة · Admin</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>المادة · Subject (اختياري)</label>
+      <input class="form-control" type="text" id="newSubject" placeholder="رياضيات">
+    </div>
+    <div class="form-group">
+      <label>الفصل المسؤول عنه · Homeroom Class (اختياري)</label>
+      <input class="form-control" type="text" id="newClass" placeholder="5A">
+    </div>
+    <div class="alert" id="addAlert"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addStaffModal')">إلغاء · Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewStaff()">حفظ · Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDIT ROLE -->
+<div class="modal-overlay" id="editRoleModal">
+  <div class="modal">
+    <h2>✏️ تعديل دور الموظف/ة · Edit Role</h2>
+    <input type="hidden" id="editId">
+    <div class="form-group">
+      <label>الموظف/ة</label>
+      <input class="form-control" type="text" id="editName" readonly>
+    </div>
+    <div class="form-group">
+      <label>الدور الجديد · New Role</label>
+      <select class="form-control" id="editRole">
+        <option value="teacher">معلم/ة · Teacher</option>
+        <option value="principal">مدير/ة · Principal</option>
+        <option value="specialist">أخصائي/ة · Specialist</option>
+        <option value="nurse">ممرضة · Nurse</option>
+        <option value="technician">فني/ة تقنية · Technician</option>
+        <option value="secretary">سكرتير/ة · Secretary</option>
+        <option value="security">أمن · Security</option>
+        <option value="sub_teacher">معلم/ة احتياط · Sub Teacher</option>
+        <option value="coach">مدرب/ة رياضي/ة · Coach</option>
+        <option value="admin">مسؤول/ة · Admin</option>
+        <option value="official">مسؤول/ة رسمي/ة · Official</option>
+        <option value="parent">ولي/ة أمر · Parent</option>
+      </select>
+    </div>
+    <div class="alert" id="editAlert"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('editRoleModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveRoleEdit()">حفظ الدور</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://zuyizaiugpmhmeycqton.supabase.co';
+const SB_KEY = window.EduOS && window.EduOS.SB_KEY;
+
+// ── Auth ──
+const sess = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+const sessRole = sess.role_key || sess.role || '';
+if (!sess.username) location.href = '../eduos-login/';
+if (!['admin', 'official', 'principal'].includes(sessRole)) location.href = '../eduos-hub/';
+
+const displayName = sess.name_ar || sess.username || '—';
+document.getElementById('hUser').textContent = displayName + ' · ' + roleLabel(sessRole);
+document.getElementById('hAv').textContent = (displayName[0] || 'م');
+
+function doLogout() { sessionStorage.removeItem('edoos_user'); location.href = '../eduos-login/'; }
+
+// ── Week header ──
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.getPlatformWeek) {
+    const w = window.getPlatformWeek();
+    const wEl = document.getElementById('hWeek');
+    if (wEl) {
+      if (w.isHoliday) {
+        wEl.innerHTML = w.holidayName + '<br>2025-2026';
+      } else {
+        wEl.innerHTML = 'الأسبوع ' + w.weekNum + ' · ' + w.termName + '<br>2025-2026';
+      }
+    }
+  }
+});
+
+// ── DB helpers ──
+async function dbGet(table, params) {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/' + table + '?' + (params || ''), {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact' }
+    });
+    const data = await r.json();
+    const ct = r.headers.get('content-range');
+    return { data: Array.isArray(data) ? data : [], count: ct ? parseInt(ct.split('/')[1]) : (Array.isArray(data) ? data.length : 0) };
+  } catch(e) { return { data: [], count: 0 }; }
+}
+
+async function dbPost(table, body) {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/' + table, {
+      method: 'POST',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify(body)
+    });
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+async function dbPatch(table, id, body) {
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    return r.ok;
+  } catch(e) { return false; }
+}
+
+// ── Sidebar navigation ──
+document.querySelectorAll('.snav').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const p = this.dataset.panel;
+    document.querySelectorAll('.snav').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+    const panel = document.getElementById('panel-' + p);
+    if (panel) panel.classList.add('active');
+    if (p === 'overview') loadOverview();
+    else if (p === 'staff') loadStaff();
+    else if (p === 'students') loadStudents();
+    else if (p === 'roles') loadRoles();
+    else if (p === 'settings') loadSettings();
+    else if (p === 'audit') loadAudit();
+    else if (p === 'system') loadSystem();
+  });
+});
+
+// ── Role helpers ──
+function roleLabel(r) {
+  const m = {
+    admin: 'مسؤول/ة · Admin', official: 'مسؤول/ة رسمي/ة · Official',
+    principal: 'مدير/ة · Principal', teacher: 'معلم/ة · Teacher',
+    sub_teacher: 'معلم/ة احتياط · Sub', nurse: 'ممرضة · Nurse',
+    specialist: 'أخصائي/ة · Specialist', social_worker: 'أخصائي/ة اجتماعي/ة',
+    special_ed: 'تربية خاصة · Special Ed', technician: 'فني/ة · Technician',
+    secretary: 'سكرتير/ة · Secretary', security: 'أمن · Security',
+    coach: 'مدرب/ة · Coach', observer: 'مراقب/ة · Observer',
+    parent: 'ولي/ة أمر · Parent', student: 'طالب/ة · Student'
+  };
+  return m[r] || r || '—';
+}
+
+function roleBadge(r) {
+  const colors = {
+    teacher: 'b-purple', principal: 'b-blue', admin: 'b-red', official: 'b-red',
+    nurse: 'b-green', specialist: 'b-blue', social_worker: 'b-orange',
+    special_ed: 'b-orange', technician: 'b-gray', secretary: 'b-gray',
+    security: 'b-gray', coach: 'b-gold', sub_teacher: 'b-gray', observer: 'b-gray'
+  };
+  return '<span class="badge ' + (colors[r] || 'b-gray') + '">' + roleLabel(r) + '</span>';
+}
+
+// ── OVERVIEW ──
+async function loadOverview() {
+  try {
+    const [staff, students, parents, schedules] = await Promise.all([
+      dbGet('staff_profiles', 'select=id,role_key,role&limit=500'),
+      dbGet('students', 'select=id,student_number,class_name&limit=2000'),
+      dbGet('parents', 'select=id&limit=2000'),
+      dbGet('schedules', 'select=id&limit=1&head=true')
+    ]);
+
+    const staffList = staff.data;
+    const stuList = students.data;
+    const staffCount = staffList.length;
+    const stuCount = stuList.length;
+    const noNum = stuList.filter(function(s) { return !s.student_number; }).length;
+
+    document.getElementById('kpiGrid').innerHTML = [
+      { icon: '🧑\u200d🏫', val: staffCount, label: 'أعضاء الكادر · Staff', sub: '', bg: '#EDE9FE' },
+      { icon: '🎓', val: stuCount.toLocaleString('ar'), label: 'طالب/ة · Students', sub: noNum + ' بدون رقم طالب/ة', bg: '#DBEAFE' },
+      { icon: '👨\u200d👩\u200d👧', val: parents.count.toLocaleString('ar'), label: 'أولياء الأمور · Parents', sub: '', bg: '#FEF3C7' },
+      { icon: '📅', val: schedules.count.toLocaleString('ar'), label: 'حصص مجدولة · Scheduled', sub: '', bg: '#F0F4FF' }
+    ].map(function(k) {
+      return '<div class="kpi-card"><div class="kpi-icon" style="background:' + k.bg + '">' + k.icon + '</div><div class="kpi-val">' + k.val + '</div><div class="kpi-label">' + k.label + '</div>' + (k.sub ? '<div class="kpi-sub">' + k.sub + '</div>' : '') + '</div>';
+    }).join('');
+
+    // Role distribution
+    var roleCounts = {};
+    staffList.forEach(function(s) {
+      var r = s.role_key || s.role || 'unknown';
+      roleCounts[r] = (roleCounts[r] || 0) + 1;
+    });
+    var sortedR = Object.entries(roleCounts).sort(function(a, b) { return b[1] - a[1]; });
+    var rdHtml = '';
+    sortedR.forEach(function(entry) {
+      var pct = Math.round(entry[1] / staffCount * 100);
+      rdHtml += '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px">' + roleLabel(entry[0]) + '</span><span style="font-size:13px;font-weight:700">' + entry[1] + '</span></div><div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%"></div></div></div>';
+    });
+    document.getElementById('roleDistribution').innerHTML = rdHtml || '<div class="empty"><div class="empty-icon">📊</div><p>لا بيانات</p></div>';
+
+    // Grade distribution
+    var gradeCounts = {};
+    stuList.forEach(function(s) {
+      var g = (s.class_name || '—').replace(/[A-Za-z]+$/, '') || '—';
+      gradeCounts[g] = (gradeCounts[g] || 0) + 1;
+    });
+    var gradeOrder = ['KG1', 'KG2', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+    var sortedG = Object.entries(gradeCounts).sort(function(a, b) {
+      var ia = gradeOrder.indexOf(a[0]);
+      var ib = gradeOrder.indexOf(b[0]);
+      if (ia === -1) ia = 99;
+      if (ib === -1) ib = 99;
+      return ia - ib;
+    });
+    var gHtml = '<div style="overflow-x:auto"><table><thead><tr><th>الصف</th><th>الطلاب</th><th>النسبة</th></tr></thead><tbody>';
+    sortedG.forEach(function(entry) {
+      gHtml += '<tr><td>صف ' + entry[0] + '</td><td>' + entry[1] + '</td><td>' + Math.round(entry[1] / stuCount * 100) + '%</td></tr>';
+    });
+    gHtml += '</tbody></table></div>';
+    document.getElementById('gradeDistribution').innerHTML = gHtml;
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('kpiGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--red)">⚠️ تعذّر التحميل: ' + e.message + '</div>';
+  }
+}
+
+// ── STAFF ──
+var allStaff = [];
+async function loadStaff() {
+  var res = await dbGet('staff_profiles', 'select=id,name_ar,name_en,username,role_key,role,subject_ar,homeroom_classes,is_active&order=name_ar.asc&limit=500');
+  allStaff = res.data;
+  renderStaff(allStaff);
+  document.getElementById('staffCount').textContent = 'إجمالي: ' + allStaff.length + ' موظف/ة';
+  var inactive = allStaff.filter(function(s) { return s.is_active === false; }).length;
+  if (inactive > 0) {
+    var badge = document.getElementById('staffBadge');
+    badge.textContent = inactive + ' موقوف/ة';
+    badge.style.display = 'inline-block';
+  }
+}
+
+function renderStaff(list) {
+  if (!list.length) {
+    document.getElementById('staffBody').innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">👥</div><p>لا يوجد كادر مسجّل</p></div></td></tr>';
+    return;
+  }
+  document.getElementById('staffBody').innerHTML = list.map(function(s) {
+    var effectiveRole = s.role_key || s.role || 'staff';
+    var isActive = s.is_active !== false;
+    var safeName = (s.name_ar || '').replace(/'/g, '').replace(/"/g, '');
+    return '<tr><td><strong>' + (s.name_ar || s.name_en || '—') + '</strong>' + (s.name_en ? '<div style="font-size:11px;color:var(--text3)">' + s.name_en + '</div>' : '') + '</td><td style="color:var(--text3);font-family:monospace;font-size:12px">' + (s.username || '—') + '</td><td>' + roleBadge(effectiveRole) + '</td><td>' + (s.subject_ar || '<span style="color:var(--text3)">—</span>') + '</td><td>' + (s.homeroom_classes || '<span style="color:var(--text3)">—</span>') + '</td><td><span class="badge ' + (isActive ? 'b-green' : 'b-red') + '">' + (isActive ? 'نشط/ة' : 'موقوف/ة') + '</span></td><td><button class="btn btn-outline btn-sm" data-id="' + s.id + '" data-name="' + safeName + '" data-role="' + effectiveRole + '" onclick="openEditRole(this)">تعديل الدور</button></td></tr>';
+  }).join('');
+}
+
+function filterStaff() {
+  var q = document.getElementById('staffSearch').value.trim().toLowerCase();
+  if (!q) { renderStaff(allStaff); return; }
+  renderStaff(allStaff.filter(function(s) {
+    return (s.name_ar || '').toLowerCase().includes(q) ||
+           (s.name_en || '').toLowerCase().includes(q) ||
+           (s.username || '').toLowerCase().includes(q) ||
+           (s.role_key || s.role || '').toLowerCase().includes(q) ||
+           (s.subject_ar || '').includes(q);
+  }));
+}
+
+// ── STUDENTS ──
+async function loadStudents() {
+  var res = await dbGet('students', 'select=id,class_name,student_number,parent_id&order=class_name.asc&limit=2000');
+  var list = res.data;
+  var total = list.length;
+  var hasNum = list.filter(function(s) { return s.student_number; }).length;
+  var hasParent = list.filter(function(s) { return s.parent_id; }).length;
+
+  document.getElementById('stuKpi').innerHTML = [
+    { icon: '🎓', val: total, label: 'إجمالي الطلاب', bg: '#EDE9FE' },
+    { icon: '🔢', val: hasNum, label: 'لديهم رقم طالب/ة', bg: '#D1FAE5' },
+    { icon: '⚠️', val: total - hasNum, label: 'بدون رقم', bg: '#FEE2E2' },
+    { icon: '👨\u200d👩\u200d👧', val: hasParent, label: 'مرتبطون بولي أمر', bg: '#FEF3C7' }
+  ].map(function(k) {
+    return '<div class="kpi-card"><div class="kpi-icon" style="background:' + k.bg + '">' + k.icon + '</div><div class="kpi-val">' + k.val + '</div><div class="kpi-label">' + k.label + '</div></div>';
+  }).join('');
+
+  var classCounts = {};
+  list.forEach(function(s) {
+    var cn = s.class_name || '—';
+    if (!classCounts[cn]) classCounts[cn] = { total: 0, hasNum: 0, hasParent: 0 };
+    classCounts[cn].total++;
+    if (s.student_number) classCounts[cn].hasNum++;
+    if (s.parent_id) classCounts[cn].hasParent++;
+  });
+
+  var order = ['KG1A','KG1B','KG1C','KG2A','KG2B','KG2C'];
+  for (var g = 1; g <= 12; g++) {
+    ['A','B','C','D','E','F'].forEach(function(l) { order.push(g + l); });
+  }
+
+  var rows = Object.entries(classCounts).sort(function(a, b) {
+    var ia = order.indexOf(a[0]);
+    var ib = order.indexOf(b[0]);
+    if (ia === -1) ia = 999;
+    if (ib === -1) ib = 999;
+    return ia - ib;
+  });
+
+  document.getElementById('stuBody').innerHTML = rows.length ? rows.map(function(entry) {
+    var c = entry[1];
+    var noNum = c.total - c.hasNum;
+    return '<tr><td><strong>' + entry[0] + '</strong></td><td>' + c.total + '</td><td>' + c.hasNum + '</td><td' + (noNum > 0 ? ' style="color:var(--red);font-weight:700"' : '') + '>' + noNum + '</td><td>' + c.hasParent + '</td></tr>';
+  }).join('') : '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text3)">لا بيانات</td></tr>';
+}
+
+// ── ROLES ──
+async function loadRoles() {
+  var res = await dbGet('staff_profiles', 'select=id,name_ar,username,role_key,role&limit=500');
+  var list = res.data;
+
+  var roleCounts = {};
+  list.forEach(function(s) {
+    var r = s.role_key || s.role || '';
+    if (r) roleCounts[r] = (roleCounts[r] || 0) + 1;
+  });
+
+  var roleIcons = {
+    teacher: '🏫', principal: '🎓', admin: '⚙️', official: '📋',
+    nurse: '🏥', specialist: '🌿', social_worker: '💬',
+    special_ed: '♿', technician: '🔧', secretary: '📁',
+    security: '🛡️', coach: '🥋', sub_teacher: '🔄', observer: '👁️', parent: '👨‍👩‍👧'
+  };
+
+  document.getElementById('roleMap').innerHTML = Object.entries(roleCounts).sort(function(a, b) { return b[1] - a[1]; }).map(function(entry) {
+    return '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px"><div style="width:42px;height:42px;border-radius:11px;background:rgba(108,61,214,.1);display:flex;align-items:center;justify-content:center;font-size:22px">' + (roleIcons[entry[0]] || '👤') + '</div><div style="flex:1"><div style="font-size:14px;font-weight:700">' + roleLabel(entry[0]) + '</div><div style="font-size:12px;color:var(--text3);margin-top:2px">' + entry[1] + ' موظف/ة</div></div><div style="font-size:24px;font-weight:900;color:var(--brand)">' + entry[1] + '</div></div>';
+  }).join('') || '<div style="text-align:center;padding:24px;color:var(--text3)">لا بيانات</div>';
+
+  var noRole = list.filter(function(s) { return !s.role_key && !s.role; });
+  document.getElementById('noRoleCount').textContent = noRole.length + ' موظف/ة';
+  document.getElementById('noRoleBody').innerHTML = noRole.length ? noRole.map(function(s) {
+    return '<tr><td>' + (s.name_ar || '—') + '</td><td style="font-family:monospace;font-size:12px">' + (s.username || '—') + '</td><td><span class="badge b-gray">—</span></td><td><button class="btn btn-primary btn-sm" data-id="' + s.id + '" data-name="' + (s.name_ar || '') + '" data-role="" onclick="openEditRole(this)">تعيين</button></td></tr>';
+  }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3)">✅ الجميع لديهم دور محدد</td></tr>';
+}
+
+// ── SETTINGS ──
+async function loadSettings() {
+  var res = await dbGet('app_settings', 'select=key,value&order=key.asc');
+  var list = res.data;
+
+  var groups = {
+    'الحضور والدوام': ['attendance_cutoff_time', 'attendance_start', 'attendance_end', 'qr_interval_sec', 'substitute_generate_time'],
+    'الموقع الجغرافي': ['school_gps_lat', 'school_gps_lng', 'geofence_radius'],
+    'المنظومة': ['school_type', 'curriculum_type', 'emiratization_academic_year', 'emiratization_target_pct'],
+    'نافس والتأميرة': ['nafis_subsidy_standard', 'nafis_subsidy_premium', 'national_edu_emirati_required']
+  };
+
+  var html = '';
+  Object.entries(groups).forEach(function(entry) {
+    html += '<div class="setting-card"><h3>' + entry[0] + '</h3>';
+    entry[1].forEach(function(key) {
+      var row = list.find(function(r) { return r.key === key; });
+      if (row) {
+        html += '<div class="setting-row"><span class="setting-label">' + key.replace(/_/g, ' ') + '</span><span class="setting-val">' + (row.value || '—') + '</span></div>';
+      }
+    });
+    html += '</div>';
+  });
+
+  // Other settings
+  var knownKeys = [].concat.apply([], Object.values(groups));
+  var others = list.filter(function(r) { return !knownKeys.includes(r.key) && r.key !== 'gemini_api_key'; });
+  if (others.length) {
+    html += '<div class="setting-card"><h3>إعدادات أخرى</h3>';
+    others.forEach(function(r) {
+      html += '<div class="setting-row"><span class="setting-label">' + r.key + '</span><span class="setting-val" style="font-family:monospace;font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis">' + (r.value || '—').substring(0, 50) + '</span></div>';
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('settingsGrid').innerHTML = html || '<div style="text-align:center;padding:32px;color:var(--text3)">لا إعدادات</div>';
+}
+
+// ── AUDIT ──
+async function loadAudit() {
+  var res = await dbGet('audit_log', 'select=id,action,actor,details,created_at&order=created_at.desc&limit=100');
+  var list = res.data;
+  if (!list.length) {
+    document.getElementById('auditBody').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>لا سجلات مراجعة</p></div>';
+    return;
+  }
+  document.getElementById('auditBody').innerHTML = list.map(function(item) {
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)"><div style="width:10px;height:10px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:6px"></div><div style="flex:1"><div style="font-size:13px;color:var(--text)">' + (item.action || '—') + (item.details ? ' · ' + item.details : '') + '</div><div style="font-size:11px;color:var(--text3);margin-top:3px">' + (item.actor || '—') + ' · ' + (item.created_at ? new Date(item.created_at).toLocaleString('ar-AE') : '—') + '</div></div></div>';
+  }).join('');
+}
+
+// ── SYSTEM ──
+async function loadSystem() {
+  var checks = [];
+  try {
+    var r1 = await dbGet('staff_profiles', 'select=id&limit=1&head=true');
+    checks.push({ label: 'staff_profiles', ok: true, sub: r1.count + ' سجل' });
+  } catch(e) { checks.push({ label: 'staff_profiles', ok: false, sub: 'خطأ' }); }
+
+  try {
+    var r2 = await dbGet('students', 'select=id&limit=1&head=true');
+    checks.push({ label: 'students', ok: true, sub: r2.count + ' سجل' });
+  } catch(e) { checks.push({ label: 'students', ok: false, sub: 'خطأ' }); }
+
+  try {
+    var r3 = await dbGet('schedules', 'select=id&limit=1&head=true');
+    checks.push({ label: 'schedules', ok: true, sub: r3.count + ' صف' });
+  } catch(e) { checks.push({ label: 'schedules', ok: false, sub: 'خطأ' }); }
+
+  try {
+    var r4 = await dbGet('parents', 'select=id&limit=1&head=true');
+    checks.push({ label: 'parents', ok: true, sub: r4.count + ' سجل' });
+  } catch(e) { checks.push({ label: 'parents', ok: false, sub: 'خطأ' }); }
+
+  checks.push({ label: 'SB_KEY', ok: !!SB_KEY, sub: SB_KEY ? 'موجود ✅' : 'مفقود ❌' });
+  checks.push({ label: 'Session', ok: !!sess.username, sub: sess.username || '—' });
+
+  document.getElementById('statusGrid').innerHTML = checks.map(function(c) {
+    return '<div class="status-item"><div class="status-dot ' + (c.ok ? 'dot-ok' : 'dot-err') + '"></div><div><div class="status-label">' + c.label + '</div><div class="status-sub">' + c.sub + '</div></div></div>';
+  }).join('');
+
+  // DB stats
+  var tables = ['staff_profiles', 'students', 'parents', 'schedules', 'student_grades', 'behavior_incidents', 'attendance'];
+  var statsHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">';
+  for (var i = 0; i < tables.length; i++) {
+    try {
+      var rr = await dbGet(tables[i], 'select=id&limit=1&head=true');
+      statsHtml += '<div style="background:var(--card2);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;font-family:monospace">' + tables[i] + '</span><span style="font-size:18px;font-weight:700;color:var(--brand)">' + rr.count + '</span></div>';
+    } catch(e) {
+      statsHtml += '<div style="background:var(--card2);border-radius:12px;padding:14px"><span style="font-size:13px;color:var(--red)">' + tables[i] + ' ❌</span></div>';
+    }
+  }
+  statsHtml += '</div>';
+  document.getElementById('dbStats').innerHTML = statsHtml;
+}
+
+// ── MODALS ──
+function openAddStaff() {
+  ['newNameAr','newNameEn','newUsername','newPassword','newSubject','newClass'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  hideAlert('addAlert');
+  document.getElementById('addStaffModal').classList.add('open');
+}
+
+function openEditRole(btn) {
+  document.getElementById('editId').value = btn.dataset.id;
+  document.getElementById('editName').value = btn.dataset.name;
+  var sel = document.getElementById('editRole');
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === btn.dataset.role) { sel.selectedIndex = i; break; }
+  }
+  hideAlert('editAlert');
+  document.getElementById('editRoleModal').classList.add('open');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showAlert(id, msg, type) {
+  var el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'alert show alert-' + (type === 'ok' ? 'ok' : 'err');
+}
+function hideAlert(id) {
+  var el = document.getElementById(id);
+  el.className = 'alert';
+}
+
+async function saveNewStaff() {
+  var nameAr = document.getElementById('newNameAr').value.trim();
+  var username = document.getElementById('newUsername').value.trim();
+  var password = document.getElementById('newPassword').value.trim();
+  var roleKey = document.getElementById('newRole').value;
+
+  if (!nameAr || !username || !password) {
+    showAlert('addAlert', 'يرجى ملء الاسم واسم المستخدم وكلمة المرور', 'err');
+    return;
+  }
+
+  var body = {
+    name_ar: nameAr,
+    name_en: document.getElementById('newNameEn').value.trim() || null,
+    username: username,
+    role_key: roleKey,
+    role: roleKey,
+    subject_ar: document.getElementById('newSubject').value.trim() || null,
+    homeroom_classes: document.getElementById('newClass').value.trim() || null,
+    is_active: true
+  };
+
+  var ok = await dbPost('staff_profiles', body);
+  if (ok) {
+    showAlert('addAlert', 'تمت الإضافة بنجاح ✅', 'ok');
+    setTimeout(function() { closeModal('addStaffModal'); loadStaff(); }, 1200);
+  } else {
+    showAlert('addAlert', 'حدث خطأ أثناء الحفظ', 'err');
+  }
+}
+
+async function saveRoleEdit() {
+  var id = document.getElementById('editId').value;
+  var roleKey = document.getElementById('editRole').value;
+  var ok = await dbPatch('staff_profiles', id, { role_key: roleKey, role: roleKey });
+  if (ok) {
+    showAlert('editAlert', 'تم تحديث الدور بنجاح ✅', 'ok');
+    setTimeout(function() { closeModal('editRoleModal'); loadStaff(); if (document.getElementById('panel-roles').classList.contains('active')) loadRoles(); }, 1200);
+  } else {
+    showAlert('editAlert', 'حدث خطأ أثناء الحفظ', 'err');
+  }
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    if (e.target === el) el.classList.remove('open');
+  });
+});
+
+// ── INIT ──
+loadOverview();
+</script>
+</body>
+</html>

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بوابة EduOS الذكية · EduOS Smart Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="../platform-config.js"></script>
+<script src="../platform-shield.js" defer></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold:       #D4A84B;
+    --gold-light: #E8C97A;
+    --navy:       #1C2A2A;
+    --cream:      #F8F5F0;
+    --beige:      #E0D8CA;
+    --grey-100:   #F0EBE3;
+    --grey-300:   #C8BDB0;
+    --grey-500:   #6B7280;
+    --grey-700:   #374151;
+    --primary:    #5B3FBE;
+    --error:      #DC2626;
+    --font:       'Tajawal', Arial, sans-serif;
+    --radius:     14px;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font);
+    background: #071414;
+  }
+
+  /* ══════════════════════════════════════════
+     FULL-PAGE CENTERED LAYOUT
+  ══════════════════════════════════════════ */
+  .page {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #071414 0%, #0D3333 50%, #0A2020 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+  }
+
+  /* Subtle gold radial glow */
+  .page::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212,168,75,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Lang toggle — fixed top-left corner */
+  .lang-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 30px;
+    padding: 4px;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+  .lang-btn {
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border: none;
+    border-radius: 26px;
+    cursor: pointer;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: var(--primary);
+    color: white;
+  }
+
+  /* Center column */
+  .login-center {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Brand header — no logo */
+  .brand-header {
+    text-align: center;
+    width: 100%;
+  }
+  .brand-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--gold-light);
+    letter-spacing: 0.5px;
+  }
+  .brand-subtitle {
+    font-size: 12px;
+    color: rgba(212,168,75,0.5);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .brand-divider {
+    width: 48px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 12px auto 0;
+  }
+
+  /* Login card */
+  .form-inner {
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .form-welcome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--grey-500);
+    margin-bottom: 4px;
+    text-align: right;
+  }
+  .form-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 4px;
+    text-align: right;
+    line-height: 1.2;
+  }
+  .form-desc {
+    font-size: 13px;
+    color: var(--grey-500);
+    margin-bottom: 28px;
+    text-align: right;
+    line-height: 1.6;
+  }
+
+  .input-group { margin-bottom: 18px; }
+  .input-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey-700);
+    margin-bottom: 8px;
+    text-align: right;
+  }
+  .input-wrap { position: relative; }
+  .input-wrap .input-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--grey-300);
+    pointer-events: none;
+  }
+  .form-input {
+    width: 100%;
+    padding: 13px 44px 13px 16px;
+    border: 1.5px solid var(--grey-300);
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 15px;
+    color: var(--navy);
+    background: #FAFAFA;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: right;
+    direction: rtl;
+  }
+  .form-input::placeholder { color: var(--grey-300); }
+  .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(91,63,190,0.10);
+    background: #FFFFFF;
+  }
+  .form-input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+  }
+
+  .btn-eye {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--grey-300);
+    font-size: 16px;
+    padding: 4px;
+    line-height: 1;
+  }
+  .btn-eye:hover { color: var(--primary); }
+
+  .error-msg {
+    display: none;
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 6px;
+    text-align: right;
+    font-weight: 500;
+  }
+  .error-msg.show { display: block; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary) 0%, #7B5BD8 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 20px rgba(91,63,190,0.4);
+    transition: all 0.25s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(91,63,190,0.5); }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+  .btn-submit .spinner {
+    display: none;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .role-badge {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(91,63,190,0.08), rgba(201,168,76,0.08));
+    border: 1px solid rgba(91,63,190,0.15);
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 16px;
+    justify-content: center;
+  }
+  .role-badge.show { display: flex; }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--grey-500);
+    margin-top: 20px;
+    justify-content: center;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #22C55E;
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+  @keyframes pulse-green { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .form-footer {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #F0EBE3;
+    text-align: center;
+  }
+  .footer-logo-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--grey-300);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--grey-300); }
+
+  /* Features chips below card */
+  .features-strip {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .feat-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    padding: 6px 13px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    font-family: var(--font);
+    white-space: nowrap;
+  }
+
+  /* Page-level NAFAS footer */
+  .page-footer {
+    font-size: 11px;
+    color: rgba(212,168,75,0.35);
+    letter-spacing: 1px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  /* Loading overlay */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,20,20,0.93);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+    padding: 24px;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-spinner {
+    width: 52px; height: 52px;
+    border: 3px solid rgba(201,168,76,0.3);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 8px;
+  }
+  .loading-greeting {
+    color: var(--gold);
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .loading-name {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: -4px;
+  }
+  .loading-role-lbl {
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    margin-top: 2px;
+    border: 1px solid rgba(201,168,76,0.3);
+    padding: 3px 14px;
+    border-radius: 20px;
+  }
+  .loading-text { color: var(--gold-light); font-size: 14px; font-weight: 500; margin-top: 6px; }
+
+  /* Farewell overlay */
+  .farewell-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,20,20,0.97);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+    padding: 24px;
+  }
+  .farewell-overlay.show { display: flex; }
+  .farewell-icon { font-size: 52px; margin-bottom: 4px; }
+  .farewell-title { color: var(--gold); font-size: 24px; font-weight: 700; }
+  .farewell-sub { color: rgba(255,255,255,0.75); font-size: 16px; line-height: 1.7; max-width: 320px; }
+  .farewell-dots { color: rgba(201,168,76,0.5); font-size: 13px; margin-top: 8px; }
+
+  /* Mobile */
+  @media (max-width: 520px) {
+    .form-inner { padding: 28px 20px; }
+    .brand-title { font-size: 24px; }
+    .features-strip { display: none; }
+    .page { padding: 24px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Farewell overlay (logout / session expiry) -->
+<div class="farewell-overlay" id="farewellOverlay">
+  <div class="farewell-icon" id="farewellIcon">🌙</div>
+  <div class="farewell-title" id="farewellTitle">في حفظ الله ورعايته</div>
+  <div class="farewell-sub" id="farewellSub">نراكِ في الجلسة القادمة بإذن الله 🤍<br>تم تسجيل الخروج بأمان</div>
+  <div class="farewell-dots" id="farewellDots">جارٍ العودة لصفحة الدخول…</div>
+</div>
+
+<!-- Loading overlay (post-login transition) -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-greeting" id="loadingGreeting"></div>
+  <div class="loading-name" id="loadingName"></div>
+  <div class="loading-role-lbl" id="loadingRoleLbl"></div>
+  <div class="loading-text" id="loadingText">جارٍ التحقق من هويتك…</div>
+</div>
+
+<!-- Lang toggle fixed -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btnAR" onclick="setLang('ar')">AR</button>
+  <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+</div>
+
+<div class="page">
+  <div class="login-center">
+
+    <!-- ── Brand header (no logo) ── -->
+    <div class="brand-header">
+      <div class="brand-title" id="brandTitle">بوابة EduOS الذكية</div>
+      <div class="brand-subtitle" id="brandSubtitle">EDUOS SMART PORTAL · POWERED BY NAFAS AI</div>
+      <div class="brand-divider"></div>
+    </div>
+
+    <!-- ── Login card ── -->
+    <div class="form-inner">
+      <div class="form-welcome" id="txt-welcome">مرحباً بك 👋</div>
+      <div class="form-title" id="txt-title">تسجيل الدخول</div>
+      <div class="form-desc" id="txt-desc">أدخل بيانات حسابك — سيتم تحديد دورك تلقائياً</div>
+
+      <!-- Username -->
+      <div class="input-group">
+        <label class="input-label" id="lbl-user">اسم المستخدم</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input
+            type="text"
+            class="form-input"
+            id="username"
+            placeholder="مثال: ahmed.alali"
+            autocomplete="username"
+            spellcheck="false"
+          >
+        </div>
+        <div class="error-msg" id="err-user">الرجاء إدخال اسم المستخدم</div>
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+        <label class="input-label" id="lbl-pass">كلمة المرور</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            class="form-input"
+            id="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          >
+          <button class="btn-eye" type="button" onclick="togglePass()" id="eyeBtn" title="إظهار / إخفاء">👁</button>
+        </div>
+        <div class="error-msg" id="err-pass">الرجاء إدخال كلمة المرور</div>
+      </div>
+
+      <!-- General error -->
+      <div class="error-msg" id="err-general" style="margin-bottom:12px; font-size:13px;"></div>
+
+      <!-- Submit -->
+      <button class="btn-submit" id="btnLogin" onclick="doLogin()">
+        <span id="btnText">دخول</span>
+        <div class="spinner" id="btnSpinner"></div>
+      </button>
+
+      <!-- Role badge (post-detect) -->
+      <div class="role-badge" id="roleBadge">
+        <span id="roleIcon">✅</span>
+        <span id="roleLabel">جارٍ التوجيه…</span>
+      </div>
+
+      <!-- Status -->
+      <div class="status-bar">
+        <div class="status-dot"></div>
+        <span id="txt-status">النظام نشط · المنصة آمنة</span>
+      </div>
+
+      <!-- Footer -->
+      <div class="form-footer">
+        <div class="footer-logo-line">
+          <span>© 2026</span>
+          <div class="footer-dot"></div>
+          <span>NAFAS FOR ARTIFICIAL INTELLIGENCE</span>
+          <div class="footer-dot"></div>
+          <span>CN-6573712</span>
+        </div>
+      </div>
+    </div>
+    <!-- ── END login card ── -->
+
+    <!-- Features strip -->
+    <div class="features-strip">
+      <div class="feat-chip">🧠 ذكاء اصطناعي متكامل</div>
+      <div class="feat-chip">📊 رؤية بيانية شاملة</div>
+      <div class="feat-chip">🔒 أمان مؤسسي</div>
+      <div class="feat-chip">🌐 متعدد المدارس</div>
+    </div>
+
+    <!-- Page-level NAFAS footer -->
+    <div class="page-footer">NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712 · ABU DHABI</div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script>
+/* ─ Config — ديناميكي من platform-config.js ─ */
+const SB_URL  = window.EduOS?.SB_URL  || '';
+const getSBKey = () => window.EduOS?.SB_KEY || '';
+
+/* ─ Brand — ديناميكي من platform-config.js ─ */
+(function initBrand() {
+  const school = window.EduOS?.school;
+  if (!school) return;
+  const nameAr = school.nameAr || 'بوابة EduOS الذكية';
+  const nameEn = school.nameEn || 'EduOS Smart Portal';
+  const el = document.getElementById('brandTitle');
+  const sub = document.getElementById('brandSubtitle');
+  if (el)  el.textContent  = nameAr;
+  if (sub) sub.textContent = nameEn.toUpperCase() + ' · POWERED BY EDUOS';
+  document.title = nameAr + ' · ' + nameEn;
+})();
+
+/* ─ Language ─ */
+const STRINGS = {
+  ar: {
+    welcome: 'مرحباً بك 👋',
+    title: 'تسجيل الدخول',
+    desc: 'أدخل بيانات حسابك — سيتم تحديد دورك تلقائياً',
+    lblUser: 'اسم المستخدم',
+    lblPass: 'كلمة المرور',
+    placeholderUser: 'مثال: ahmed.alali',
+    btnText: 'دخول',
+    errUser: 'الرجاء إدخال اسم المستخدم',
+    errPass: 'الرجاء إدخال كلمة المرور',
+    errInvalid: 'اسم المستخدم أو كلمة المرور غير صحيحة',
+    errServer: 'خطأ في الاتصال بالخادم — حاول مجدداً',
+    loading: 'جارٍ التحقق من هويتك…',
+    status: 'النظام نشط · المنصة آمنة',
+    roleRedirect: 'جارٍ التوجيه…',
+  },
+  en: {
+    welcome: 'Welcome back 👋',
+    title: 'Sign In',
+    desc: 'Enter your credentials — your role will be detected automatically',
+    lblUser: 'Username',
+    lblPass: 'Password',
+    placeholderUser: 'e.g. ahmed.alali',
+    btnText: 'Sign In',
+    errUser: 'Please enter your username',
+    errPass: 'Please enter your password',
+    errInvalid: 'Incorrect username or password',
+    errServer: 'Connection error — please try again',
+    loading: 'Verifying your identity…',
+    status: 'System active · Platform secure',
+    roleRedirect: 'Redirecting…',
+  }
+};
+
+let currentLang = 'ar';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+  const s = STRINGS[lang];
+  document.getElementById('txt-welcome').textContent = s.welcome;
+  document.getElementById('txt-title').textContent   = s.title;
+  document.getElementById('txt-desc').textContent    = s.desc;
+  document.getElementById('lbl-user').textContent    = s.lblUser;
+  document.getElementById('lbl-pass').textContent    = s.lblPass;
+  document.getElementById('username').placeholder    = s.placeholderUser;
+  document.getElementById('btnText').textContent     = s.btnText;
+  document.getElementById('err-user').textContent    = s.errUser;
+  document.getElementById('err-pass').textContent    = s.errPass;
+  document.getElementById('txt-status').textContent  = s.status;
+  document.getElementById('loadingText').textContent = s.loading;
+
+  // Form alignment
+  const fp = document.querySelector('.form-panel');
+  fp.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('.form-input').forEach(el => {
+    el.style.textAlign = lang === 'ar' ? 'right' : 'left';
+    el.style.direction = lang;
+  });
+
+  // Active btn
+  document.getElementById('btnAR').classList.toggle('active', lang === 'ar');
+  document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+}
+
+/* ─ Toggle password visibility ─ */
+function togglePass() {
+  const inp = document.getElementById('password');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+/* ─ Role routing map ─ */
+const ROLE_ROUTES = {
+  admin:        '../eduos-admin/index.html',
+  official:     '../eduos-admin/index.html',
+  principal:    '../eduos-principal/index.html',
+  teacher:      '../eduos-teacher/index.html',
+  sub_teacher:  '../eduos-sub-teacher/index.html',
+  student:      '../eduos-student/index.html',
+  parent:       '../eduos-parent/index.html',
+  specialist:   '../eduos-specialist/index.html',
+  social_worker:'../eduos-social-worker/index.html',
+  special_ed:   '../eduos-inclusion/index.html',
+  librarian:    '../eduos-library/index.html',
+  assistant:    '../eduos-teacher/index.html',
+  nurse:        '../eduos-nurse/index.html',
+  security:     '../eduos-security/index.html',
+  technician:   '../eduos-technician/index.html',
+  secretary:    '../eduos-secretary/index.html',
+  observer:     '../eduos-observer/index.html',
+  coach:        '../eduos-coach/index.html',
+};
+
+const ROLE_LABELS_AR = {
+  admin:'مدير النظام', official:'مسؤول رسمي', principal:'مدير/ة المدرسة',
+  teacher:'معلم/ة', sub_teacher:'معلم/ة بديل/ة', student:'طالب/ة',
+  parent:'ولي/ة أمر', specialist:'أخصائي/ة اجتماعي/ة', nurse:'ممرض/ة',
+  social_worker:'مرشد/ة اجتماعي/ة', special_ed:'معلم/ة تربية خاصة',
+  librarian:'أمين/ة المكتبة', assistant:'مساعد/ة معلم/ة',
+  security:'أمن المدرسة', technician:'فني/ة', secretary:'سكرتير/ة',
+  observer:'مراقب/ة', coach:'مدرب/ة رياضي',
+};
+const ROLE_LABELS_EN = {
+  admin:'System Admin', official:'Official', principal:'Principal',
+  teacher:'Teacher', sub_teacher:'Substitute Teacher', student:'Student',
+  parent:'Parent / Guardian', specialist:'Social Specialist', nurse:'Nurse',
+  social_worker:'Social Worker', special_ed:'Special Ed Teacher',
+  librarian:'Librarian', assistant:'Teaching Assistant',
+  security:'Security', technician:'Technician', secretary:'Secretary',
+  observer:'Observer', coach:'Sports Coach',
+};
+
+/* ─ Main login ─ */
+async function doLogin() {
+  const s = STRINGS[currentLang];
+  const uInput = document.getElementById('username').value.trim();
+  const pInput = document.getElementById('password').value;
+
+  // Clear errors
+  ['err-user','err-pass','err-general'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
+  document.getElementById('username').classList.remove('error');
+  document.getElementById('password').classList.remove('error');
+  document.getElementById('roleBadge').classList.remove('show');
+
+  // Validate
+  let valid = true;
+  if (!uInput) {
+    document.getElementById('err-user').classList.add('show');
+    document.getElementById('username').classList.add('error');
+    valid = false;
+  }
+  if (!pInput) {
+    document.getElementById('err-pass').classList.add('show');
+    document.getElementById('password').classList.add('error');
+    valid = false;
+  }
+  if (!valid) return;
+
+  // Loading state
+  setBtnLoading(true);
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  try {
+    const SBKEY = getSBKey();
+
+    // 1 — Supabase Auth sign in
+    const authRes = await fetch(`${SB_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SBKEY,
+      },
+      body: JSON.stringify({ email: uInput + '@' + (window.EduOS?.school?.domain || 'eduos.ae'), password: pInput })
+    });
+
+    // If auth fails, try direct staff_profiles lookup (username-based)
+    let roleKey = null;
+    let userId  = null;
+    let authToken = null;
+
+    if (authRes.ok) {
+      const authData = await authRes.json();
+      authToken = authData.access_token;
+      userId    = authData.user?.id;
+    }
+
+    // 2 — Verify via Edge Function (handles staff + parent, SHA-256 comparison)
+    const verifyRes = await fetch(`${SB_URL}/functions/v1/eduos-login-verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SBKEY}`,
+      },
+      body: JSON.stringify({ username: uInput, password: pInput })
+    });
+
+    if (verifyRes.ok) {
+      const vd = await verifyRes.json();
+      if (vd.ok) {
+        roleKey = vd.role_key;
+
+        if (roleKey === 'parent') {
+          // Parent session
+          sessionStorage.setItem('edoos_user', JSON.stringify({
+            username: uInput,
+            role: 'parent',
+            role_key: 'parent',
+            full_name: vd.name_ar,
+            name: vd.name_ar,
+            name_en: vd.name_en,
+            parent_id: vd.parent_id,
+            id: vd.parent_id,
+            db_id: vd.parent_id,
+            national_id: uInput,
+            student_ids: vd.student_ids || [],
+            token: authToken,
+            ts: Date.now(),
+            loginTime: Date.now(),
+          }));
+        } else {
+          // Staff session
+          sessionStorage.setItem('edoos_user', JSON.stringify({
+            username: uInput,
+            role: roleKey,
+            role_key: roleKey,
+            full_name: vd.name_ar,
+            name_en: vd.name_en,
+            staff_db_id: vd.staff_db_id,
+            token: authToken,
+            ts: Date.now(),
+            loginTime: Date.now(),
+          }));
+        }
+      } else if (vd.error === 'account_inactive') {
+        showError(s.errInvalid);
+        return;
+      }
+      // If vd.ok is false but no specific error → could be student/unknown → continue to step 3
+    }
+
+    // 3 — Try students table if still no role
+    if (!roleKey) {
+      const stuRes = await fetch(
+        `${SB_URL}/rest/v1/students?student_number=eq.${encodeURIComponent(uInput)}&select=id,name,name_en,grade,class_name`,
+        { headers: { 'apikey': SBKEY, 'Authorization': `Bearer ${SBKEY}` } }
+      );
+      if (stuRes.ok) {
+        const stuData = await stuRes.json();
+        if (stuData.length > 0) {
+          roleKey = 'student';
+          const stu = stuData[0];
+          sessionStorage.setItem('edoos_user', JSON.stringify({
+            username: uInput,
+            role: 'student',
+            role_key: 'student',
+            full_name: stu.name,
+            name: stu.name,
+            name_en: stu.name_en,
+            student_id: stu.id,
+            id: stu.id,
+            grade: stu.grade,
+            class_name: stu.class_name,
+            class_id: stu.class_name,
+            token: authToken,
+            ts: Date.now(),
+            loginTime: Date.now(),
+          }));
+        }
+      }
+    }
+
+    if (!roleKey) {
+      showError(s.errInvalid);
+      return;
+    }
+
+    // 4 — Show warm welcome & redirect
+    const labels = currentLang === 'ar' ? ROLE_LABELS_AR : ROLE_LABELS_EN;
+    document.getElementById('roleIcon').textContent  = '✅';
+    document.getElementById('roleLabel').textContent = labels[roleKey] || roleKey;
+    document.getElementById('roleBadge').classList.add('show');
+
+    // Get user first name from session
+    const _session = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    const _fullNameAr = _session.full_name || '';
+    const _fullNameEn = _session.name_en || '';
+    const _firstName = currentLang === 'ar'
+      ? (_fullNameAr.split(' ')[0] || _fullNameAr)
+      : (_fullNameEn.split(' ')[0] || _fullNameAr.split(' ')[0] || '');
+
+    const _greeting = getTimeGreeting(currentLang);
+    document.getElementById('loadingGreeting').textContent = _greeting.text;
+    document.getElementById('loadingName').textContent = _firstName ? `${_greeting.prefix}${_firstName}` : '';
+    document.getElementById('loadingRoleLbl').textContent = labels[roleKey] || roleKey;
+    document.getElementById('loadingText').textContent = currentLang === 'ar' ? 'جارٍ التوجيه إلى لوحتك…' : 'Redirecting to your dashboard…';
+
+    const route = ROLE_ROUTES[roleKey] || '../eduos-hub/index.html';
+    setTimeout(() => { window.location.href = route; }, 1800);
+
+  } catch (err) {
+    console.error(err);
+    showError(STRINGS[currentLang].errServer);
+  } finally {
+    setBtnLoading(false);
+    // Keep overlay visible until redirect
+  }
+}
+
+function showError(msg) {
+  document.getElementById('loadingOverlay').classList.remove('show');
+  const el = document.getElementById('err-general');
+  el.textContent = msg;
+  el.classList.add('show');
+  setBtnLoading(false);
+}
+
+function setBtnLoading(on) {
+  const btn = document.getElementById('btnLogin');
+  const txt = document.getElementById('btnText');
+  const spinner = document.getElementById('btnSpinner');
+  btn.disabled = on;
+  txt.style.display = on ? 'none' : 'inline';
+  spinner.style.display = on ? 'block' : 'none';
+}
+
+/* Enter key support */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+/* ── Time-based greeting ── */
+function getTimeGreeting(lang) {
+  const h = new Date().getHours();
+  if (lang === 'en') {
+    if (h >= 5  && h < 12) return { text: 'Good Morning ☀️',   prefix: '' };
+    if (h >= 12 && h < 17) return { text: 'Good Afternoon 🌤️', prefix: '' };
+    if (h >= 17 && h < 21) return { text: 'Good Evening 🌅',   prefix: '' };
+    return { text: 'Good Night 🌙', prefix: '' };
+  }
+  if (h >= 5  && h < 12) return { text: 'صباح الخير 🌅',  prefix: '' };
+  if (h >= 12 && h < 17) return { text: 'مساء الخير ☀️',  prefix: '' };
+  if (h >= 17 && h < 21) return { text: 'مساء النور 🌆',  prefix: '' };
+  return { text: 'طابت ليلتك 🌙', prefix: '' };
+}
+
+/* ── Farewell overlay ── */
+function showFarewell(reason) {
+  const isAr = (currentLang || 'ar') === 'ar';
+  const icon = document.getElementById('farewellIcon');
+  const title = document.getElementById('farewellTitle');
+  const sub = document.getElementById('farewellSub');
+  const dots = document.getElementById('farewellDots');
+  if (reason === 'idle') {
+    if (icon) icon.textContent = '⏰';
+    title.textContent = isAr ? 'انتهت جلستك تلقائياً' : 'Session expired';
+    sub.innerHTML = isAr
+      ? 'تم تسجيل خروجك تلقائياً لحمايتك 🔒<br>نراكِ في الجلسة القادمة بإذن الله 🤍'
+      : 'You were logged out automatically for your security 🔒<br>See you next time!';
+  } else {
+    if (icon) icon.textContent = '🌙';
+    title.textContent = isAr ? 'في حفظ الله ورعايته' : 'Goodbye!';
+    sub.innerHTML = isAr
+      ? 'نراكِ في الجلسة القادمة بإذن الله 🤍<br>تم تسجيل الخروج بأمان'
+      : 'See you next time! Logged out safely.';
+  }
+  dots.textContent = isAr ? 'جارٍ العودة لصفحة الدخول…' : 'Returning to login…';
+  document.getElementById('farewellOverlay').classList.add('show');
+}
+
+/* ── Check for ?bye param on page load ── */
+(function checkByeParam() {
+  const p = new URLSearchParams(window.location.search);
+  const bye = p.get('bye');
+  if (bye) {
+    sessionStorage.removeItem('edoos_user');
+    showFarewell(bye === 'idle' ? 'idle' : 'manual');
+    setTimeout(() => {
+      document.getElementById('farewellOverlay').classList.remove('show');
+      // Clean URL
+      history.replaceState({}, '', window.location.pathname);
+    }, 3500);
+  }
+})();
+
+/* ── Auto-idle logout (15 min) ── */
+let idleTimer;
+const IDLE_MS = 15 * 60 * 1000;
+function resetIdle() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    sessionStorage.removeItem('edoos_user');
+    window.location.href = 'index.html?bye=idle';
+  }, IDLE_MS);
+}
+['mousemove','keydown','click','touchstart'].forEach(ev => document.addEventListener(ev, resetIdle));
+resetIdle();
+</script>
+</body>
+</html>
