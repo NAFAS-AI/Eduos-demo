@@ -430,8 +430,6 @@ tr:hover td{background:#F8FAFC;}
 </div>
 
 <script>
-const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
-const SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
 
 // ── Auth ──
 const sess = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
@@ -463,8 +461,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── DB helpers ──
 async function dbGet(table, params) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/' + table + '?' + (params || ''), {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'count=exact' }
+    const r = await fetch((window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/' + table + '?' + (params || ''), {
+      headers: { 'apikey': (window.EduOS?window.EduOS.SB_KEY:''), 'Authorization': 'Bearer ' + (window.EduOS?window.EduOS.SB_KEY:''), 'Prefer': 'count=exact' }
     });
     const data = await r.json();
     const ct = r.headers.get('content-range');
@@ -474,9 +472,9 @@ async function dbGet(table, params) {
 
 async function dbPost(table, body) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/' + table, {
+    const r = await fetch((window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/' + table, {
       method: 'POST',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      headers: { 'apikey': (window.EduOS?window.EduOS.SB_KEY:''), 'Authorization': 'Bearer ' + (window.EduOS?window.EduOS.SB_KEY:''), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
       body: JSON.stringify(body)
     });
     return r.ok;
@@ -485,9 +483,9 @@ async function dbPost(table, body) {
 
 async function dbPatch(table, id, body) {
   try {
-    const r = await fetch(SB_URL + '/rest/v1/' + table + '?id=eq.' + id, {
+    const r = await fetch((window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/' + table + '?id=eq.' + id, {
       method: 'PATCH',
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
+      headers: { 'apikey': (window.EduOS?window.EduOS.SB_KEY:''), 'Authorization': 'Bearer ' + (window.EduOS?window.EduOS.SB_KEY:''), 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     return r.ok;
@@ -793,7 +791,7 @@ async function loadSystem() {
     checks.push({ label: 'parents', ok: true, sub: r4.count + ' سجل' });
   } catch(e) { checks.push({ label: 'parents', ok: false, sub: 'خطأ' }); }
 
-  checks.push({ label: 'SB_KEY', ok: !!SB_KEY, sub: SB_KEY ? 'موجود ✅' : 'مفقود ❌' });
+  checks.push({ label: '(window.EduOS?window.EduOS.SB_KEY:'')', ok: !!(window.EduOS?window.EduOS.SB_KEY:''), sub: (window.EduOS?window.EduOS.SB_KEY:'') ? 'موجود ✅' : 'مفقود ❌' });
   checks.push({ label: 'Session', ok: !!sess.username, sub: sess.username || '—' });
 
   document.getElementById('statusGrid').innerHTML = checks.map(function(c) {
