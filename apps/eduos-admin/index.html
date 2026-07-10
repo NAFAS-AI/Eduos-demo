@@ -543,7 +543,7 @@ async function loadOverview() {
       dbGet('staff_profiles', 'select=id,role_key&limit=500'),
       dbGet('students', 'select=id,student_number,class_name&limit=2000'),
       dbGet('parents', 'select=id&limit=2000'),
-      dbGet('schedules', 'select=id&limit=1&head=true')
+      dbGet('schedules', 'is_active=eq.true&select=id&limit=1&head=true')
     ]);
 
     const staffList = staff.data;
@@ -782,7 +782,7 @@ async function loadSystem() {
   } catch(e) { checks.push({ label: 'students', ok: false, sub: 'خطأ' }); }
 
   try {
-    var r3 = await dbGet('schedules', 'select=id&limit=1&head=true');
+    var r3 = await dbGet('schedules', 'is_active=eq.true&select=id&limit=1&head=true');
     checks.push({ label: 'schedules', ok: true, sub: r3.count + ' صف' });
   } catch(e) { checks.push({ label: 'schedules', ok: false, sub: 'خطأ' }); }
 

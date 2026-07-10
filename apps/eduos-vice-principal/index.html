@@ -532,8 +532,8 @@ async function loadVpTimetableStatus() {
   if (!sb) return;
   var el = document.getElementById('vpTimetableStatus');
   try {
-    var countRes = await sb.from('schedules').select('*', {count:'exact', head:true});
-    var classRes = await sb.from('schedules').select('class_name').limit(500);
+    var countRes = await sb.from('schedules').select('*', {count:'exact', head:true}).eq('is_active', true);
+    var classRes = await sb.from('schedules').select('class_name').eq('is_active', true).limit(500);
     var unique = new Set((classRes.data||[]).map(function(r){return r.class_name;})).size;
     el.innerHTML = '<div style="display:flex;gap:20px;flex-wrap:wrap">' +
       '<div style="background:#F1F5F9;border-radius:10px;padding:14px 20px;text-align:center"><div style="font-size:26px;font-weight:900;color:#6C3DD6">' + (countRes.count||0) + '</div><div style="font-size:12px;color:#64748B;margin-top:4px">إجمالي الحصص / Total Slots</div></div>' +

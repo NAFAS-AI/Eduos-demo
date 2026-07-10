@@ -932,8 +932,8 @@ async function loadTimetableStatus() {
   if (!sb) return;
   const el = document.getElementById('timetableStatus');
   try {
-    const { count } = await sb.from('schedules').select('*', {count:'exact', head:true});
-    const { data: classes } = await sb.from('schedules').select('class_name').limit(500);
+    const { count } = await sb.from('schedules').select('*', {count:'exact', head:true}).eq('is_active', true);
+    const { data: classes } = await sb.from('schedules').select('class_name').eq('is_active', true).limit(500);
     const unique = new Set((classes||[]).map(r=>r.class_name)).size;
     el.innerHTML = `
       <div style="display:flex;gap:20px;flex-wrap:wrap">
