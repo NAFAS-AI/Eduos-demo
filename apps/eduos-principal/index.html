@@ -285,6 +285,7 @@ tr:hover td{background:var(--surface2)}
   <button class="tab-btn" data-tab="attendance" onclick="switchTab('attendance',this)">📋 الحضور / Attendance</button>
   <button class="tab-btn" data-tab="platform" onclick="switchTab('platform',this)">⚙️ حالة المنصة / Platform</button>
   <button class="tab-btn" data-tab="analytics" onclick="switchTab('analytics',this)">📈 التحليلات / Analytics</button>
+  <button class="tab-btn" data-tab="timetable" onclick="switchTab('timetable',this)">📅 الجداول / Timetable</button>
 </nav>
 
 <div class="content">
@@ -514,6 +515,41 @@ tr:hover td{background:var(--surface2)}
 
     <p class="sec-title" style="margin-top:24px">📅 الأحداث القادمة / Upcoming Events</p>
     <div id="platformEvents"><div class="skeleton" style="height:120px"></div></div>
+  </div>
+
+  <!-- ─── TIMETABLE ─── -->
+  <div class="tab-panel" id="panel-timetable">
+    <p class="sec-title">📅 إدارة الجداول / Timetable Management</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px">
+      <a href="../eduos-timetable-gen/" style="display:block;text-decoration:none">
+        <div style="background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:16px;padding:28px 24px;color:#fff;text-align:center;box-shadow:0 4px 20px rgba(108,61,214,0.25);transition:transform .15s" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="font-size:42px;margin-bottom:12px">✨</div>
+          <div style="font-size:18px;font-weight:900;margin-bottom:6px">إنشاء جدول ذكي</div>
+          <div style="font-size:13px;opacity:.85">Smart Timetable Generator</div>
+          <div style="margin-top:16px;background:rgba(255,255,255,0.2);border-radius:10px;padding:8px 14px;font-size:12px">توليد تلقائي مع قيود ذكية ← انقر هنا</div>
+        </div>
+      </a>
+      <a href="../eduos-timetable-builder/" style="display:block;text-decoration:none">
+        <div style="background:#fff;border:2px solid rgba(108,61,214,0.2);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.06);transition:transform .15s" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="font-size:42px;margin-bottom:12px">✏️</div>
+          <div style="font-size:18px;font-weight:900;color:#1E293B;margin-bottom:6px">تعديل يدوي</div>
+          <div style="font-size:13px;color:#64748B">Manual Timetable Editor</div>
+          <div style="margin-top:16px;background:#F1F5F9;border-radius:10px;padding:8px 14px;font-size:12px;color:#475569">تعديل خلية بخلية بالسحب والإفلات</div>
+        </div>
+      </a>
+      <a href="../eduos-timetable-pdf/" style="display:block;text-decoration:none">
+        <div style="background:#fff;border:2px solid rgba(108,61,214,0.2);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.06);transition:transform .15s" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="font-size:42px;margin-bottom:12px">🖨️</div>
+          <div style="font-size:18px;font-weight:900;color:#1E293B;margin-bottom:6px">طباعة الجداول</div>
+          <div style="font-size:13px;color:#64748B">Print Timetables</div>
+          <div style="margin-top:16px;background:#F1F5F9;border-radius:10px;padding:8px 14px;font-size:12px;color:#475569">طباعة بالصف أو المعلمة أو المرحلة</div>
+        </div>
+      </a>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:22px">
+      <div style="font-size:15px;font-weight:800;color:#1E293B;margin-bottom:16px">📊 حالة الجداول / Timetable Status</div>
+      <div id="timetableStatus" style="color:#94A3B8;font-size:14px">جاري التحميل...</div>
+    </div>
   </div>
 
   <!-- ─── ANALYTICS ─── -->
@@ -874,6 +910,7 @@ function switchTab(name, btn) {
   if (name==='attendance') loadAttendance();
   if (name==='analytics') loadAnalytics();
   if (name==='platform') loadPlatformEvents();
+  if (name==='timetable') loadTimetableStatus();
 }
 
 async function loadStaff() {
@@ -889,6 +926,27 @@ async function loadStaff() {
       <td><span class="chip chip-green">نشط/ة / Active</span></td>
     </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)">لا بيانات / No data</td></tr>';
   } catch(e) { console.warn('staff:', e); }
+}
+
+async function loadTimetableStatus() {
+  if (!sb) return;
+  const el = document.getElementById('timetableStatus');
+  try {
+    const { count } = await sb.from('schedules').select('*', {count:'exact', head:true});
+    const { data: classes } = await sb.from('schedules').select('class_name').limit(500);
+    const unique = new Set((classes||[]).map(r=>r.class_name)).size;
+    el.innerHTML = `
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div style="background:#F1F5F9;border-radius:10px;padding:14px 20px;text-align:center">
+          <div style="font-size:26px;font-weight:900;color:#6C3DD6">${count||0}</div>
+          <div style="font-size:12px;color:#64748B;margin-top:4px">إجمالي الحصص / Total Slots</div>
+        </div>
+        <div style="background:#F1F5F9;border-radius:10px;padding:14px 20px;text-align:center">
+          <div style="font-size:26px;font-weight:900;color:#059669">${unique}</div>
+          <div style="font-size:12px;color:#64748B;margin-top:4px">فصول مجدولة / Classes Scheduled</div>
+        </div>
+      </div>`;
+  } catch(e) { el.textContent = 'لا بيانات / No data'; }
 }
 
 function doLogout() { sessionStorage.removeItem('edoos_user'); window.location.href = '../eduos-login/'; }
