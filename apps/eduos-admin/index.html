@@ -616,7 +616,7 @@ async function loadOverview() {
     const [staff, students, parents, schedules] = await Promise.all([
       dbGet('staff_profiles', 'select=id,role_key&limit=500'),
       dbGet('students', 'select=id,student_number,class_name&limit=2000'),
-      dbGet('parent_credentials', 'select=id&limit=1'),
+      dbGet('parents', 'select=id&limit=1'),
       dbGet('schedules', 'is_active=eq.true&select=id&limit=1')
     ]);
 
