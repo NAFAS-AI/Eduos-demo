@@ -794,7 +794,7 @@ async function doLogin() {
     if (!roleKey) {
       // Query only canonical columns guaranteed across all EduOS schools
       const stuRes = await fetch(
-        `${(window.EduOS?window.EduOS.SB_URL:'')}/rest/v1/students?student_number=eq.${encodeURIComponent(uInput)}&select=id,name,class_name,grade,name_en`,
+        `${(window.EduOS?window.EduOS.SB_URL:'')}/rest/v1/students?student_number=eq.${encodeURIComponent(uInput)}&select=id,name,class_name,grade`,
         { headers: { 'apikey': SBKEY, 'Authorization': `Bearer ${SBKEY}` } }
       );
       if (stuRes.ok) {
