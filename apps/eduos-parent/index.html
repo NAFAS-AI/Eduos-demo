@@ -588,8 +588,8 @@ function renderBehavior() {
       <table>
         <thead><tr><th>التاريخ | Date</th><th>النوع | Type</th><th>الوصف | Description</th><th>النقاط | Points</th></tr></thead>
         <tbody>${behData.map(b => {
-          const deg = b.degree || '—';
-          const badge = b.degree === 'minor' ? 'badge-amber' : b.degree === 'major' ? 'badge-red' : 'badge-green';
+          const deg = b.degree != null ? (b.degree === 1 ? 'خفيف' : b.degree === 2 ? 'متوسط' : b.degree >= 3 ? 'شديد' : b.degree) : '—';
+          const badge = b.degree === 1 ? 'badge-amber' : b.degree >= 2 ? 'badge-red' : 'badge-green';
           return `<tr>
             <td>${(b.created_at||'').slice(0,10) || '—'}</td>
             <td><span class="badge badge-blue">${b.violation_type || '—'}</span></td>
@@ -645,7 +645,7 @@ function updateHomeKpis() {
 
   // Behavior points
   const beh_total = behData.length;
-  document.getElementById('kpiBeh').textContent = beh_total || '—';
+  document.getElementById('kpiBeh').textContent = beh_total === 0 ? '0 ✓' : beh_total;
 
   // Subjects count
   const uniqueSubjects = [...new Set(gradesData.map(g => g.subject))];
