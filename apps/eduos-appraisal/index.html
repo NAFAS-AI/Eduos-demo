@@ -5,221 +5,674 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>تقييم أداء الموظفين — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<script src="/apps/platform-config.js"></script>
 <script src="/apps/platform-week.js"></script>
 <script src="/apps/platform-autologout.js"></script>
 <script src="/apps/platform-auth-guard.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-    margin: 0;
-    padding: 0;font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
-:root{--primary:#6C3DD6;--secondary:#22D3EE;--card:#fff;--border:#e2e8f0;--text:#1e293b;--text2:#64748b}
+body{font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min-height:100vh;direction:rtl}
+:root{--pr:#6C3DD6;--sc:#22D3EE;--card:#fff;--border:#e2e8f0;--txt:#1e293b;--txt2:#64748b}
 .hdr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(108,61,214,.25)}
 .hdr-brand{display:flex;align-items:center;gap:12px}
 .hdr-logo{background:rgba(255,255,255,.2);border-radius:10px;padding:8px 14px;font-size:1.4rem;font-weight:900;color:#fff}
 .hdr-title{color:#fff;font-size:1rem;font-weight:700}
 .hdr-sub{color:rgba(255,255,255,.8);font-size:.75rem}
-.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600;transition:.2s}
+.btn-hdr{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:7px 16px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;transition:.2s}
 .btn-hdr:hover{background:rgba(255,255,255,.35)}
 .tabs-bar{background:#fff;border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
-.tab{padding:14px 18px;border:none;background:transparent;color:var(--text2);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab{padding:14px 20px;border:none;background:transparent;color:var(--txt2);font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--pr);border-bottom-color:var(--pr)}
 .panel{display:none}.panel.active{display:block}
 .main{padding:24px;max-width:1200px;margin:0 auto}
-.card{background:var(--card);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
-.card-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:14px;padding:22px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.card-title{font-size:1rem;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
+.badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;display:inline-block}
+.badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}
+.badge-red{background:#fee2e2;color:#dc2626}.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-purple{background:#ede9fe;color:#7c3aed}.badge-gray{background:#f1f5f9;color:#64748b}
+/* Staff Overview */
 .staff-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;transition:.2s;cursor:pointer}
-.staff-row:hover{background:#F8FAFF;border-color:var(--primary)}
-.staff-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
+.staff-row:hover{background:#F8FAFF;border-color:var(--pr)}
+.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
 .staff-name{font-weight:700;font-size:.92rem}
-.staff-role{font-size:.75rem;color:var(--text2)}
+.staff-meta{font-size:.75rem;color:var(--txt2);margin-top:2px}
 .score-bar{width:120px;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
 .score-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6C3DD6,#22D3EE)}
-.score-num{font-size:.82rem;font-weight:700;color:var(--primary)}
-.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block}
-.badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}.badge-red{background:#fee2e2;color:#dc2626}.badge-blue{background:#dbeafe;color:#1d4ed8}
-.criterion-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
-.criterion-label{flex:1;font-size:.88rem;font-weight:600}
-.criterion-score{display:flex;gap:6px}
-.score-btn{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:.85rem;transition:.2s}
-.score-btn:hover{border-color:var(--primary);background:#F8FAFF}
-.score-btn.selected{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-color:var(--primary)}
-input,select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:9px 14px;font-family:inherit;font-size:.88rem}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)}
+/* Form */
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:768px){.grid3,.grid2{grid-template-columns:1fr}}
 .form-group{margin-bottom:14px}
-.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--text);margin-bottom:6px}
-.btn{padding:9px 20px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:.2s}
-.btn-primary{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-primary:hover{opacity:.9}
-.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--primary)}
+.form-label{display:block;font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:6px}
+input[type=date],select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--txt);padding:9px 14px;font-family:inherit;font-size:.88rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pr)}
+/* UAE Framework Sections */
+.section-hd{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:10px;padding:10px 18px;font-size:.9rem;font-weight:700;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
+.domain-hd{background:#F0F4F8;border-right:4px solid var(--pr);padding:8px 14px;border-radius:0 8px 8px 0;font-size:.88rem;font-weight:700;color:var(--pr);margin:14px 0 8px}
+.criterion-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;background:#FAFBFF;flex-wrap:wrap}
+.criterion-info{flex:1;min-width:200px}
+.criterion-label{font-size:.88rem;font-weight:600;color:var(--txt)}
+.criterion-key{font-size:.72rem;color:var(--txt2);margin-top:2px}
+.score-btns{display:flex;gap:5px;flex-shrink:0}
+.sb{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:.85rem;transition:.2s;font-family:inherit;color:var(--txt)}
+.sb:hover{border-color:var(--pr);background:#F0EDFF;color:var(--pr)}
+.sb.sel{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-color:var(--pr)}
+.sb.sel-high{background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-color:#059669}
+/* Score Summary */
+.score-summary{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:14px;padding:20px 24px;margin:20px 0}
+.score-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:14px}
+@media(max-width:600px){.score-summary-grid{grid-template-columns:1fr}}
+.score-box{background:rgba(255,255,255,.08);border-radius:10px;padding:14px;text-align:center}
+.score-big{font-size:1.8rem;font-weight:900;color:#22D3EE}
+.score-lbl{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:4px}
+.grade-pill{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:.85rem;margin-top:8px}
+.g-ex{background:#059669;color:#fff}.g-ab{background:#0284c7;color:#fff}
+.g-mt{background:#d97706;color:#fff}.g-bl{background:#dc2626;color:#fff}.g-nr{background:#374151;color:#fff}
+/* Scale legend */
+.scale-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sl-item{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--txt2)}
+.sl-dot{width:10px;height:10px;border-radius:50%}
+/* Table */
 .tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:.85rem}
 thead{background:#F8FAFF}
-th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);border-bottom:2px solid var(--border)}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--txt2);border-bottom:2px solid var(--border)}
 td{padding:10px 14px;border-bottom:1px solid var(--border)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#F8FAFF}
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 24px;font-size:.88rem;font-weight:600;z-index:999;display:none}
+/* PDP */
+.pdp-card{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.pdp-progress{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:8px}
+.pdp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6C3DD6,#22D3EE)}
+/* Buttons */
+.btn{padding:10px 22px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;transition:.2s}
+.btn-pr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-pr:hover{opacity:.9}
+.btn-ol{background:#fff;border:1.5px solid var(--border);color:var(--txt2)}.btn-ol:hover{border-color:var(--pr)}
+/* Toast */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 28px;font-size:.9rem;font-weight:600;z-index:999;display:none;white-space:nowrap}
 .toast.show{display:block}
+.empty{text-align:center;padding:40px;color:var(--txt2);font-size:.9rem}
 </style>
-<script src="../platform-lang.js" defer></script>
-<script src="../platform-config.js"></script>
 </head>
 <body>
 <header class="hdr">
   <div class="hdr-brand">
-    <div class="hdr-logo">📋</div>
+    <div class="hdr-logo">&#128203;</div>
     <div>
-      <div class="hdr-title">تقييم الأداء | Staff Appraisal</div>
-      <div class="hdr-sub">تقييم الكادر التدريسي والإداري — EduOS</div>
+      <div class="hdr-title">تقييم أداء الموظفين</div>
+      <div class="hdr-sub">الإطار الوطني الإماراتي للمعلم — EduOS</div>
     </div>
   </div>
-  <button class="btn-hdr" onclick="location.href='/apps/eduos-principal/'">← رجوع</button>
+  <button class="btn-hdr" onclick="location.href='/apps/eduos-principal/'">&#8594; رجوع للبوابة</button>
 </header>
+
 <div class="tabs-bar">
-  <button class="tab active" onclick="switchTab('overview')">📊 نظرة عامة</button>
-  <button class="tab" onclick="switchTab('evaluate')">✏️ تقييم جديد</button>
-  <button class="tab" onclick="switchTab('history')">📋 السجل</button>
-  <button class="tab" onclick="switchTab('pdp')">🎯 خطط التطوير</button>
+  <button class="tab active" data-tab="overview">&#128202; نظرة عامة</button>
+  <button class="tab" data-tab="evaluate">&#9999;&#65039; تقييم جديد</button>
+  <button class="tab" data-tab="history">&#128203; السجل</button>
+  <button class="tab" data-tab="pdp">&#127919; خطط التطوير</button>
 </div>
+
 <div class="main">
+
+  <!-- ===== OVERVIEW ===== -->
   <div id="tab-overview" class="panel active">
     <div class="card">
       <div class="card-header">
-        <div class="card-title">📊 ملخص أداء الكادر | Staff Overview</div>
-        <span class="badge badge-blue">الفصل الدراسي الثالث 2025-2026</span>
+        <div class="card-title">&#128202; ملخص أداء الكادر</div>
+        <span class="badge badge-blue" id="termBadge">العام الدراسي 2025-2026</span>
       </div>
-      <div id="staffList"></div>
+      <div id="overviewKPIs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
+      <div id="staffList"><div class="empty">&#8987; جار التحميل...</div></div>
     </div>
   </div>
 
+  <!-- ===== NEW EVALUATION ===== -->
   <div id="tab-evaluate" class="panel">
     <div class="card">
-      <div class="card-header"><div class="card-title">✏️ نموذج التقييم | Evaluation Form</div></div>
-      <div class="grid2">
-        <div>
-          <div class="form-group"><label class="form-label">الموظف/ة | Staff</label><select id="evalStaff"><option value="">اختر الموظف/ة...</option></select></div>
-          <div class="form-group"><label class="form-label">نوع التقييم | Type</label>
-            <select id="evalType"><option value="classroom">زيارة صفية | Classroom Visit</option><option value="annual">تقييم سنوي | Annual</option><option value="midterm">منتصف الفصل | Mid-term</option></select>
-          </div>
-          <div class="form-group"><label class="form-label">التاريخ | Date</label><input type="date" id="evalDate"/></div>
+      <div class="card-header">
+        <div class="card-title">&#9999;&#65039; تقييم جديد — الإطار الوطني الإماراتي للمعلم</div>
+      </div>
+
+      <!-- Staff + Type + Date -->
+      <div class="grid3">
+        <div class="form-group">
+          <label class="form-label">الموظف/ة</label>
+          <select id="evalStaff"><option value="">اختر الموظف/ة...</option></select>
         </div>
-        <div>
-          <div style="font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:12px">معايير التقييم | Criteria (1–5)</div>
-          <div id="criteriaList"></div>
-          <div class="form-group" style="margin-top:14px"><label class="form-label">ملاحظات | Notes</label><textarea id="evalNotes" style="min-height:70px" placeholder="ملاحظات التقييم..."></textarea></div>
+        <div class="form-group">
+          <label class="form-label">نوع التقييم</label>
+          <select id="evalType">
+            <option value="annual">تقييم سنوي</option>
+            <option value="classroom">زيارة صفية</option>
+            <option value="midterm">منتصف الفصل</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">التاريخ</label>
+          <input type="date" id="evalDate"/>
         </div>
       </div>
+
+      <!-- Scale Legend -->
+      <div class="scale-legend">
+        <span style="font-size:.78rem;font-weight:700;color:var(--txt);margin-left:8px">مقياس التقييم:</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#374151"></span>0 غير مقبول</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#dc2626"></span>1 دون التوقعات</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#d97706"></span>2 يلبي جزئياً</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#0284c7"></span>3 يلبي التوقعات</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#059669"></span>4 يفوق التوقعات</span>
+        <span class="sl-item"><span class="sl-dot" style="background:#6C3DD6"></span>5 استثنائي</span>
+      </div>
+
+      <!-- Part 1: 6 Goals -->
+      <div class="section-hd">&#127937; الجزء الأول — أهداف الأداء (6 أهداف)</div>
+      <div id="goalsSection"></div>
+
+      <!-- Part 2: Competencies -->
+      <div class="section-hd">&#127775; الجزء الثاني — الكفاءات (4 محاور — 13 كفاءة)</div>
+      <div id="compsSection"></div>
+
+      <!-- Live Score Summary -->
+      <div class="score-summary">
+        <div style="font-size:.95rem;font-weight:700;color:rgba(255,255,255,.9)">&#128200; ملخص الدرجات — يتحدث تلقائياً</div>
+        <div class="score-summary-grid">
+          <div class="score-box">
+            <div class="score-big" id="p1score">—</div>
+            <div class="score-lbl">متوسط الجزء الأول (من 5)</div>
+          </div>
+          <div class="score-box">
+            <div class="score-big" id="p2score">—</div>
+            <div class="score-lbl">متوسط الجزء الثاني (من 5)</div>
+          </div>
+          <div class="score-box">
+            <div class="score-big" id="totalScore">—</div>
+            <div class="score-lbl">المجموع الكلي (من 100)</div>
+            <div id="gradePill" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label class="form-label">ملاحظات المقيِّم/ة</label>
+        <textarea id="evalNotes" style="min-height:80px" placeholder="ملاحظات إضافية حول أداء الموظف/ة..."></textarea>
+      </div>
+
       <div style="display:flex;gap:10px;justify-content:flex-end">
-        <button class="btn btn-outline" onclick="switchTab('overview')">إلغاء</button>
-        <button class="btn btn-primary" onclick="saveEval()">💾 حفظ التقييم</button>
+        <button class="btn btn-ol" data-tab-go="overview">إلغاء</button>
+        <button class="btn btn-pr" id="saveBtn">&#128190; حفظ التقييم</button>
       </div>
     </div>
   </div>
 
+  <!-- ===== HISTORY ===== -->
   <div id="tab-history" class="panel">
     <div class="card">
-      <div class="card-header"><div class="card-title">📋 سجل التقييمات | Evaluation History</div></div>
+      <div class="card-header">
+        <div class="card-title">&#128203; سجل التقييمات</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="text" id="histSearch" placeholder="بحث باسم الموظف/ة..." style="width:200px;padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem"/>
+        </div>
+      </div>
       <div class="tbl-wrap">
-        <table><thead><tr><th>الموظف/ة</th><th>نوع التقييم</th><th>التاريخ</th><th>الدرجة</th><th>المقيِّم/ة</th><th>الحالة</th></tr></thead>
-        <tbody id="historyBody"></tbody></table>
+        <table>
+          <thead>
+            <tr>
+              <th>الموظف/ة</th>
+              <th>نوع التقييم</th>
+              <th>التاريخ</th>
+              <th>الجزء 1</th>
+              <th>الجزء 2</th>
+              <th>المجموع</th>
+              <th>التقدير</th>
+              <th>المقيِّم/ة</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"><tr><td colspan="8" class="empty">&#8987; جار التحميل...</td></tr></tbody>
+        </table>
       </div>
     </div>
   </div>
 
+  <!-- ===== PDP ===== -->
   <div id="tab-pdp" class="panel">
     <div class="card">
-      <div class="card-header"><div class="card-title">🎯 خطط التطوير المهني | PDP</div></div>
-      <div id="pdpList"></div>
+      <div class="card-header">
+        <div class="card-title">&#127919; خطط التطوير المهني</div>
+        <span class="badge badge-blue" id="pdpCount">...</span>
+      </div>
+      <div id="pdpList"><div class="empty">&#8987; جار التحميل...</div></div>
     </div>
   </div>
+
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
-const SB='https://zuyizaiugpmhmeycqton.supabase.co';
-const KEY=window.EduOS?.SB_KEY;
-async function get(t,p=''){ const r=await fetch(`${SB}/rest/v1/${t}?${p}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}}); return r.ok?r.json():[]; }
-const CRITERIA=[{key:'planning',label:'التخطيط للدرس | Lesson Planning'},{key:'delivery',label:'أساليب التدريس | Teaching Methods'},{key:'classroom_mgmt',label:'إدارة الصف | Classroom Mgmt'},{key:'assessment',label:'التقييم | Assessment'},{key:'professional',label:'السلوك المهني | Professional Conduct'}];
-let scores={};
+var SB = (window.EduOS && window.EduOS.SB_URL) ? window.EduOS.SB_URL : 'https://xdkiktwuuwghvzcukvew.supabase.co';
+var KEY = (window.EduOS && window.EduOS.SB_KEY) ? window.EduOS.SB_KEY : '';
 
-async function init(){
-  document.getElementById('evalDate').value=new Date().toISOString().split('T')[0];
-  renderCriteria();
-  await Promise.all([loadStaff(),renderStaffOverview(),renderHistory(),renderPDP()]);
+var allStaff = [];
+var allEvals = [];
+var principalScores = {};
+
+// UAE Framework
+var GOALS = [
+  {key:'g1', label:'إدخال بيانات الحضور في الوقت المحدد', target:'مستهدف: 95% أو أكثر'},
+  {key:'g2', label:'تنظيم نشاط وطني في الفصل الدراسي', target:'مستهدف: نشاط واحد على الأقل، مشاركة 80%'},
+  {key:'g3', label:'تحسّن الطلاب الأكاديمي', target:'مستهدف: تحسّن بنسبة 5% أو أكثر'},
+  {key:'g4', label:'معايير الزيارة الصفية', target:'مستهدف: يلبي معايير الزيارة الصفية'},
+  {key:'g5', label:'المشاركة في المسابقات', target:'مستهدف: 5 طلاب فأكثر مع فوز واحد على الأقل'},
+  {key:'g6', label:'خطة الدعم الأكاديمي', target:'مستهدف: تحقيق 60% أو أكثر من الخطة'}
+];
+
+var DOMAINS = [
+  {id:1, label:'المحور الأول — المربي الأخلاقي', items:[
+    {key:'c1_1', label:'الوعي الثقافي'},
+    {key:'c1_2', label:'الرعاية والصحة النفسية'},
+    {key:'c1_3', label:'الأخلاقيات المهنية'}
+  ]},
+  {id:2, label:'المحور الثاني — المهني الفعّال', items:[
+    {key:'c2_1', label:'إتقان المحتوى المعرفي'},
+    {key:'c2_2', label:'ممارسات التدريس'},
+    {key:'c2_3', label:'التقييم'},
+    {key:'c2_4', label:'التعلم مدى الحياة'},
+    {key:'c2_5', label:'التدريس المتمايز'}
+  ]},
+  {id:3, label:'المحور الثالث — صانع المستقبل', items:[
+    {key:'c3_1', label:'الاستعداد للمستقبل'},
+    {key:'c3_2', label:'الابتكار التقني'},
+    {key:'c3_3', label:'الثقافة المحلية والعالمية'}
+  ]},
+  {id:4, label:'المحور الرابع — شريك المجتمع', items:[
+    {key:'c4_1', label:'مجتمعات التعلم المهني'},
+    {key:'c4_2', label:'الشراكة مع أولياء الأمور'}
+  ]}
+];
+
+// Helpers
+function gradeInfo(avg5) {
+  if (avg5 >= 4.5) return {label:'استثنائي', cls:'g-ex'};
+  if (avg5 >= 3.5) return {label:'يفوق التوقعات', cls:'g-ab'};
+  if (avg5 >= 2.5) return {label:'يلبي التوقعات', cls:'g-mt'};
+  if (avg5 >= 1.5) return {label:'دون التوقعات', cls:'g-bl'};
+  return {label:'غير مقبول', cls:'g-nr'};
 }
 
-function renderCriteria(){
-  document.getElementById('criteriaList').innerHTML=CRITERIA.map(c=>`
-    <div class="criterion-row">
-      <div class="criterion-label">${c.label}</div>
-      <div class="criterion-score">${[1,2,3,4,5].map(n=>`<button class="score-btn ${scores[c.key]===n?'selected':''}" onclick="setScore('${c.key}',${n})">${n}</button>`).join('')}</div>
-    </div>`).join('');
+function evalTypeName(t) {
+  if (t === 'classroom') return 'زيارة صفية';
+  if (t === 'midterm') return 'منتصف الفصل';
+  return 'تقييم سنوي';
 }
 
-function setScore(key,val){ scores[key]=val; renderCriteria(); }
-
-async function loadStaff(){
-  try{
-    const s=await get('staff_profiles','select=id,name_ar,role_key&order=name_ar&limit=100');
-    s.forEach(st=>{ const o=document.createElement('option'); o.value=st.id; o.textContent=`${st.name_ar} — ${st.role||'موظف/ة'}`; document.getElementById('evalStaff').appendChild(o); });
-  }catch(e){}
+async function apiFetch(table, params) {
+  var url = SB + '/rest/v1/' + table + (params ? ('?' + params) : '');
+  var r = await fetch(url, {headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+  return r.ok ? r.json() : [];
 }
 
-function renderStaffOverview(){
-  const demo=[{name:'أ. سارة أحمد',role:'معلمة رياضيات',score:92,evals:3},{name:'أ. خالد محمد',role:'معلم لغة عربية',score:88,evals:2},{name:'أ. نورة علي',role:'معلمة علوم',score:95,evals:4},{name:'أ. فاطمة سالم',role:'معلمة إنجليزية',score:84,evals:2},{name:'أ. عمر ناصر',role:'مشرف/ة اجتماعي',score:90,evals:1}];
-  document.getElementById('staffList').innerHTML=demo.map(d=>`
-    <div class="staff-row" onclick="startEval('${d.name}')">
-      <div class="staff-avatar">${d.name[3]}</div>
-      <div style="flex:1">
-        <div class="staff-name">${d.name}</div>
-        <div class="staff-role">${d.role} · ${d.evals} تقييم</div>
-        <div class="score-bar"><div class="score-fill" style="width:${d.score}%"></div></div>
-      </div>
-      <div style="text-align:center">
-        <div class="score-num">${d.score}%</div>
-        <span class="badge ${d.score>=90?'badge-green':d.score>=80?'badge-blue':'badge-yellow'}">${d.score>=90?'ممتاز':d.score>=80?'جيد':'يحتاج تطوير'}</span>
-      </div>
-    </div>`).join('');
+async function apiPost(table, data) {
+  var r = await fetch(SB + '/rest/v1/' + table, {
+    method:'POST',
+    headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify(data)
+  });
+  return r.ok || r.status === 201;
 }
 
-function renderHistory(){
-  const demo=[{name:'أ. سارة أحمد',type:'زيارة صفية',date:'2026-06-20',score:'91%',by:'المدير/ة',status:'مكتمل'},{name:'أ. خالد محمد',type:'منتصف الفصل',date:'2026-06-10',score:'88%',by:'المدير/ة',status:'مكتمل'},{name:'أ. نورة علي',type:'زيارة صفية',date:'2026-06-22',score:'95%',by:'المدير/ة',status:'مكتمل'}];
-  document.getElementById('historyBody').innerHTML=demo.map(d=>`<tr><td><strong>${d.name}</strong></td><td>${d.type}</td><td>${d.date}</td><td><strong>${d.score}</strong></td><td>${d.by}</td><td><span class="badge badge-green">${d.status}</span></td></tr>`).join('');
+// ===== INIT =====
+async function init() {
+  document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
+  renderForm();
+  setupTabs();
+  var results = await Promise.all([
+    apiFetch('staff_profiles', 'select=id,name_ar,role_key,subject&is_active=eq.true&order=name_ar&limit=200'),
+    apiFetch('staff_evaluations', 'select=*&order=eval_date.desc&limit=500')
+  ]);
+  allStaff = results[0] || [];
+  allEvals = results[1] || [];
+  populateStaffSelect();
+  renderOverview();
+  renderHistory(allEvals);
+  renderPDP();
 }
 
-function renderPDP(){
-  const demo=[{name:'أ. خالد محمد',goal:'تطوير استخدام التكنولوجيا في الدرس',progress:60,deadline:'2026-07-30'},{name:'أ. فاطمة سالم',goal:'تحسين أساليب التقييم التكويني',progress:35,deadline:'2026-08-15'}];
-  document.getElementById('pdpList').innerHTML=demo.map(d=>`
-    <div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div style="font-weight:700">${d.name}</div>
-        <span class="badge badge-blue">حتى ${d.deadline}</span>
-      </div>
-      <div style="font-size:.85rem;color:var(--text2);margin-bottom:8px">🎯 ${d.goal}</div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="flex:1;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden"><div style="height:100%;width:${d.progress}%;background:linear-gradient(90deg,#6C3DD6,#22D3EE);border-radius:4px"></div></div>
-        <div style="font-weight:700;font-size:.82rem;color:var(--primary)">${d.progress}%</div>
-      </div>
-    </div>`).join('');
+// ===== FORM RENDER =====
+function renderForm() {
+  // Goals
+  var goalsHtml = '';
+  GOALS.forEach(function(g, i) {
+    goalsHtml += '<div class="criterion-row" id="row_' + g.key + '">';
+    goalsHtml += '<div class="criterion-info">';
+    goalsHtml += '<div class="criterion-label">' + (i+1) + '. ' + g.label + '</div>';
+    goalsHtml += '<div class="criterion-key">' + g.target + '</div>';
+    goalsHtml += '</div>';
+    goalsHtml += '<div class="score-btns" id="btns_' + g.key + '">';
+    for (var n = 0; n <= 5; n++) {
+      goalsHtml += '<button class="sb" data-key="' + g.key + '" data-val="' + n + '">' + n + '</button>';
+    }
+    goalsHtml += '</div></div>';
+  });
+  document.getElementById('goalsSection').innerHTML = goalsHtml;
+
+  // Competencies
+  var compsHtml = '';
+  DOMAINS.forEach(function(d) {
+    compsHtml += '<div class="domain-hd">' + d.label + '</div>';
+    d.items.forEach(function(c, ci) {
+      compsHtml += '<div class="criterion-row" id="row_' + c.key + '">';
+      compsHtml += '<div class="criterion-info">';
+      compsHtml += '<div class="criterion-label">' + (d.id) + '.' + (ci+1) + ' ' + c.label + '</div>';
+      compsHtml += '</div>';
+      compsHtml += '<div class="score-btns" id="btns_' + c.key + '">';
+      for (var n = 0; n <= 5; n++) {
+        compsHtml += '<button class="sb" data-key="' + c.key + '" data-val="' + n + '">' + n + '</button>';
+      }
+      compsHtml += '</div></div>';
+    });
+  });
+  document.getElementById('compsSection').innerHTML = compsHtml;
+
+  // Bind score buttons
+  document.querySelectorAll('.sb').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var key = btn.getAttribute('data-key');
+      var val = parseInt(btn.getAttribute('data-val'), 10);
+      principalScores[key] = val;
+      document.querySelectorAll('[data-key="' + key + '"]').forEach(function(b) {
+        b.classList.remove('sel', 'sel-high');
+        if (parseInt(b.getAttribute('data-val'), 10) === val) {
+          b.classList.add(val >= 4 ? 'sel-high' : 'sel');
+        }
+      });
+      updateScoreSummary();
+    });
+  });
 }
 
-function startEval(name){ switchTab('evaluate'); showToast(`✏️ تقييم: ${name}`); }
+function updateScoreSummary() {
+  var g1vals = GOALS.map(function(g) { return principalScores[g.key] !== undefined ? principalScores[g.key] : null; });
+  var g1filled = g1vals.filter(function(v) { return v !== null; });
+  var p1avg = g1filled.length ? g1filled.reduce(function(a,b){return a+b;},0)/g1filled.length : null;
 
-async function saveEval(){
-  const staff=document.getElementById('evalStaff').value;
-  if(!staff){ showToast('⚠️ اختر/ي الموظف/ة'); return; }
-  const total=Object.values(scores).length>0?Math.round(Object.values(scores).reduce((a,b)=>a+b,0)/Object.values(scores).length*20):0;
-  try{
-    await fetch(`${SB}/rest/v1/staff_appraisals`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({staff_id:staff,appraisal_type:document.getElementById('evalType').value,evaluation_date:document.getElementById('evalDate').value,scores,total_score:total,notes:document.getElementById('evalNotes').value})});
-  }catch(e){}
-  showToast('✅ تم حفظ التقييم بنجاح');
-  scores={}; switchTab('history'); renderHistory();
+  var allComps = [];
+  DOMAINS.forEach(function(d) { d.items.forEach(function(c) { allComps.push(c); }); });
+  var c2vals = allComps.map(function(c) { return principalScores[c.key] !== undefined ? principalScores[c.key] : null; });
+  var c2filled = c2vals.filter(function(v) { return v !== null; });
+  var p2avg = c2filled.length ? c2filled.reduce(function(a,b){return a+b;},0)/c2filled.length : null;
+
+  document.getElementById('p1score').textContent = p1avg !== null ? p1avg.toFixed(2) : '—';
+  document.getElementById('p2score').textContent = p2avg !== null ? p2avg.toFixed(2) : '—';
+
+  if (p1avg !== null && p2avg !== null) {
+    var overall5 = (p1avg + p2avg) / 2;
+    var overall100 = +(overall5 * 20).toFixed(1);
+    document.getElementById('totalScore').textContent = overall100 + '%';
+    var gi = gradeInfo(overall5);
+    document.getElementById('gradePill').innerHTML = '<span class="grade-pill ' + gi.cls + '">' + gi.label + '</span>';
+  } else {
+    document.getElementById('totalScore').textContent = '—';
+    document.getElementById('gradePill').innerHTML = '';
+  }
 }
 
-function switchTab(n){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); ['overview','evaluate','history','pdp'].forEach((t,i)=>{ if(t===n) document.querySelectorAll('.tab')[i].classList.add('active'); }); document.getElementById(`tab-${n}`).classList.add('active'); }
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+// ===== STAFF SELECT =====
+function populateStaffSelect() {
+  var sel = document.getElementById('evalStaff');
+  allStaff.forEach(function(s) {
+    var o = document.createElement('option');
+    o.value = s.id;
+    o.textContent = (s.name_ar || 'موظف/ة') + ' — ' + (s.role_key || '');
+    sel.appendChild(o);
+  });
+}
+
+// ===== OVERVIEW =====
+function renderOverview() {
+  if (!allEvals.length) {
+    document.getElementById('staffList').innerHTML = '<div class="empty">لا توجد تقييمات مسجّلة حتى الآن</div>';
+    return;
+  }
+
+  // Aggregate by staff
+  var byStaff = {};
+  allEvals.forEach(function(e) {
+    var sid = e.staff_id;
+    if (!byStaff[sid]) {
+      byStaff[sid] = {staff_name:e.staff_name, scores:[], last_date:'', last_grade:''};
+    }
+    byStaff[sid].scores.push(parseFloat(e.score) || 0);
+    if (!byStaff[sid].last_date || e.eval_date > byStaff[sid].last_date) {
+      byStaff[sid].last_date = e.eval_date;
+      byStaff[sid].last_grade = e.grade || '';
+    }
+  });
+
+  var staffArr = Object.keys(byStaff).map(function(k) {
+    var d = byStaff[k];
+    var avg = d.scores.reduce(function(a,b){return a+b;},0) / d.scores.length;
+    return {name:d.staff_name, avg:+avg.toFixed(1), count:d.scores.length, last_date:d.last_date, last_grade:d.last_grade};
+  });
+  staffArr.sort(function(a,b){return b.avg - a.avg;});
+
+  // KPIs
+  var totalEvals = allEvals.length;
+  var avgAll = staffArr.reduce(function(a,b){return a+b.avg;},0) / (staffArr.length || 1);
+  var excellent = staffArr.filter(function(s){return s.avg >= 90;}).length;
+  document.getElementById('overviewKPIs').innerHTML =
+    kpiBox('إجمالي التقييمات', totalEvals, '#6C3DD6') +
+    kpiBox('متوسط الأداء العام', avgAll.toFixed(1) + '%', '#059669') +
+    kpiBox('درجة ممتازة (90%+)', excellent + ' موظف/ة', '#0284c7');
+
+  var html = '';
+  staffArr.forEach(function(s) {
+    var avg5 = s.avg / 20;
+    var gi = gradeInfo(avg5);
+    var initial = s.name && s.name.length > 2 ? s.name[2] : 'م';
+    html += '<div class="staff-row" onclick="filterHistory(\'' + s.name + '\')">';
+    html += '<div class="avatar">' + initial + '</div>';
+    html += '<div style="flex:1">';
+    html += '<div class="staff-name">' + s.name + '</div>';
+    html += '<div class="staff-meta">' + s.count + ' تقييم · آخر تقييم: ' + s.last_date + '</div>';
+    html += '<div class="score-bar"><div class="score-fill" style="width:' + Math.min(s.avg,100) + '%"></div></div>';
+    html += '</div>';
+    html += '<div style="text-align:center;min-width:90px">';
+    html += '<div style="font-size:1.2rem;font-weight:900;color:var(--pr)">' + s.avg + '%</div>';
+    html += '<span class="badge ' + (s.avg >= 90 ? 'badge-green' : s.avg >= 75 ? 'badge-blue' : s.avg >= 60 ? 'badge-yellow' : 'badge-red') + '">' + gi.label + '</span>';
+    html += '</div></div>';
+  });
+  document.getElementById('staffList').innerHTML = html;
+}
+
+function kpiBox(lbl, val, color) {
+  return '<div style="background:' + color + '18;border:1px solid ' + color + '44;border-radius:12px;padding:16px;text-align:center">' +
+    '<div style="font-size:1.6rem;font-weight:900;color:' + color + '">' + val + '</div>' +
+    '<div style="font-size:.8rem;color:var(--txt2);margin-top:4px">' + lbl + '</div>' +
+    '</div>';
+}
+
+// ===== HISTORY =====
+function renderHistory(evals) {
+  if (!evals || !evals.length) {
+    document.getElementById('historyBody').innerHTML = '<tr><td colspan="8" class="empty">لا توجد تقييمات</td></tr>';
+    return;
+  }
+  var rows = '';
+  evals.forEach(function(e) {
+    var score = parseFloat(e.score) || 0;
+    var avg5 = score / 20;
+    var gi = gradeInfo(avg5);
+    var sd = (e.scores_detail && e.scores_detail.part1_avg) ? e.scores_detail.part1_avg.toFixed(2) : '—';
+    var cd = (e.scores_detail && e.scores_detail.part2_avg) ? e.scores_detail.part2_avg.toFixed(2) : '—';
+    rows += '<tr>';
+    rows += '<td><strong>' + (e.staff_name || '—') + '</strong></td>';
+    rows += '<td>' + evalTypeName(e.eval_type) + '</td>';
+    rows += '<td>' + (e.eval_date || '—') + '</td>';
+    rows += '<td>' + sd + '</td>';
+    rows += '<td>' + cd + '</td>';
+    rows += '<td><strong>' + score.toFixed(1) + '%</strong></td>';
+    rows += '<td><span class="badge ' + (score >= 90 ? 'badge-green' : score >= 70 ? 'badge-blue' : score >= 50 ? 'badge-yellow' : 'badge-red') + '">' + gi.label + '</span></td>';
+    rows += '<td>' + (e.evaluator || '—') + '</td>';
+    rows += '</tr>';
+  });
+  document.getElementById('historyBody').innerHTML = rows;
+}
+
+function filterHistory(name) {
+  switchTab('history');
+  document.getElementById('histSearch').value = name;
+  applyHistSearch();
+}
+
+function applyHistSearch() {
+  var q = (document.getElementById('histSearch').value || '').trim().toLowerCase();
+  var filtered = q ? allEvals.filter(function(e) {
+    return (e.staff_name || '').toLowerCase().includes(q);
+  }) : allEvals;
+  renderHistory(filtered);
+}
+
+// ===== PDP =====
+async function renderPDP() {
+  var data = await apiFetch('staff_pdp', 'select=*&order=progress.desc&limit=100');
+  document.getElementById('pdpCount').textContent = (data.length || 0) + ' خطة';
+  if (!data.length) {
+    document.getElementById('pdpList').innerHTML = '<div class="empty">لا توجد خطط تطوير مسجّلة</div>';
+    return;
+  }
+  var html = '';
+  data.forEach(function(p) {
+    var progress = p.progress || 0;
+    var statusBadge = progress >= 100 ? 'badge-green' : progress >= 60 ? 'badge-blue' : progress >= 30 ? 'badge-yellow' : 'badge-red';
+    html += '<div class="pdp-card">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">';
+    html += '<div style="font-weight:700">' + (p.staff_name || '—') + '</div>';
+    html += '<div style="display:flex;gap:8px">';
+    html += '<span class="badge ' + statusBadge + '">' + progress + '%</span>';
+    html += '<span class="badge badge-gray">' + (p.status || 'جارٍ') + '</span>';
+    html += '<span class="badge badge-gray">' + (p.academic_year || '—') + '</span>';
+    html += '</div></div>';
+    if (p.goal_1) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_1 + '</div>'; }
+    if (p.goal_2) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_2 + '</div>'; }
+    if (p.goal_3) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_3 + '</div>'; }
+    html += '<div class="pdp-progress"><div class="pdp-fill" style="width:' + Math.min(progress,100) + '%"></div></div>';
+    html += '</div>';
+  });
+  document.getElementById('pdpList').innerHTML = html;
+}
+
+// ===== SAVE EVAL =====
+document.getElementById('saveBtn').addEventListener('click', saveEval);
+
+async function saveEval() {
+  var staffId = document.getElementById('evalStaff').value;
+  if (!staffId) { showToast('اختر/ي الموظف/ة أولاً'); return; }
+
+  var allKeys = GOALS.map(function(g){return g.key;});
+  DOMAINS.forEach(function(d){d.items.forEach(function(c){allKeys.push(c.key);});});
+  var missing = allKeys.filter(function(k){return principalScores[k] === undefined;});
+  if (missing.length) {
+    showToast('يرجى تقييم جميع المعايير (' + missing.length + ' لم يُقيَّم بعد)');
+    return;
+  }
+
+  var g1vals = GOALS.map(function(g){return principalScores[g.key];});
+  var p1avg = g1vals.reduce(function(a,b){return a+b;},0) / g1vals.length;
+
+  var allCompKeys = [];
+  DOMAINS.forEach(function(d){d.items.forEach(function(c){allCompKeys.push(c.key);});});
+  var c2vals = allCompKeys.map(function(k){return principalScores[k];});
+  var p2avg = c2vals.reduce(function(a,b){return a+b;},0) / c2vals.length;
+
+  var overall5 = (p1avg + p2avg) / 2;
+  var score100 = +(overall5 * 20).toFixed(2);
+  var gi = gradeInfo(overall5);
+
+  var scores_detail = {goals:{}, competencies:{}, part1_avg:+p1avg.toFixed(3), part2_avg:+p2avg.toFixed(3)};
+  GOALS.forEach(function(g){ scores_detail.goals[g.key] = principalScores[g.key]; });
+  DOMAINS.forEach(function(d){ d.items.forEach(function(c){ scores_detail.competencies[c.key] = principalScores[c.key]; }); });
+
+  var selectedStaff = allStaff.find(function(s){ return s.id == staffId; });
+  var user = {};
+  try { user = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(e) {}
+
+  var payload = {
+    staff_id: parseInt(staffId, 10),
+    staff_name: (selectedStaff && selectedStaff.name_ar) ? selectedStaff.name_ar : '',
+    evaluator: user.name || user.name_ar || 'المدير/ة',
+    eval_date: document.getElementById('evalDate').value,
+    eval_type: document.getElementById('evalType').value,
+    score: score100,
+    max_score: 100,
+    grade: gi.label,
+    notes: document.getElementById('evalNotes').value,
+    scores_detail: scores_detail
+  };
+
+  document.getElementById('saveBtn').textContent = 'جار الحفظ...';
+  document.getElementById('saveBtn').disabled = true;
+
+  var ok = await apiPost('staff_evaluations', payload);
+  document.getElementById('saveBtn').textContent = 'حفظ التقييم';
+  document.getElementById('saveBtn').disabled = false;
+
+  if (ok) {
+    showToast('تم حفظ التقييم بنجاح — ' + gi.label + ' (' + score100 + '%)');
+    // Refresh data
+    allEvals = await apiFetch('staff_evaluations', 'select=*&order=eval_date.desc&limit=500');
+    allEvals = allEvals || [];
+    renderOverview();
+    renderHistory(allEvals);
+    // Reset form
+    principalScores = {};
+    document.querySelectorAll('.sb').forEach(function(b){ b.classList.remove('sel','sel-high'); });
+    document.getElementById('evalStaff').value = '';
+    document.getElementById('evalNotes').value = '';
+    document.getElementById('p1score').textContent = '—';
+    document.getElementById('p2score').textContent = '—';
+    document.getElementById('totalScore').textContent = '—';
+    document.getElementById('gradePill').innerHTML = '';
+    switchTab('history');
+  } else {
+    showToast('حدث خطأ أثناء الحفظ — تحقق من الاتصال');
+  }
+}
+
+// ===== TABS =====
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  var tabBtn = document.querySelector('[data-tab="' + name + '"]');
+  var panel = document.getElementById('tab-' + name);
+  if (tabBtn) tabBtn.classList.add('active');
+  if (panel) panel.classList.add('active');
+}
+
+function setupTabs() {
+  document.querySelectorAll('[data-tab]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      switchTab(el.getAttribute('data-tab'));
+    });
+  });
+  document.querySelectorAll('[data-tab-go]').forEach(function(el) {
+    el.addEventListener('click', function() {
+      switchTab(el.getAttribute('data-tab-go'));
+    });
+  });
+  document.getElementById('histSearch').addEventListener('input', applyHistSearch);
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+
 init();
 </script>
 </body>
