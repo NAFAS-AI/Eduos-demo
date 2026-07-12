@@ -267,19 +267,21 @@ async function init(){
 async function loadKPIs(){
   const today=new Date().toISOString().split('T')[0];
   const monthStart=new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0];
-  const visits=await dbGet('nurse_visits','select=id,student_name,complaint,priority,action_taken,created_at&order=created_at.desc&limit=200');
+  const visits=await dbGet('nurse_visits','select=id,student_name,symptoms,outcome,action_taken,created_at&order=created_at.desc&limit=200');
   if(!visits||visits.length===0){['kpiToday','kpiMonth','kpiUrgent','kpiMeds','statToday','statTotal','statMeds'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';});empty('recentVisits','لا زيارات | No visits');return;}
   const todayV=visits.filter(v=>v.created_at&&v.created_at.startsWith(today)).length;
   const monthV=visits.filter(v=>v.created_at&&v.created_at>=monthStart).length;
-  const urgentV=visits.filter(v=>v.priority==='urgent').length;
-  document.getElementById('kpiToday').textContent=todayV;document.getElementById('kpiMonth').textContent=monthV;document.getElementById('kpiUrgent').textContent=urgentV;document.getElementById('kpiMeds').textContent='—';
-  document.getElementById('statToday').textContent=todayV;document.getElementById('statTotal').textContent=monthV;document.getElementById('statMeds').textContent='—';
-  document.getElementById('recentVisits').innerHTML=visits.slice(0,8).map(v=>
-    '<div class="visit-card"><div class="visit-icon">'+(v.priority==='urgent'?'🔴':'🏥')+'</div>'+
+  const urgentV=visits.filter(v=>v.outcome&&(v.outcome.includes('إسعاف')||v.outcome.includes('طوارئ')||v.outcome.includes('مستشفى'))).length;
+  const medsV=visits.filter(v=>v.medicine_given).length;
+  document.getElementById('kpiToday').textContent=monthV;document.getElementById('kpiMonth').textContent=monthV;document.getElementById('kpiUrgent').textContent=urgentV;document.getElementById('kpiMeds').textContent=medsV||'0';
+  document.getElementById('statToday').textContent=todayV;document.getElementById('statTotal').textContent=monthV;document.getElementById('statMeds').textContent=medsV||'0';
+  document.getElementById('recentVisits').innerHTML=visits.slice(0,8).map(v=>{
+    const isUrgent=v.outcome&&(v.outcome.includes('إسعاف')||v.outcome.includes('طوارئ')||v.outcome.includes('مستشفى'));
+    return '<div class="visit-card"><div class="visit-icon">'+(isUrgent?'🔴':'🏥')+'</div>'+
     '<div class="visit-info"><div class="visit-name">'+(v.student_name||'طالب/ة')+'</div>'+
-    '<div class="visit-sub">'+(v.complaint||'—')+'</div></div>'+
-    '<span class="badge '+(v.priority==='urgent'?'badge-red':'badge-green')+'">'+(v.priority==='urgent'?'عاجل':'عادي')+'</span></div>'
-  ).join('');
+    '<div class="visit-sub">'+(v.symptoms||'—')+'</div></div>'+
+    '<span class="badge '+(isUrgent?'badge-red':'badge-green')+'">'+(isUrgent?'عاجل | Urgent':'عادي | Normal')+'</span></div>';
+  }).join('');
 }
 
 let allVisits=[];
@@ -313,10 +315,10 @@ async function loadHealth(){
 
 async function loadMeds(){
   document.getElementById('medsList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
-  const data=await dbGet('nursing_visits','select=student_name,class_id,medication_given,dosage,time_given&order=time_given.desc&limit=100');
+  const data=await dbGet('nurse_visits','select=student_name,class_name,medicine_given,notes,visit_date,visit_time&medicine_given=not.is.null&order=visit_date.desc&limit=100');
   if(!data||data.length===0){empty('medsList','لا طلاب على أدوية | No medications');return;}
-  document.getElementById('medsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الطالب/ة</th><th>الصف</th><th>الدواء</th><th>الجرعة</th><th>وقت الإعطاء</th></tr></thead><tbody>'+
-  data.map(m=>'<tr><td><strong>'+(m.student_name||'—')+'</strong></td><td>'+(m.class_id||'—')+'</td><td>'+(m.medication_given||'—')+'</td><td>'+(m.dosage||'—')+'</td><td>'+(m.time_given||'—')+'</td></tr>').join('')+
+  document.getElementById('medsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الطالب/ة</th><th>الصف</th><th>الدواء المعطى</th><th>ملاحظات</th><th>وقت الإعطاء</th></tr></thead><tbody>'+
+  data.map(m=>'<tr><td><strong>'+(m.student_name||'—')+'</strong></td><td>'+(m.class_name||'—')+'</td><td>'+(m.medicine_given||'—')+'</td><td>'+(m.notes||'—')+'</td><td>'+(m.visit_time||m.visit_date||'—')+'</td></tr>').join('')+
   '</tbody></table></div>';
 }
 
