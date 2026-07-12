@@ -249,25 +249,26 @@ async function init(){
 }
 async function loadKPIs(){
   const today=new Date().toISOString().split('T')[0];
-  const inc=await dbGet('security_incidents','select=id,incident_type,status,priority,created_at&order=created_at.desc&limit=100');
+  const inc=await dbGet('security_incidents','select=id,incident_type,status,severity,created_at&order=created_at.desc&limit=200');
+  const totalInc=inc?inc.length:0;
+  const openInc=inc?inc.filter(i=>i.status!=='resolved'&&i.status!=='closed').length:0;
   const todayInc=inc?inc.filter(i=>i.created_at&&i.created_at.startsWith(today)).length:0;
-  const openInc=inc?inc.filter(i=>i.status==='open'||i.status==='pending').length:0;
-  document.getElementById('kpiInc').textContent=openInc;document.getElementById('kpiIn').textContent='—';document.getElementById('kpiVis').textContent='—';document.getElementById('kpiVeh').textContent='—';
-  document.getElementById('statIn').textContent='—';document.getElementById('statInc').textContent=openInc;document.getElementById('statVis').textContent='—';
+  document.getElementById('kpiInc').textContent=totalInc;document.getElementById('kpiIn').textContent=todayInc;document.getElementById('kpiVis').textContent='—';document.getElementById('kpiVeh').textContent='—';
+  document.getElementById('statIn').textContent=todayInc;document.getElementById('statInc').textContent=openInc;document.getElementById('statVis').textContent='—';
   if(openInc>0){document.getElementById('incBadge').textContent=openInc;document.getElementById('incBadge').style.display='inline-block';}
   if(!inc||inc.length===0){empty('recentIncidents','لا حوادث | No incidents');return;}
   document.getElementById('recentIncidents').innerHTML=inc.slice(0,5).map(i=>
-    '<div class="incident-row"><div class="inc-icon">'+(i.priority==='high'?'🔴':i.priority==='medium'?'🟡':'🟢')+'</div>'+
+    '<div class="incident-row"><div class="inc-icon">'+(i.severity==='high'?'🔴':i.severity==='medium'?'🟡':'🟢')+'</div>'+
     '<div class="inc-info"><div class="inc-title">'+(i.incident_type||'حادثة')+'</div><div class="inc-sub">'+(i.created_at?new Date(i.created_at).toLocaleDateString('ar-AE'):'')+'</div></div>'+
-    '<span class="badge '+(i.status==='closed'?'badge-green':i.priority==='high'?'badge-red':'badge-amber')+'">'+(i.status||'—')+'</span></div>'
+    '<span class="badge '+(i.status==='closed'||i.status==='resolved'?'badge-green':i.severity==='high'?'badge-red':'badge-amber')+'">'+(i.status||'مفتوحة')+'</span></div>'
   ).join('');
 }
 async function loadTodayLog(){
   const today=new Date().toISOString().split('T')[0];
-  const data=await dbGet('security_checkins','select=name,type,action,created_at&created_at=gte.'+today+'&order=created_at.desc&limit=50');
-  if(!data||data.length===0){empty('todayLog','لا سجلات اليوم | No entries today');return;}
-  document.getElementById('todayLog').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الاسم</th><th>النوع</th><th>الإجراء</th><th>الوقت</th></tr></thead><tbody>'+
-  data.map(d=>'<tr><td><strong>'+(d.name||'—')+'</strong></td><td>'+(d.type||'—')+'</td><td><span class="badge '+(d.action==='entry'?'badge-green':'badge-amber')+'">'+(d.action==='entry'?'دخول':'خروج')+'</span></td><td>'+(d.created_at?new Date(d.created_at).toLocaleTimeString('ar-AE'):'—')+'</td></tr>').join('')+
+  const data=await dbGet('security_incidents','select=id,incident_type,location,severity,status,created_at&created_at=gte.'+today+'T00:00:00&order=created_at.desc&limit=50');
+  if(!data||data.length===0){empty('todayLog','لا حوادث اليوم | No incidents today');return;}
+  document.getElementById('todayLog').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>نوع الحادثة</th><th>الموقع</th><th>الخطورة</th><th>الوقت</th></tr></thead><tbody>'+
+  data.map(d=>'<tr><td><strong>'+(d.incident_type||'—')+'</strong></td><td>'+(d.location||'—')+'</td><td><span class="badge '+(d.severity==='high'?'badge-red':d.severity==='medium'?'badge-amber':'badge-green')+'">'+(d.severity||'—')+'</span></td><td>'+(d.created_at?new Date(d.created_at).toLocaleTimeString('ar-AE'):'—')+'</td></tr>').join('')+
   '</tbody></table></div>';
 }
 async function loadIncidents(){
@@ -292,13 +293,13 @@ async function loadVisitors(){
 }
 async function saveCheckin(){
   const name=document.getElementById('ciName').value.trim();if(!name){toast('⚠️ أدخل الاسم | Enter name');return;}
-  const ok=await dbPost('security_checkins',{name,type:document.getElementById('ciType').value,action:document.getElementById('ciAction').value,note:document.getElementById('ciNote').value,created_at:new Date().toISOString()});
+  const ok=await dbPost('visitor_log',{visitor_name:name,purpose:document.getElementById('ciType').value,visiting:'بوابة',id_type:document.getElementById('ciAction').value,created_at:new Date().toISOString()});
   if(ok){toast('✅ تم التسجيل | Registered');document.getElementById('ciName').value='';document.getElementById('ciNote').value='';loadTodayLog();}
   else toast('❌ خطأ | Error');
 }
 async function saveIncident(){
   const desc=document.getElementById('niDesc').value.trim();if(!desc){toast('⚠️ أدخل الوصف | Enter description');return;}
-  const ok=await dbPost('security_incidents',{incident_type:document.getElementById('niType').value,priority:document.getElementById('niPriority').value,description:desc,location:document.getElementById('niLocation').value,status:'open',created_at:new Date().toISOString()});
+  const ok=await dbPost('security_incidents',{incident_type:document.getElementById('niType').value,severity:document.getElementById('niPriority').value,description:desc,location:document.getElementById('niLocation').value,status:'open',created_at:new Date().toISOString()});
   if(ok){toast('✅ تم تسجيل الحادثة | Incident saved');document.getElementById('niDesc').value='';document.getElementById('niLocation').value='';await loadKPIs();}
   else toast('❌ خطأ | Error');
 }
