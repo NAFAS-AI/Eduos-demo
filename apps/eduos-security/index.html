@@ -272,11 +272,11 @@ async function loadTodayLog(){
 }
 async function loadIncidents(){
   document.getElementById('incidentsList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
-  const data=await dbGet('security_incidents','select=id,incident_type,description,location,priority,status,created_at&order=created_at.desc&limit=100');
+  const data=await dbGet('security_incidents','select=id,incident_type,description,location,severity,status,reported_by,created_at&order=created_at.desc&limit=100');
   if(!data||data.length===0){empty('incidentsList','لا حوادث | No incidents');return;}
-  document.getElementById('incidentsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>النوع</th><th>الموقع</th><th>الأولوية</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+
+  document.getElementById('incidentsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>النوع</th><th>الموقع</th><th>خطورة</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>'+
   data.map(i=>'<tr><td><strong>'+(i.incident_type||'—')+'</strong></td><td>'+(i.location||'—')+'</td>'+
-  '<td><span class="badge '+(i.priority==='high'?'badge-red':i.priority==='medium'?'badge-amber':'badge-green')+'">'+(i.priority||'—')+'</span></td>'+
+  '<td><span class="badge '+(i.severity==='high'?'badge-red':i.severity==='medium'?'badge-amber':'badge-green')+'">'+(i.severity||'—')+'</span></td>'+
   '<td><span class="badge '+(i.status==='closed'?'badge-green':'badge-amber')+'">'+(i.status||'—')+'</span></td>'+
   '<td>'+(i.created_at?new Date(i.created_at).toLocaleDateString('ar-AE'):'—')+'</td></tr>').join('')+
   '</tbody></table></div>';

@@ -286,25 +286,28 @@ let allVisits=[];
 async function loadVisits(){
   document.getElementById('visitsList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   const q=document.getElementById('visitSearch').value.toLowerCase();
-  const data=await dbGet('nurse_visits','select=id,student_name,class_id,complaint,action_taken,priority,temperature,notes,created_at&order=created_at.desc&limit=100');
+  const data=await dbGet('nurse_visits','select=id,student_name,class_name,symptoms,action_taken,outcome,medicine_given,notes,visit_date,created_at&order=created_at.desc&limit=100');
   if(!data||data.length===0){empty('visitsList','لا زيارات | No visits');return;}
   allVisits=data;
   const filtered=q?data.filter(v=>(v.student_name||'').toLowerCase().includes(q)):data;
-  document.getElementById('visitsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الطالب/ة</th><th>الصف</th><th>الشكوى</th><th>الإجراء</th><th>الأولوية</th><th>التاريخ</th></tr></thead><tbody>'+
-  filtered.map(v=>'<tr><td><strong>'+(v.student_name||'—')+'</strong></td><td>'+(v.class_id||'—')+'</td><td>'+(v.complaint||'—')+'</td><td>'+(v.action_taken||'—')+'</td>'+
-  '<td><span class="badge '+(v.priority==='urgent'?'badge-red':'badge-green')+'">'+(v.priority==='urgent'?'عاجل':'عادي')+'</span></td>'+
-  '<td>'+(v.created_at?new Date(v.created_at).toLocaleDateString('ar-AE'):'—')+'</td></tr>').join('')+
+  document.getElementById('visitsList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الطالب/ة</th><th>الصف</th><th>الأعراض</th><th>الإجراء</th><th>النتيجة</th><th>التاريخ</th></tr></thead><tbody>'+
+  filtered.map(v=>{
+    const isUrgent=v.outcome&&(v.outcome.includes('إسعاف')||v.outcome.includes('طوارئ')||v.outcome.includes('مستشفى'));
+    return '<tr><td><strong>'+(v.student_name||'—')+'</strong></td><td>'+(v.class_name||'—')+'</td><td>'+(v.symptoms||'—')+'</td><td>'+(v.action_taken||'—')+'</td>'+
+    '<td><span class="badge '+(isUrgent?'badge-red':'badge-green')+'">'+(v.outcome||'عادي')+'</span></td>'+
+    '<td>'+(v.visit_date||v.created_at?new Date(v.visit_date||v.created_at).toLocaleDateString('ar-AE'):'—')+'</td></tr>';
+  }).join('')+
   '</tbody></table></div>';
 }
 
 async function loadHealth(){
   document.getElementById('healthList').innerHTML='<div class="spinner-wrap"><div class="spinner"></div></div>';
   const q=document.getElementById('healthSearch').value.toLowerCase();
-  const data=await dbGet('student_health_records','select=student_name,class_id,allergies,chronic_conditions,blood_type,emergency_contact&order=student_name&limit=200');
+  const data=await dbGet('student_health_records','select=student_name,class_name,allergies,chronic_conditions,blood_type,emergency_contact&order=student_name&limit=200');
   if(!data||data.length===0){empty('healthList','لا سجلات | No records');return;}
   const filtered=q?data.filter(s=>(s.student_name||'').toLowerCase().includes(q)):data;
   document.getElementById('healthList').innerHTML='<div class="tbl-wrap"><table><thead><tr><th>الطالب/ة</th><th>الصف</th><th>فصيلة الدم</th><th>الأمراض المزمنة</th><th>الحساسية</th></tr></thead><tbody>'+
-  filtered.map(s=>'<tr><td><strong>'+(s.student_name||'—')+'</strong></td><td>'+(s.class_id||'—')+'</td><td>'+(s.blood_type||'—')+'</td><td>'+(s.chronic_conditions||'—')+'</td><td>'+(s.allergies||'—')+'</td></tr>').join('')+
+  filtered.map(s=>'<tr><td><strong>'+(s.student_name||'—')+'</strong></td><td>'+(s.class_name||'—')+'</td><td>'+(s.blood_type||'—')+'</td><td>'+(s.chronic_conditions||'—')+'</td><td>'+(s.allergies||'—')+'</td></tr>').join('')+
   '</tbody></table></div>';
 }
 
@@ -326,7 +329,7 @@ async function saveVisit(){
   const action=document.getElementById('nvAction').value;
   const notes=document.getElementById('nvNotes').value.trim();
   if(!student){toast('⚠️ أدخل اسم الطالب/ة');return;}
-  const ok=await dbPost('nurse_visits',{student_name:student,class_id:cls,complaint,priority,temperature:temp?parseFloat(temp):null,action_taken:action,notes,created_at:new Date().toISOString()});
+  const ok=await dbPost('nurse_visits',{student_name:student,class_name:cls,symptoms:complaint,outcome:priority,action_taken:action,notes,visit_date:new Date().toISOString().split('T')[0],created_at:new Date().toISOString()});
   if(ok){toast('✅ تم تسجيل الزيارة | Visit saved');document.getElementById('nvStudent').value='';document.getElementById('nvNotes').value='';await loadKPIs();}
   else toast('❌ خطأ في الحفظ | Save error');
 }

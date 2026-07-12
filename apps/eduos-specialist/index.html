@@ -412,7 +412,7 @@ function renderStudents(data) {
 
 function filterStudents() {
   const q = document.getElementById('studentSearch').value.toLowerCase();
-  renderStudents(allStudents.filter(s => (s.name || '').toLowerCase().includes(q) || (s.class_id || '').toLowerCase().includes(q)));
+  renderStudents(allStudents.filter(s => (s.name || '').toLowerCase().includes(q) || (s.class_name || '').toLowerCase().includes(q)));
 }
 
 function openCase(name, cls) {
