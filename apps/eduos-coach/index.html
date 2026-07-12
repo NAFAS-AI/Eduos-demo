@@ -221,6 +221,10 @@ body{overflow:hidden}
       <span class="snav-icon">&#x1F3C6;</span>
       <div><span class="snav-label">Achievements</span><span class="snav-sub">Belts &amp; medals</span></div>
     </button>
+    <button class="snav" data-section="appraisal" onclick="showSection('appraisal',this)">
+      <span class="snav-icon">&#x2B50;</span>
+      <div><span class="snav-label">My Appraisal</span><span class="snav-sub">Performance review</span></div>
+    </button>
   </nav>
   <div class="sidebar-footer">
     <button onclick="logout()" style="width:100%;padding:9px 14px;border-radius:10px;border:1px solid rgba(225,29,72,0.2);background:rgba(225,29,72,0.06);color:#E11D48;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer">&#x1F6AA; Sign Out</button>
@@ -397,6 +401,95 @@ body{overflow:hidden}
     </div>
   </section>
 
+  <section id="sec-appraisal" class="section">
+    <div class="card" style="max-width:800px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+        <div class="card-title">&#x2B50; My Appraisal — Performance Review</div>
+        <div id="coachAppraisalStatus"></div>
+      </div>
+
+      <div id="coachAppraisalLoading" style="text-align:center;padding:30px;color:#64748b">Loading...</div>
+
+      <div id="coachAppraisalContent" style="display:none">
+        <div id="coachRevisionNote" style="display:none;background:#fef3c7;border:1.5px solid #fbbf24;border-radius:10px;padding:14px;margin-bottom:18px">
+          <div style="font-weight:800;color:#92400e;margin-bottom:6px">&#9888; Principal Note</div>
+          <div id="coachRevisionNoteText" style="color:#78350f;font-size:14px"></div>
+        </div>
+
+        <div id="coachApprovedSection" style="display:none;text-align:center;padding:36px 16px">
+          <div style="font-size:48px;margin-bottom:12px">&#x2705;</div>
+          <div style="font-size:18px;font-weight:900;color:#15803d;margin-bottom:6px">Appraisal Approved</div>
+          <div id="coachApprovedAt" style="font-size:14px;color:#64748b"></div>
+        </div>
+
+        <div id="coachSelfAssessSection">
+          <div style="background:#f8f5ff;border:1.5px solid #ede9fe;border-radius:12px;padding:16px;margin-bottom:20px">
+            <div style="font-weight:800;font-size:14px;color:#5b21b6;margin-bottom:12px">System Evidence (Auto-Collected)</div>
+            <div id="coachAutoEvidence" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px"></div>
+          </div>
+
+          <div style="font-weight:800;font-size:15px;margin-bottom:8px">Self Assessment Criteria (0 = Not Applicable — 5 = Exceptional)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;font-size:12px">
+            <span style="background:#dcfce7;color:#15803d;padding:3px 10px;border-radius:8px;font-weight:700">4.5-5 Exceptional</span>
+            <span style="background:#dbeafe;color:#1d4ed8;padding:3px 10px;border-radius:8px;font-weight:700">3.5-4.4 Exceeds</span>
+            <span style="background:#fef3c7;color:#92400e;padding:3px 10px;border-radius:8px;font-weight:700">2.5-3.4 Meets</span>
+            <span style="background:#fee2e2;color:#b91c1c;padding:3px 10px;border-radius:8px;font-weight:700">0-2.4 Below</span>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:700;font-size:14px">1. Student Skill Improvement</div>
+              <select id="coach-score-skill" style="width:110px;padding:7px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option><option value="3.5">3.5</option><option value="4.0">4.0</option><option value="4.5">4.5</option><option value="5.0">5.0</option></select>
+            </div>
+            <textarea id="coach-note-skill" placeholder="Note..." style="width:100%;margin-top:8px;height:50px;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:700;font-size:14px">2. Session Attendance Rate</div>
+              <select id="coach-score-attendance" style="width:110px;padding:7px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option><option value="3.5">3.5</option><option value="4.0">4.0</option><option value="4.5">4.5</option><option value="5.0">5.0</option></select>
+            </div>
+            <textarea id="coach-note-attendance" placeholder="Note..." style="width:100%;margin-top:8px;height:50px;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:700;font-size:14px">3. Competition Participation</div>
+              <select id="coach-score-competition" style="width:110px;padding:7px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option><option value="3.5">3.5</option><option value="4.0">4.0</option><option value="4.5">4.5</option><option value="5.0">5.0</option></select>
+            </div>
+            <textarea id="coach-note-competition" placeholder="Note..." style="width:100%;margin-top:8px;height:50px;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:700;font-size:14px">4. Training Plan Adherence</div>
+              <select id="coach-score-plan" style="width:110px;padding:7px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option><option value="3.5">3.5</option><option value="4.0">4.0</option><option value="4.5">4.5</option><option value="5.0">5.0</option></select>
+            </div>
+            <textarea id="coach-note-plan" placeholder="Note..." style="width:100%;margin-top:8px;height:50px;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+          </div>
+
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+              <div style="font-weight:700;font-size:14px">5. Sports Safety Standards</div>
+              <select id="coach-score-safety" style="width:110px;padding:7px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px"><option value="0.0">0.0</option><option value="0.5">0.5</option><option value="1.0">1.0</option><option value="1.5">1.5</option><option value="2.0">2.0</option><option value="2.5">2.5</option><option value="3.0">3.0</option><option value="3.5">3.5</option><option value="4.0">4.0</option><option value="4.5">4.5</option><option value="5.0">5.0</option></select>
+            </div>
+            <textarea id="coach-note-safety" placeholder="Note..." style="width:100%;margin-top:8px;height:50px;padding:8px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-lbl">Additional Notes &amp; Achievements</label>
+            <textarea class="form-ta" id="coachAppraisalNotes" placeholder="Add your notes and achievements..."></textarea>
+          </div>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
+            <button class="btn-sec" id="coachSaveDraftBtn">Save Draft</button>
+            <button class="btn-pri" id="coachSubmitBtn">Submit to Principal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div><!-- /scroll-area -->
 </div><!-- /main-area -->
 </div><!-- /app-shell -->
@@ -467,6 +560,7 @@ function showSection(name, btn) {
   if (btn) btn.classList.add('active');
   if (name === 'attendance') loadTodaySessions();
   if (name === 'achievements') { loadAchievements(); populateAchClasses(); }
+  if (name === 'appraisal') loadMyAppraisal();
 }
 
 // ─── Schedule ───
@@ -802,6 +896,148 @@ window.addEventListener('DOMContentLoaded', async () => {
   } catch(e) { console.error('Schedule load failed:', e); }
   document.getElementById('loadingScreen').style.display = 'none';
 });
+
+// ─── COACH APPRAISAL ───
+var coachAppraisalId = null;
+var coachScores = {};
+var COACH_CRITERIA = ['skill','attendance','competition','plan','safety'];
+
+async function coachDbPatch(id, body) {
+  var url = (window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/staff_evaluations?id=eq.' + id;
+  var key = window.EduOS?window.EduOS.SB_KEY:'';
+  try {
+    var r = await fetch(url, {method:'PATCH',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
+    return r.ok;
+  } catch(e){return false;}
+}
+
+async function coachDbGet(table, params) {
+  var url = (window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/' + table + '?' + params;
+  var key = window.EduOS?window.EduOS.SB_KEY:'';
+  try {
+    var r = await fetch(url, {headers:{'apikey':key,'Authorization':'Bearer '+key}});
+    return r.ok ? r.json() : [];
+  } catch(e){return [];}
+}
+
+async function coachDbPost(table, body) {
+  var url = (window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/' + table;
+  var key = window.EduOS?window.EduOS.SB_KEY:'';
+  try {
+    var r = await fetch(url, {method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
+    return r.ok;
+  } catch(e){return false;}
+}
+
+async function loadMyAppraisal() {
+  var staffId = COACH && (COACH.id || COACH.staff_db_id);
+  if (!staffId) return;
+  document.getElementById('coachAppraisalLoading').style.display = 'block';
+  document.getElementById('coachAppraisalContent').style.display = 'none';
+
+  // Auto evidence
+  var ach = await coachDbGet('sport_achievements', 'select=id,achievement_type&limit=500');
+  var belt = (ach||[]).filter(function(a){return a.achievement_type==='belt_promotion';}).length;
+  var medals = (ach||[]).filter(function(a){return a.achievement_type==='gold_medal'||a.achievement_type==='silver_medal'||a.achievement_type==='bronze_medal';}).length;
+  var evGrid = document.getElementById('coachAutoEvidence');
+  if (evGrid) {
+    evGrid.innerHTML = [
+      {icon:'&#x1F3C6;', val:(ach||[]).length, label:'Total Achievements'},
+      {icon:'&#x1F945;', val:belt, label:'Belt Promotions'},
+      {icon:'&#x1F947;', val:medals, label:'Medals Won'},
+    ].map(function(it){
+      return '<div style="background:#fff;border:1px solid #ede9fe;border-radius:10px;padding:12px;text-align:center">' +
+      '<div style="font-size:22px;margin-bottom:4px">'+it.icon+'</div>' +
+      '<div style="font-size:20px;font-weight:900;color:#6C3DD6">'+it.val+'</div>' +
+      '<div style="font-size:11px;color:#64748b;margin-top:2px">'+it.label+'</div></div>';
+    }).join('');
+  }
+
+  var acYear = '2025-2026';
+  var evals = await coachDbGet('staff_evaluations', 'select=id,status,self_scores,revision_note,notes_self,approved_at,submitted_at&staff_db_id=eq.'+staffId+'&academic_year=eq.'+acYear+'&order=id.desc&limit=1');
+  var ev = evals && evals[0] ? evals[0] : null;
+  coachAppraisalId = ev ? ev.id : null;
+  coachScores = (ev && ev.self_scores) ? ev.self_scores : {};
+
+  document.getElementById('coachAppraisalLoading').style.display = 'none';
+  document.getElementById('coachAppraisalContent').style.display = 'block';
+
+  var STATUS_MAP = {
+    'draft': ['Draft','#f1f5f9','#475569'],
+    'submitted': ['Submitted','#dbeafe','#1d4ed8'],
+    'revision_requested': ['Revision Needed','#fef3c7','#92400e'],
+    'approved': ['Approved','#dcfce7','#15803d']
+  };
+  var s = ev && ev.status ? STATUS_MAP[ev.status] : STATUS_MAP.draft;
+  if (!s) s = STATUS_MAP.draft;
+  document.getElementById('coachAppraisalStatus').innerHTML =
+    '<span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:'+s[1]+';color:'+s[2]+';font-weight:700;font-size:13px">' +
+    '<span style="width:7px;height:7px;border-radius:50%;background:'+s[2]+';display:inline-block"></span>'+s[0]+'</span>';
+
+  COACH_CRITERIA.forEach(function(k) {
+    var sel = document.getElementById('coach-score-'+k);
+    if (sel && coachScores[k] !== undefined) sel.value = coachScores[k];
+    var note = document.getElementById('coach-note-'+k);
+    if (note && coachScores[k+'_note']) note.value = coachScores[k+'_note'];
+  });
+  if (ev && ev.notes_self) { var nn = document.getElementById('coachAppraisalNotes'); if(nn) nn.value = ev.notes_self; }
+  if (ev && ev.revision_note) {
+    document.getElementById('coachRevisionNote').style.display = 'block';
+    document.getElementById('coachRevisionNoteText').textContent = ev.revision_note;
+  } else { document.getElementById('coachRevisionNote').style.display = 'none'; }
+
+  var isApproved = ev && ev.status === 'approved';
+  var isSubmitted = ev && ev.status === 'submitted';
+  document.getElementById('coachApprovedSection').style.display = isApproved ? 'block' : 'none';
+  document.getElementById('coachSelfAssessSection').style.display = isApproved ? 'none' : 'block';
+  if (isApproved) document.getElementById('coachApprovedAt').textContent = 'Approved: ' + (ev.approved_at ? new Date(ev.approved_at).toLocaleDateString('en-AE') : '--');
+  var locked = isApproved || isSubmitted;
+  COACH_CRITERIA.forEach(function(k) {
+    var sel = document.getElementById('coach-score-'+k); if(sel) sel.disabled = locked;
+    var note = document.getElementById('coach-note-'+k); if(note) note.disabled = locked;
+  });
+  var nb = document.getElementById('coachAppraisalNotes'); if(nb) nb.disabled = locked;
+  var sdb = document.getElementById('coachSaveDraftBtn');
+  if (sdb) { sdb.disabled = locked; sdb.onclick = saveCoachDraft; }
+  var sub = document.getElementById('coachSubmitBtn');
+  if (sub) { sub.disabled = locked; sub.textContent = isSubmitted ? 'Submitted' : 'Submit to Principal'; sub.onclick = submitCoachAppraisal; }
+}
+
+async function saveCoachDraft() {
+  var staffId = COACH && (COACH.id || COACH.staff_db_id);
+  if (!staffId) return;
+  var acYear = '2025-2026';
+  COACH_CRITERIA.forEach(function(k) {
+    var sel = document.getElementById('coach-score-'+k); if(sel) coachScores[k] = parseFloat(sel.value)||0;
+    var note = document.getElementById('coach-note-'+k); if(note) coachScores[k+'_note'] = note.value;
+  });
+  var notes = ''; var nn = document.getElementById('coachAppraisalNotes'); if(nn) notes = nn.value;
+  if (coachAppraisalId) {
+    await coachDbPatch(coachAppraisalId, {self_scores:coachScores, notes_self:notes, status:'draft'});
+  } else {
+    var existing = await coachDbGet('staff_evaluations', 'select=id&staff_db_id=eq.'+staffId+'&academic_year=eq.'+acYear+'&limit=1');
+    if (existing && existing[0]) { coachAppraisalId = existing[0].id; await coachDbPatch(coachAppraisalId, {self_scores:coachScores, notes_self:notes, status:'draft'}); }
+    else { await coachDbPost('staff_evaluations', {staff_db_id:staffId, role_key:'coach', academic_year:acYear, status:'draft', self_scores:coachScores, notes_self:notes}); }
+    var fresh = await coachDbGet('staff_evaluations', 'select=id&staff_db_id=eq.'+staffId+'&academic_year=eq.'+acYear+'&order=id.desc&limit=1');
+    if (fresh && fresh[0]) coachAppraisalId = fresh[0].id;
+  }
+  var toast = document.getElementById('coachToast');
+  if (!toast) { toast = document.createElement('div'); toast.id='coachToast'; toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:600;z-index:9999;display:none'; document.body.appendChild(toast); }
+  toast.textContent = 'Saved as draft'; toast.style.display='block'; setTimeout(function(){toast.style.display='none';},2500);
+}
+
+async function submitCoachAppraisal() {
+  if (!confirm('Submit appraisal to principal? You cannot edit after submission.')) return;
+  await saveCoachDraft();
+  if (coachAppraisalId) {
+    var ok = await coachDbPatch(coachAppraisalId, {status:'submitted', submitted_at: new Date().toISOString()});
+    var toast = document.getElementById('coachToast');
+    if (!toast) { toast = document.createElement('div'); toast.id='coachToast'; toast.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:600;z-index:9999;display:none'; document.body.appendChild(toast); }
+    toast.textContent = ok ? 'Submitted successfully' : 'Error — try again'; toast.style.display='block'; setTimeout(function(){toast.style.display='none';},2500);
+    if (ok) setTimeout(loadMyAppraisal, 800);
+  }
+}
+
 </script>
 </body>
 </html>
