@@ -209,6 +209,9 @@ tr:hover td{background:var(--surface2)}
 .clock-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:#fff;margin-top:10px}
 
 /* TOAST */
+.att-period-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);font-family:Tajawal,Arial,sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.att-period-btn:hover{border-color:var(--brand);color:var(--brand)}
+.att-period-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none}
 .toast.show{opacity:1}
 
@@ -474,7 +477,24 @@ tr:hover td{background:var(--surface2)}
 
     <!-- PANEL: ATTENDANCE -->
     <div class="panel" id="panel-attendance">
-      <p class="sec-title">&#x1F4CB; &#x627;&#x644;&#x62D;&#x636;&#x648;&#x631; &#x627;&#x644;&#x64A;&#x648;&#x645;&#x64A; / Daily Attendance</p>
+      <p class="sec-title">&#x1F4CB; &#x633;&#x62C;&#x644;&#x627;&#x62A; &#x627;&#x644;&#x62D;&#x636;&#x648;&#x631; / Attendance</p>
+      <!-- فلتر الفترة الزمنية -->
+      <div id="attFilterBar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;padding:14px 18px;background:var(--surface);border-radius:14px;border:1px solid var(--border)">
+        <span style="font-weight:900;font-size:14px;color:var(--text)">&#x1F4C5; &#x627;&#x644;&#x641;&#x62A;&#x631;&#x629;&#x3A;</span>
+        <button class="att-period-btn active" onclick="setAttPeriod('today',this)">&#x627;&#x644;&#x64A;&#x648;&#x645;</button>
+        <button class="att-period-btn" onclick="setAttPeriod('thisweek',this)">&#x647;&#x630;&#x627; &#x627;&#x644;&#x623;&#x633;&#x628;&#x648;&#x639;</button>
+        <button class="att-period-btn" onclick="setAttPeriod('lastweek',this)">&#x627;&#x644;&#x623;&#x633;&#x628;&#x648;&#x639; &#x627;&#x644;&#x645;&#x627;&#x636;&#x64A;</button>
+        <button class="att-period-btn" onclick="setAttPeriod('thismonth',this)">&#x647;&#x630;&#x627; &#x627;&#x644;&#x634;&#x647;&#x631;</button>
+        <button class="att-period-btn" onclick="setAttPeriod('term1',this)">&#x641;&#x635;&#x644; 1</button>
+        <button class="att-period-btn" onclick="setAttPeriod('term2',this)">&#x641;&#x635;&#x644; 2</button>
+        <button class="att-period-btn" onclick="setAttPeriod('term3',this)">&#x641;&#x635;&#x644; 3</button>
+        <span style="margin-right:auto;display:flex;align-items:center;gap:6px">
+          <input type="date" id="attFrom" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:Tajawal,Arial,sans-serif;font-size:13px" onchange="setAttPeriod('custom',null)"/>
+          <span style="font-size:13px;color:var(--text2)">&#x627;&#x644;&#x649;</span>
+          <input type="date" id="attTo" style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-family:Tajawal,Arial,sans-serif;font-size:13px" onchange="setAttPeriod('custom',null)"/>
+        </span>
+        <div id="attPeriodLabel" style="font-size:12px;color:var(--text3);min-width:120px;text-align:center"></div>
+      </div>
       <div class="att-cycle-grid">
         <div class="att-cycle-card"><div class="acc-pct" id="acc-students">&#x2014;</div><div class="acc-label">&#x625;&#x62C;&#x645;&#x627;&#x644;&#x64A; &#x627;&#x644;&#x637;&#x644;&#x627;&#x628;</div><div class="acc-frac" id="acc-students-frac"></div><div class="acc-bar"><div class="acc-bar-fill" id="acc-students-bar" style="width:0%"></div></div></div>
         <div class="att-cycle-card"><div class="acc-pct" id="acc-kg">&#x2014;</div><div class="acc-label">&#x1F338; &#x627;&#x644;&#x631;&#x648;&#x636;&#x629; / KG</div><div class="acc-frac" id="acc-kg-frac"></div><div class="acc-bar"><div class="acc-bar-fill" id="acc-kg-bar" style="width:0%"></div></div></div>
@@ -820,11 +840,61 @@ function filterStu() {
   document.querySelectorAll('#allStuBody tr').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q)?'':'none'; });
 }
 
+// ── فلتر الحضور ──
+let _attFrom = null, _attTo = null, _attPeriod = 'today';
+function setAttPeriod(period, btn) {
+  _attPeriod = period;
+  document.querySelectorAll('.att-period-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // حساب النطاق
+  const today = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  if (period === 'today') {
+    _attFrom = fmt(today); _attTo = fmt(today);
+  } else if (period === 'thisweek') {
+    const mon = new Date(today); mon.setDate(today.getDate() - (today.getDay()||7) + 1);
+    const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+    _attFrom = fmt(mon); _attTo = fmt(fri);
+  } else if (period === 'lastweek') {
+    const mon = new Date(today); mon.setDate(today.getDate() - (today.getDay()||7) - 6);
+    const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+    _attFrom = fmt(mon); _attTo = fmt(fri);
+  } else if (period === 'thismonth') {
+    _attFrom = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+    _attTo = fmt(new Date(today.getFullYear(), today.getMonth()+1, 0));
+  } else if (period === 'term1') {
+    _attFrom = '2025-09-01'; _attTo = '2025-12-31';
+  } else if (period === 'term2') {
+    _attFrom = '2026-01-01'; _attTo = '2026-03-31';
+  } else if (period === 'term3') {
+    _attFrom = '2026-04-01'; _attTo = '2026-07-10';
+  } else if (period === 'custom') {
+    _attFrom = document.getElementById('attFrom').value;
+    _attTo = document.getElementById('attTo').value;
+    if (!_attFrom || !_attTo) return;
+  }
+  if (_attFrom) document.getElementById('attFrom').value = _attFrom;
+  if (_attTo) document.getElementById('attTo').value = _attTo;
+  const lbl = document.getElementById('attPeriodLabel');
+  if (lbl) lbl.textContent = _attFrom === _attTo ? _attFrom : (_attFrom + ' → ' + _attTo);
+  loadAttendance();
+}
+
 async function loadAttendance() {
   if (!sb) return;
   try {
-    const attDate = await getAttDate();
-    const { data } = await sb.from('student_attendance').select('class_name,status,student_id').eq('date',attDate).limit(2000);
+    let fromDate = _attFrom, toDate = _attTo;
+    if (!fromDate) { fromDate = toDate = await getAttDate(); }
+    // عرض التسمية
+    const lbl = document.getElementById('attPeriodLabel');
+    if (lbl) lbl.textContent = fromDate === toDate ? fromDate : (fromDate + ' → ' + toDate);
+    // تحديث حقول التاريخ
+    const fEl = document.getElementById('attFrom'), tEl = document.getElementById('attTo');
+    if (fEl && !fEl.value) fEl.value = fromDate;
+    if (tEl && !tEl.value) tEl.value = toDate;
+    // جلب البيانات
+    let q = sb.from('student_attendance').select('class_name,status,student_id').gte('date', fromDate).lte('date', toDate).limit(50000);
+    const { data } = await q;
     if (!data) return;
     let present=0, absent=0, late=0;
     const cls = {};
@@ -886,7 +956,7 @@ async function loadAttendance() {
         </td>
         <td><span class="chip ${pct>=90?'chip-green':'chip-amber'}">${pct>=90?'✅ ممتاز':'📊 مقبول'}</span></td>
       </tr>`;
-    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">لا بيانات حضور اليوم / No attendance data today</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text3)">لا بيانات حضور في هذه الفترة / No attendance data for this period</td></tr>';
   } catch(e) { console.warn('attendance:', e); }
 }
 
