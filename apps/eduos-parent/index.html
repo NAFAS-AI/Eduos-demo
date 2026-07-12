@@ -456,7 +456,7 @@ async function loadChildren() {
 
   if (sessionIds.length) {
     // Query students by TEXT student_id column
-    children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${sessionIds.join(',')})`);
+    children = await dbGet('students', `select=id,name,class_name,grade&id=in.(${sessionIds.join(',')})`);
   } else {
     // Fallback: query parent_credentials by national_id
     const nat = user.national_id;
@@ -464,7 +464,7 @@ async function loadChildren() {
       const pc = await dbGet('parent_credentials', `select=student_ids&national_id=eq.${nat}&limit=1`);
       const ids2 = (pc[0] && pc[0].student_ids) ? pc[0].student_ids : [];
       if (ids2.length) {
-        children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${ids2.join(',')})`);
+        children = await dbGet('students', `select=id,name,class_name,grade&id=in.(${ids2.join(',')})`);
       }
     }
   }
@@ -483,7 +483,7 @@ function renderChildTabs() {
   }
 
   const html = children.map((c, i) =>
-    `<button class="child-tab${i===0?' active':''}" data-sid="${c.student_id}" onclick="selectChild('${c.student_id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
+    `<button class="child-tab${i===0?' active':''}" data-sid="${c.id}" onclick="selectChild('${c.id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
   ).join('');
 
   containers.forEach(id => {
@@ -607,7 +607,7 @@ async function loadSchedule(id) {
   const child = children.find(c => c.id === id);
   if (!child) return;
   const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
-  const rows = await dbGet('schedules', `select=day,period,subject,staff_id&section=eq.${child.section}&grade=eq.${child.grade}&order=day,period`);
+  const rows = await dbGet('schedules', `select=day,period,subject,teacher_name,class_name&class_name=eq.${child.class_name}&is_active=eq.true&order=day,period`);
   const el = document.getElementById('schedTable');
   if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div>لا بيانات</div>'; return; }
 
