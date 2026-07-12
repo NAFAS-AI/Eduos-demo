@@ -412,7 +412,7 @@ async function loadKPIs() {
     var weekAgo = new Date(Date.now() - 7*24*3600*1000).toISOString().split('T')[0];
     var stuRes = await sb.from('students').select('*', {count:'exact', head:true});
     var staffRes = await sb.from('staff_profiles').select('*', {count:'exact', head:true}).eq('role_key', 'teacher');
-    var attRes = await sb.from('attendance_logs').select('*', {count:'exact', head:true}).eq('date', today).eq('status', 'present');
+    var attRes = await sb.from('student_attendance').select('*', {count:'exact', head:true}).eq('date', today).eq('status', 'present');
     var incRes = await sb.from('behavior_incidents').select('*', {count:'exact', head:true}).gte('created_at', weekAgo);
     var stuCount = stuRes.count || 0;
     var staffCount = staffRes.count || 0;
@@ -473,7 +473,7 @@ async function loadOverviewCards() {
   if (!sb) return;
   try {
     var today = new Date().toISOString().split('T')[0];
-    var attRes = await sb.from('attendance_logs').select('class_name, status').eq('date', today).limit(500);
+    var attRes = await sb.from('student_attendance').select('class_name, status').eq('date', today).limit(500);
     var attData = attRes.data || [];
     var cls = {};
     attData.forEach(function(r) {
@@ -558,7 +558,7 @@ async function loadAttendance() {
   if (!sb) return;
   try {
     var today = new Date().toISOString().split('T')[0];
-    var res = await sb.from('attendance_logs').select('class_name,status,student_id').eq('date',today).limit(2000);
+    var res = await sb.from('student_attendance').select('class_name,status,student_id').eq('date',today).limit(2000);
     var data = res.data || [];
     var present=0, absent=0, late=0;
     var cls = {};
