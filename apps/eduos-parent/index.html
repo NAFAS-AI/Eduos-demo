@@ -456,7 +456,7 @@ async function loadChildren() {
 
   if (sessionIds.length) {
     // Query students by TEXT student_id column
-    children = await dbGet('students', `select=id,name,class_name,grade&id=in.(${sessionIds.join(',')})`);
+    children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${sessionIds.join(',')})`);
   } else {
     // Fallback: query parent_credentials by national_id
     const nat = user.national_id;
@@ -464,7 +464,7 @@ async function loadChildren() {
       const pc = await dbGet('parent_credentials', `select=student_ids&national_id=eq.${nat}&limit=1`);
       const ids2 = (pc[0] && pc[0].student_ids) ? pc[0].student_ids : [];
       if (ids2.length) {
-        children = await dbGet('students', `select=id,name,class_name,grade&id=in.(${ids2.join(',')})`);
+        children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${ids2.join(',')})`);
       }
     }
   }
@@ -483,7 +483,7 @@ function renderChildTabs() {
   }
 
   const html = children.map((c, i) =>
-    `<button class="child-tab${i===0?' active':''}" data-sid="${c.id}" onclick="selectChild('${c.id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
+    `<button class="child-tab${i===0?' active':''}" data-sid="${c.student_id}" onclick="selectChild('${c.student_id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
   ).join('');
 
   containers.forEach(id => {
@@ -576,7 +576,7 @@ function renderAttendance() {
 // --- BEHAVIOR ---
 let behData = [];
 async function loadBehavior(id) {
-  behData = await dbGet('behavior_incidents', `select=date,type,description,points&student_id=eq.${id}&order=date.desc&limit=20`);
+  behData = await dbGet('behavior_incidents', `select=created_at,violation_type,description,degree&student_id=eq.${id}&order=created_at.desc&limit=20`);
   renderBehavior();
 }
 
@@ -588,13 +588,13 @@ function renderBehavior() {
       <table>
         <thead><tr><th>التاريخ | Date</th><th>النوع | Type</th><th>الوصف | Description</th><th>النقاط | Points</th></tr></thead>
         <tbody>${behData.map(b => {
-          const pts = parseInt(b.points) || 0;
-          const badge = pts > 0 ? 'badge-green' : 'badge-red';
+          const deg = b.degree || '—';
+          const badge = b.degree === 'minor' ? 'badge-amber' : b.degree === 'major' ? 'badge-red' : 'badge-green';
           return `<tr>
-            <td>${b.date || '—'}</td>
-            <td><span class="badge badge-blue">${b.type || '—'}</span></td>
+            <td>${(b.created_at||'').slice(0,10) || '—'}</td>
+            <td><span class="badge badge-blue">${b.violation_type || '—'}</span></td>
             <td>${b.description || '—'}</td>
-            <td><span class="badge ${badge}">${pts > 0 ? '+' : ''}${pts}</span></td>
+            <td><span class="badge ${badge}">${deg}</span></td>
           </tr>`;
         }).join('')}</tbody>
       </table>
@@ -604,7 +604,7 @@ function renderBehavior() {
 // --- SCHEDULE ---
 async function loadSchedule(id) {
   // get student's section
-  const child = children.find(c => c.id === id);
+  const child = children.find(c => c.student_id === id);
   if (!child) return;
   const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
   const rows = await dbGet('schedules', `select=day,period,subject,teacher_name,class_name&class_name=eq.${child.class_name}&is_active=eq.true&order=day,period`);
@@ -628,7 +628,7 @@ async function loadSchedule(id) {
 function updateHomeKpis() {
   // Average
   if (gradesData.length) {
-    const nums = gradesData.map(g => parseFloat(g.grade)).filter(n => !isNaN(n));
+    const nums = gradesData.map(g => g.max_score > 0 ? Math.round((g.score/g.max_score)*100) : null).filter(n => n !== null);
     const avg = nums.length ? (nums.reduce((a,b) => a+b, 0) / nums.length).toFixed(1) : '—';
     document.getElementById('kpiAvg').textContent = avg + '%';
   } else {
@@ -644,8 +644,8 @@ function updateHomeKpis() {
   }
 
   // Behavior points
-  const pts = behData.reduce((a,b) => a + (parseInt(b.points) || 0), 0);
-  document.getElementById('kpiBeh').textContent = behData.length ? pts : '—';
+  const beh_total = behData.length;
+  document.getElementById('kpiBeh').textContent = beh_total || '—';
 
   // Subjects count
   const uniqueSubjects = [...new Set(gradesData.map(g => g.subject))];
