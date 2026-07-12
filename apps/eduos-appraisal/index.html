@@ -93,6 +93,40 @@ tr:hover td{background:#F8FAFF}
 /* Toast */
 .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 28px;font-size:.9rem;font-weight:600;z-index:999;display:none;white-space:nowrap}
 .toast.show{display:block}
+/* ── REVIEW PANEL ── */
+.review-status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+.pill-submitted{background:#dbeafe;color:#1d4ed8}
+.pill-revision{background:#fef3c7;color:#d97706}
+.pill-approved{background:#dcfce7;color:#16a34a}
+.pill-draft{background:#f1f5f9;color:#64748b}
+.review-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
+.review-card:hover{border-color:var(--pr);background:#F8FAFF}
+.review-card .rc-name{font-weight:700;font-size:.92rem;color:var(--txt)}
+.review-card .rc-meta{font-size:.75rem;color:var(--txt2);margin-top:3px}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-start;justify-content:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
+.modal-close{position:absolute;top:14px;left:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--txt2);line-height:1;padding:4px 8px;border-radius:6px}
+.modal-close:hover{background:#fee2e2;color:#dc2626}
+.modal-title{font-size:1rem;font-weight:800;color:var(--txt);margin-bottom:20px}
+.modal-section{background:#F8FAFF;border-radius:10px;padding:14px 18px;margin-bottom:14px;border:1px solid var(--border)}
+.modal-section-title{font-size:.85rem;font-weight:700;color:var(--pr);margin-bottom:10px}
+.self-score-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.self-score-row:last-child{border-bottom:none}
+.self-score-label{font-size:.83rem;color:var(--txt);flex:1;min-width:180px}
+.self-score-val{font-weight:700;font-size:.83rem;color:var(--pr)}
+.self-score-note{font-size:.75rem;color:var(--txt2);font-style:italic;width:100%;padding-top:2px}
+.evidence-file-pill{display:inline-flex;align-items:center;gap:6px;background:#F0EDFF;border:1px solid rgba(108,61,214,.2);border-radius:8px;padding:4px 10px;font-size:.78rem;color:var(--pr);margin:3px}
+.revision-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.88rem;min-height:80px;resize:vertical}
+.revision-input:focus{outline:none;border-color:#dc2626}
+.modal-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.btn-approve{background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:10px 26px;border-radius:10px;border:none;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem}
+.btn-approve:hover{opacity:.9}
+.btn-revision{background:#fff;border:1.5px solid #dc2626;color:#dc2626;padding:10px 22px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem}
+.btn-revision:hover{background:#fee2e2}
+.btn-close-modal{background:#fff;border:1.5px solid var(--border);color:var(--txt2);padding:10px 18px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem;margin-right:auto}
+
 .empty{text-align:center;padding:40px;color:var(--txt2);font-size:.9rem}
 </style>
 </head>
@@ -113,6 +147,7 @@ tr:hover td{background:#F8FAFF}
   <button class="tab" data-tab="evaluate">&#9999;&#65039; تقييم جديد</button>
   <button class="tab" data-tab="history">&#128203; السجل</button>
   <button class="tab" data-tab="pdp">&#127919; خطط التطوير</button>
+  <button class="tab" data-tab="review">&#9989; المراجعة والاعتماد <span id="pendingBadge" style="display:none;background:#dc2626;color:#fff;border-radius:10px;padding:1px 8px;font-size:.72rem;margin-right:4px">0</span></button>
 </div>
 
 <div class="main">
@@ -248,6 +283,62 @@ tr:hover td{background:#F8FAFF}
     </div>
   </div>
 
+
+
+  <!-- ===== REVIEW & APPROVE ===== -->
+  <div id="tab-review" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#9989; مراجعة التقييمات المُرسَلة واعتمادها</div>
+        <button class="btn btn-ol" onclick="loadReviewQueue()">&#8635; تحديث</button>
+      </div>
+      <div id="pendingCountBanner" style="background:#fef3c7;border:1px solid #d9770633;border-radius:10px;padding:12px 16px;font-size:.88rem;font-weight:700;color:#d97706;margin-bottom:16px;display:none">
+        &#9888;&#65039; يوجد تقييمات بانتظار اعتمادك — راجعها وأعتمد أو اطلب تعديلاً
+      </div>
+      <div id="reviewQueueList"><div class="empty">&#8987; جار التحميل...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#128203; جميع التقييمات المكتملة</div>
+      </div>
+      <div id="approvedList"><div class="empty">جار التحميل...</div></div>
+    </div>
+  </div>
+
+  <!-- ===== REVIEW MODAL ===== -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal-box" id="reviewModalBox">
+      <button class="modal-close" onclick="closeReviewModal()">&#10005;</button>
+      <div class="modal-title" id="modalTitle">مراجعة التقييم الذاتي</div>
+
+      <div class="modal-section" id="modalSelfScores">
+        <div class="modal-section-title">&#9733; التقييم الذاتي للموظف/ة</div>
+        <div id="selfScoresList"></div>
+      </div>
+
+      <div class="modal-section" id="modalEvidenceFiles" style="display:none">
+        <div class="modal-section-title">&#128206; الأدلة المرفقة من الموظف/ة</div>
+        <div id="evidenceFilesList"></div>
+      </div>
+
+      <div class="modal-section" id="modalRevisionSection" style="display:none">
+        <div class="modal-section-title" style="color:#dc2626">&#9888;&#65039; ملاحظة التعديل السابقة</div>
+        <div id="prevRevisionNote" style="font-size:.88rem;color:#dc2626;padding:6px 0"></div>
+      </div>
+
+      <div class="modal-section" id="revisionRequestSection" style="display:none">
+        <div class="modal-section-title" style="color:#dc2626">&#9998; كتابة ملاحظة طلب التعديل</div>
+        <textarea class="revision-input" id="revisionNoteInput" placeholder="اكتب هنا ما تريد من الموظف/ة تعديله أو إضافته..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-close-modal" onclick="closeReviewModal()">إغلاق</button>
+        <button class="btn-revision" id="requestRevisionBtn" onclick="toggleRevisionInput()">&#9998; طلب تعديل</button>
+        <button class="btn-revision" id="sendRevisionBtn" style="display:none;background:#dc2626;color:#fff;border-color:#dc2626" onclick="sendRevisionRequest()">&#128233; إرسال طلب التعديل</button>
+        <button class="btn-approve" id="approveEvalBtn" onclick="approveEvaluation()">&#9989; اعتماد التقييم النهائي</button>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -672,6 +763,260 @@ function showToast(msg) {
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
+
+
+// ═══════════════════════════════════════
+// REVIEW & APPROVE MODULE
+// ═══════════════════════════════════════
+var currentReviewEval = null;
+var revisionMode = false;
+
+var CRITERIA_LABELS = {
+  'g1': 'الهدف 1 — إدخال بيانات الحضور ≥95%',
+  'g2': 'الهدف 2 — نشاط وطني ≥ مرة/فصل',
+  'g3': 'الهدف 3 — تقدم الطلاب ≥5%',
+  'g4': 'الهدف 4 — معايير الملاحظة الصفية',
+  'g5': 'الهدف 5 — المسابقات (≥5 طلاب + فوز)',
+  'g6': 'الهدف 6 — خطة الدعم الأكاديمي ≥60%',
+  'c1_1': '1.1 الوعي الثقافي', 'c1_2': '1.2 الصحة النفسية للطلاب', 'c1_3': '1.3 الأخلاقيات المهنية',
+  'c2_1': '2.1 الخبرة في المادة', 'c2_2': '2.2 ممارسات التدريس', 'c2_3': '2.3 التقييم والقياس',
+  'c2_4': '2.4 التعلم مدى الحياة', 'c2_5': '2.5 التعليم المتمايز',
+  'c3_1': '3.1 الاستعداد للمستقبل', 'c3_2': '3.2 الابتكار التكنولوجي', 'c3_3': '3.3 الثقافة المحلية والعالمية',
+  'c4_1': '4.1 مجتمعات التعلم المهنية', 'c4_2': '4.2 الشراكة مع الأسرة'
+};
+
+var ROLE_LABELS = {
+  'teacher':'معلم/ة','nurse':'ممرضة','security':'أمن','technician':'فني/ة',
+  'secretary':'سكرتيرة','specialist':'أخصائي/ة','coach':'مدرب/ة','admin':'إداري/ة',
+  'vice_principal':'وكيل/ة المدير','principal':'مدير/ة'
+};
+
+var STATUS_LABELS = {
+  'draft':'مسودة','submitted':'مُرسَل','revision_requested':'يحتاج تعديل','approved':'مُعتمَد'
+};
+
+function getStatusPillClass(s) {
+  return {draft:'pill-draft',submitted:'pill-submitted',revision_requested:'pill-revision',approved:'pill-approved'}[s] || 'pill-draft';
+}
+
+async function loadReviewQueue() {
+  var listEl = document.getElementById('reviewQueueList');
+  var approvedEl = document.getElementById('approvedList');
+  var banner = document.getElementById('pendingCountBanner');
+  var badge = document.getElementById('pendingBadge');
+  listEl.innerHTML = '<div class="empty">&#8987; جار التحميل...</div>';
+
+  try {
+    var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
+    var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
+    var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?select=*&order=submitted_at.desc&limit=200', {
+      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+    });
+    var allEv = await res.json();
+    if (!Array.isArray(allEv)) allEv = [];
+
+    var pending = allEv.filter(function(e) { return e.status === 'submitted' || e.status === 'revision_requested'; });
+    var approved = allEv.filter(function(e) { return e.status === 'approved'; });
+
+    // Update badge
+    if (pending.length > 0) {
+      badge.textContent = pending.length;
+      badge.style.display = 'inline';
+      banner.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+      banner.style.display = 'none';
+    }
+
+    // Render pending
+    if (!pending.length) {
+      listEl.innerHTML = '<div class="empty">&#9989; لا توجد تقييمات بانتظار الاعتماد</div>';
+    } else {
+      var html = '';
+      pending.forEach(function(e) {
+        var nameLabel = e.staff_name || e.staff_db_id || '—';
+        var roleLabel = ROLE_LABELS[e.role_key || e.eval_type] || (e.eval_type || '—');
+        var dateLabel = e.submitted_at ? e.submitted_at.split('T')[0] : (e.eval_date || '—');
+        var pillClass = getStatusPillClass(e.status);
+        var statusLabel = STATUS_LABELS[e.status] || e.status;
+        html += '<div class="review-card" data-eid="' + e.id + '">';
+        html += '<div class="avatar">' + (nameLabel.charAt(0) || 'م') + '</div>';
+        html += '<div style="flex:1"><div class="rc-name">' + nameLabel + '</div>';
+        html += '<div class="rc-meta">' + roleLabel + ' · أُرسل: ' + dateLabel + '</div></div>';
+        html += '<span class="review-status-pill ' + pillClass + '">' + statusLabel + '</span>';
+        html += '<button class="btn btn-pr" style="font-size:.8rem;padding:7px 16px">مراجعة</button>';
+        html += '</div>';
+      });
+      listEl.innerHTML = html;
+      pending.forEach(function(e) {
+        var card = listEl.querySelector('[data-eid="' + e.id + '"]');
+        if (card) {
+          card.addEventListener('click', function() { openReviewModal(e); });
+        }
+      });
+    }
+
+    // Render approved
+    if (!approved.length) {
+      approvedEl.innerHTML = '<div class="empty">لا توجد تقييمات مكتملة</div>';
+    } else {
+      var ahtml = '<div class="tbl-wrap"><table><thead><tr><th>الموظف/ة</th><th>الدور</th><th>تاريخ الاعتماد</th><th>الحالة</th></tr></thead><tbody>';
+      approved.forEach(function(e) {
+        var nameLabel = e.staff_name || e.staff_db_id || '—';
+        var roleLabel = ROLE_LABELS[e.role_key || e.eval_type] || '—';
+        var dateLabel = e.approved_at ? e.approved_at.split('T')[0] : '—';
+        ahtml += '<tr><td>' + nameLabel + '</td><td>' + roleLabel + '</td><td>' + dateLabel + '</td><td><span class="review-status-pill pill-approved">مُعتمَد</span></td></tr>';
+      });
+      ahtml += '</tbody></table></div>';
+      approvedEl.innerHTML = ahtml;
+    }
+
+  } catch(err) {
+    listEl.innerHTML = '<div class="empty">خطأ في التحميل</div>';
+    console.warn('loadReviewQueue:', err);
+  }
+}
+
+function openReviewModal(evalObj) {
+  currentReviewEval = evalObj;
+  revisionMode = false;
+
+  document.getElementById('reviewModal').classList.add('open');
+  var nameLabel = evalObj.staff_name || evalObj.staff_db_id || '—';
+  var roleLabel = ROLE_LABELS[evalObj.role_key || evalObj.eval_type] || '—';
+  document.getElementById('modalTitle').textContent = 'مراجعة تقييم: ' + nameLabel + ' — ' + roleLabel;
+
+  // Self scores
+  var selfScores = evalObj.self_scores || {};
+  var keys = Object.keys(selfScores).filter(function(k) { return !k.startsWith('note_'); });
+  var html = '';
+  if (!keys.length) {
+    html = '<div style="color:var(--txt2);font-size:.85rem">لم يملأ الموظف/ة التقييم الذاتي بعد</div>';
+  } else {
+    keys.forEach(function(k) {
+      var label = CRITERIA_LABELS[k] || k;
+      var val = selfScores[k];
+      var note = selfScores['note_' + k] || '';
+      var ratingLabel = val >= 4.5 ? 'استثنائي' : val >= 3.5 ? 'يفوق التوقعات' : val >= 2.5 ? 'يلبي التوقعات' : val >= 1.5 ? 'دون التوقعات' : 'غير مقبول';
+      html += '<div class="self-score-row">';
+      html += '<span class="self-score-label">' + label + '</span>';
+      html += '<span class="self-score-val">' + val + ' / 5 — ' + ratingLabel + '</span>';
+      if (note) html += '<span class="self-score-note">ملاحظة: ' + note + '</span>';
+      html += '</div>';
+    });
+  }
+  document.getElementById('selfScoresList').innerHTML = html;
+
+  // Evidence files
+  var files = evalObj.evidence_files || [];
+  var filesSection = document.getElementById('modalEvidenceFiles');
+  if (files.length > 0) {
+    var fhtml = files.map(function(f) {
+      return '<span class="evidence-file-pill">&#128206; ' + (f.name || 'ملف') + '</span>';
+    }).join('');
+    document.getElementById('evidenceFilesList').innerHTML = fhtml;
+    filesSection.style.display = 'block';
+  } else {
+    filesSection.style.display = 'none';
+  }
+
+  // Previous revision note
+  var revSection = document.getElementById('modalRevisionSection');
+  if (evalObj.revision_note) {
+    document.getElementById('prevRevisionNote').textContent = evalObj.revision_note;
+    revSection.style.display = 'block';
+  } else {
+    revSection.style.display = 'none';
+  }
+
+  // Reset revision input
+  document.getElementById('revisionRequestSection').style.display = 'none';
+  document.getElementById('revisionNoteInput').value = '';
+  document.getElementById('sendRevisionBtn').style.display = 'none';
+  document.getElementById('requestRevisionBtn').style.display = 'inline-block';
+  document.getElementById('approveEvalBtn').style.display = 'inline-block';
+}
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').classList.remove('open');
+  currentReviewEval = null;
+}
+
+function toggleRevisionInput() {
+  revisionMode = !revisionMode;
+  var revSection = document.getElementById('revisionRequestSection');
+  var sendBtn = document.getElementById('sendRevisionBtn');
+  var reqBtn = document.getElementById('requestRevisionBtn');
+  revSection.style.display = revisionMode ? 'block' : 'none';
+  sendBtn.style.display = revisionMode ? 'inline-block' : 'none';
+  reqBtn.textContent = revisionMode ? '&#10005; إلغاء' : '&#9998; طلب تعديل';
+}
+
+async function sendRevisionRequest() {
+  if (!currentReviewEval) return;
+  var note = document.getElementById('revisionNoteInput').value.trim();
+  if (!note) { showToast('يرجى كتابة ملاحظة التعديل'); return; }
+
+  var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
+  var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
+
+  var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?id=eq.' + currentReviewEval.id, {
+    method: 'PATCH',
+    headers: {
+      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ status: 'revision_requested', revision_note: note, reviewed_at: new Date().toISOString() })
+  });
+
+  if (res.ok || res.status === 204) {
+    showToast('&#9989; تم إرسال طلب التعديل للموظف/ة');
+    closeReviewModal();
+    loadReviewQueue();
+  } else {
+    showToast('خطأ في الإرسال');
+  }
+}
+
+async function approveEvaluation() {
+  if (!currentReviewEval) return;
+  var confirmed = confirm('تأكيد اعتماد تقييم: ' + (currentReviewEval.staff_name || currentReviewEval.staff_db_id || '—') + ' ؟');
+  if (!confirmed) return;
+
+  var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
+  var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
+
+  var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?id=eq.' + currentReviewEval.id, {
+    method: 'PATCH',
+    headers: {
+      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString() })
+  });
+
+  if (res.ok || res.status === 204) {
+    showToast('&#9989; تم اعتماد التقييم بنجاح');
+    closeReviewModal();
+    loadReviewQueue();
+  } else {
+    showToast('خطأ في الاعتماد');
+  }
+}
+
+// Close modal on overlay click
+document.addEventListener('DOMContentLoaded', function() {
+  var overlay = document.getElementById('reviewModal');
+  if (overlay) {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeReviewModal();
+    });
+  }
+});
+
+// Load review queue when tab activated
+var origSwitchTab = switchTab;
+switchTab = function(name) { origSwitchTab(name); if (name === "review") loadReviewQueue(); };
 
 init();
 </script>
