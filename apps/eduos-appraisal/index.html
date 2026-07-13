@@ -24,15 +24,14 @@ body{font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min
 .tab{padding:14px 20px;border:none;background:transparent;color:var(--txt2);font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.2s}
 .tab.active{color:var(--pr);border-bottom-color:var(--pr)}
 .panel{display:none}.panel.active{display:block}
-.main{padding:24px;max-width:1200px;margin:0 auto}
-.card{background:var(--card);border-radius:14px;padding:22px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:16px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.main{padding:28px;max-width:1200px;margin:0 auto}
+.card{background:var(--card);border-radius:16px;padding:24px;border:1px solid var(--border);box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:18px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .card-title{font-size:1rem;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
 .badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;display:inline-block}
 .badge-green{background:#dcfce7;color:#16a34a}.badge-yellow{background:#fef3c7;color:#d97706}
 .badge-red{background:#fee2e2;color:#dc2626}.badge-blue{background:#dbeafe;color:#1d4ed8}
 .badge-purple{background:#ede9fe;color:#7c3aed}.badge-gray{background:#f1f5f9;color:#64748b}
-/* Staff Overview */
 .staff-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--border);margin-bottom:8px;transition:.2s;cursor:pointer}
 .staff-row:hover{background:#F8FAFF;border-color:var(--pr)}
 .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
@@ -40,79 +39,109 @@ body{font-family:'Tajawal',Arial,sans-serif;background:#F0F4F8;color:#1e293b;min
 .staff-meta{font-size:.75rem;color:var(--txt2);margin-top:2px}
 .score-bar{width:120px;height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:6px}
 .score-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6C3DD6,#22D3EE)}
-/* Form */
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:768px){.grid3,.grid2{grid-template-columns:1fr}}
-.form-group{margin-bottom:14px}
+@media(max-width:768px){.grid3{grid-template-columns:1fr}}
+.form-group{margin-bottom:16px}
 .form-label{display:block;font-size:.82rem;font-weight:700;color:var(--txt);margin-bottom:6px}
 input[type=date],select,textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:8px;color:var(--txt);padding:9px 14px;font-family:inherit;font-size:.88rem}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--pr)}
-/* UAE Framework Sections */
-.section-hd{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:10px;padding:10px 18px;font-size:.9rem;font-weight:700;margin:20px 0 12px;display:flex;align-items:center;gap:8px}
-.domain-hd{background:#F0F4F8;border-right:4px solid var(--pr);padding:8px 14px;border-radius:0 8px 8px 0;font-size:.88rem;font-weight:700;color:var(--pr);margin:14px 0 8px}
-.criterion-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;background:#FAFBFF;flex-wrap:wrap}
-.criterion-info{flex:1;min-width:200px}
-.criterion-label{font-size:.88rem;font-weight:600;color:var(--txt)}
-.criterion-key{font-size:.72rem;color:var(--txt2);margin-top:2px}
-.score-btns{display:flex;gap:5px;flex-shrink:0}
-.sb{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-weight:700;font-size:.85rem;transition:.2s;font-family:inherit;color:var(--txt)}
-.sb:hover{border-color:var(--pr);background:#F0EDFF;color:var(--pr)}
-.sb.sel{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-color:var(--pr)}
-.sb.sel-high{background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-color:#059669}
-/* Score Summary */
-.score-summary{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:14px;padding:20px 24px;margin:20px 0}
-.score-summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:14px}
+
+/* SECTION HEADERS */
+.section-hd{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border-radius:12px;padding:16px 22px;font-size:1rem;font-weight:800;margin:32px 0 18px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(108,61,214,.2)}
+.domain-hd{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:10px;background:#F5F3FF;border-right:4px solid #6C3DD6;font-size:.9rem;font-weight:800;color:#5b21b6;margin:24px 0 12px}
+
+/* CRITERION CARDS */
+.crit-card{background:#fff;border:1.5px solid #e8e8f0;border-radius:16px;padding:22px 24px;margin-bottom:12px;transition:all .22s}
+.crit-card:hover{border-color:#c4b5fd;box-shadow:0 4px 20px rgba(108,61,214,.08)}
+.crit-card.rated{border-color:#a78bfa;background:#FDFCFF;box-shadow:0 2px 12px rgba(108,61,214,.07)}
+.crit-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:18px}
+.crit-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;font-size:.82rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(108,61,214,.3)}
+.crit-info{flex:1}
+.crit-label{font-size:.95rem;font-weight:700;color:#1e293b;line-height:1.5}
+.crit-sub{font-size:.76rem;color:#94a3b8;margin-top:5px}
+.crit-selected{font-size:.78rem;font-weight:700;margin-top:6px;min-height:18px;transition:color .2s}
+
+/* LEVEL CHOICE BUTTONS */
+.lvl-row{display:flex;gap:10px}
+@media(max-width:900px){.lvl-row{flex-wrap:wrap}}
+.lvl-btn{flex:1;min-width:90px;padding:14px 8px 11px;border-radius:13px;border:1.5px solid #e2e8f0;background:#f8faff;cursor:pointer;font-family:'Tajawal',Arial,sans-serif;text-align:center;transition:all .22s;position:relative;overflow:hidden}
+.lvl-btn::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s;background:radial-gradient(circle at center, rgba(255,255,255,.2) 0%, transparent 70%)}
+.lvl-btn:hover::before{opacity:1}
+.lvl-btn .lvl-icon{font-size:1.5rem;display:block;margin-bottom:6px;line-height:1}
+.lvl-btn .lvl-name{font-size:.78rem;font-weight:700;color:#475569;display:block;line-height:1.3}
+.lvl-btn .lvl-pts{font-size:.65rem;color:#94a3b8;display:block;margin-top:4px}
+.lvl-btn:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12);border-color:#c4b5fd}
+.lvl-btn:hover .lvl-name{color:#6C3DD6}
+.lvl-btn.lv-active{transform:translateY(-4px)}
+.lvl-btn.lv-5.lv-active{background:#7c3aed;border-color:#7c3aed;box-shadow:0 8px 24px rgba(124,58,237,.4)}
+.lvl-btn.lv-4.lv-active{background:#0284c7;border-color:#0284c7;box-shadow:0 8px 24px rgba(2,132,199,.35)}
+.lvl-btn.lv-3.lv-active{background:#059669;border-color:#059669;box-shadow:0 8px 24px rgba(5,150,105,.35)}
+.lvl-btn.lv-2.lv-active{background:#d97706;border-color:#d97706;box-shadow:0 8px 24px rgba(217,119,6,.3)}
+.lvl-btn.lv-1.lv-active{background:#dc2626;border-color:#dc2626;box-shadow:0 8px 24px rgba(220,38,38,.3)}
+.lvl-btn.lv-active .lvl-icon,.lvl-btn.lv-active .lvl-name,.lvl-btn.lv-active .lvl-pts{color:#fff}
+
+/* PROGRESS */
+.eval-progress{background:#f8faff;border:1px solid var(--border);border-radius:12px;padding:14px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px}
+.eval-prog-bar{flex:1;height:10px;background:#e2e8f0;border-radius:100px;overflow:hidden}
+.eval-prog-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#6C3DD6,#22D3EE);transition:width .4s ease;width:0%}
+.eval-prog-text{font-size:.83rem;font-weight:700;color:var(--txt2);white-space:nowrap}
+
+/* SCORE SUMMARY */
+.score-summary{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:16px;padding:28px;margin:32px 0}
+.score-summary-grid{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:18px;margin-top:18px}
 @media(max-width:600px){.score-summary-grid{grid-template-columns:1fr}}
-.score-box{background:rgba(255,255,255,.08);border-radius:10px;padding:14px;text-align:center}
-.score-big{font-size:1.8rem;font-weight:900;color:#22D3EE}
-.score-lbl{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:4px}
-.grade-pill{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:.85rem;margin-top:8px}
-.g-ex{background:#059669;color:#fff}.g-ab{background:#0284c7;color:#fff}
-.g-mt{background:#d97706;color:#fff}.g-bl{background:#dc2626;color:#fff}.g-nr{background:#374151;color:#fff}
-/* Scale legend */
-.scale-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.sl-item{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--txt2)}
-.sl-dot{width:10px;height:10px;border-radius:50%}
-/* Table */
+.score-box{background:rgba(255,255,255,.07);border-radius:12px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,.08)}
+.score-big{font-size:2rem;font-weight:900;color:#22D3EE}
+.score-big-main{font-size:2.8rem;font-weight:900;color:#22D3EE}
+.score-lbl{font-size:.78rem;color:rgba(255,255,255,.6);margin-top:6px}
+.grade-pill{display:inline-block;padding:7px 18px;border-radius:20px;font-weight:700;font-size:.85rem;margin-top:12px}
+.g-ex{background:#7c3aed;color:#fff}.g-ab{background:#0284c7;color:#fff}
+.g-mt{background:#059669;color:#fff}.g-bl{background:#d97706;color:#fff}.g-nr{background:#dc2626;color:#fff}
+
+/* TABLE */
 .tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:.85rem}
 thead{background:#F8FAFF}
-th{padding:11px 14px;text-align:right;font-weight:700;color:var(--txt2);border-bottom:2px solid var(--border)}
-td{padding:10px 14px;border-bottom:1px solid var(--border)}
+th{padding:12px 14px;text-align:right;font-weight:700;color:var(--txt2);border-bottom:2px solid var(--border)}
+td{padding:11px 14px;border-bottom:1px solid var(--border)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#F8FAFF}
+
 /* PDP */
-.pdp-card{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
-.pdp-progress{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:8px}
+.pdp-card{border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:10px}
+.pdp-progress{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:10px}
 .pdp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6C3DD6,#22D3EE)}
-/* Buttons */
+
+/* BUTTONS */
 .btn{padding:10px 22px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:700;transition:.2s}
 .btn-pr{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff}.btn-pr:hover{opacity:.9}
 .btn-ol{background:#fff;border:1.5px solid var(--border);color:var(--txt2)}.btn-ol:hover{border-color:var(--pr)}
-/* Toast */
-.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:12px 28px;font-size:.9rem;font-weight:600;z-index:999;display:none;white-space:nowrap}
+
+/* TOAST */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;border-radius:10px;padding:13px 30px;font-size:.9rem;font-weight:600;z-index:9999;display:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)}
 .toast.show{display:block}
-/* ── REVIEW PANEL ── */
+
+/* REVIEW */
 .review-status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
 .pill-submitted{background:#dbeafe;color:#1d4ed8}
 .pill-revision{background:#fef3c7;color:#d97706}
 .pill-approved{background:#dcfce7;color:#16a34a}
 .pill-draft{background:#f1f5f9;color:#64748b}
-.review-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
+.review-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.2s}
 .review-card:hover{border-color:var(--pr);background:#F8FAFF}
 .review-card .rc-name{font-weight:700;font-size:.92rem;color:var(--txt)}
 .review-card .rc-meta{font-size:.75rem;color:var(--txt2);margin-top:3px}
-/* Modal */
+
+/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:flex-start;justify-content:center;padding:24px}
 .modal-overlay.open{display:flex}
-.modal-box{background:#fff;border-radius:16px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;padding:28px;position:relative}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;padding:30px;position:relative}
 .modal-close{position:absolute;top:14px;left:14px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--txt2);line-height:1;padding:4px 8px;border-radius:6px}
 .modal-close:hover{background:#fee2e2;color:#dc2626}
-.modal-title{font-size:1rem;font-weight:800;color:var(--txt);margin-bottom:20px}
-.modal-section{background:#F8FAFF;border-radius:10px;padding:14px 18px;margin-bottom:14px;border:1px solid var(--border)}
-.modal-section-title{font-size:.85rem;font-weight:700;color:var(--pr);margin-bottom:10px}
-.self-score-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.modal-title{font-size:1rem;font-weight:800;color:var(--txt);margin-bottom:22px}
+.modal-section{background:#F8FAFF;border-radius:10px;padding:16px 18px;margin-bottom:14px;border:1px solid var(--border)}
+.modal-section-title{font-size:.85rem;font-weight:700;color:var(--pr);margin-bottom:12px}
+.self-score-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
 .self-score-row:last-child{border-bottom:none}
 .self-score-label{font-size:.83rem;color:var(--txt);flex:1;min-width:180px}
 .self-score-val{font-weight:700;font-size:.83rem;color:var(--pr)}
@@ -120,13 +149,12 @@ tr:hover td{background:#F8FAFF}
 .evidence-file-pill{display:inline-flex;align-items:center;gap:6px;background:#F0EDFF;border:1px solid rgba(108,61,214,.2);border-radius:8px;padding:4px 10px;font-size:.78rem;color:var(--pr);margin:3px}
 .revision-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:.88rem;min-height:80px;resize:vertical}
 .revision-input:focus{outline:none;border-color:#dc2626}
-.modal-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.modal-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--border)}
 .btn-approve{background:linear-gradient(135deg,#059669,#10b981);color:#fff;padding:10px 26px;border-radius:10px;border:none;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem}
 .btn-approve:hover{opacity:.9}
 .btn-revision{background:#fff;border:1.5px solid #dc2626;color:#dc2626;padding:10px 22px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem}
 .btn-revision:hover{background:#fee2e2}
 .btn-close-modal{background:#fff;border:1.5px solid var(--border);color:var(--txt2);padding:10px 18px;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer;font-size:.9rem;margin-right:auto}
-
 .empty{text-align:center;padding:40px;color:var(--txt2);font-size:.9rem}
 </style>
 </head>
@@ -152,26 +180,25 @@ tr:hover td{background:#F8FAFF}
 
 <div class="main">
 
-  <!-- ===== OVERVIEW ===== -->
+  <!-- OVERVIEW -->
   <div id="tab-overview" class="panel active">
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#128202; ملخص أداء الكادر</div>
         <span class="badge badge-blue" id="termBadge">العام الدراسي 2025-2026</span>
       </div>
-      <div id="overviewKPIs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px"></div>
+      <div id="overviewKPIs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px"></div>
       <div id="staffList"><div class="empty">&#8987; جار التحميل...</div></div>
     </div>
   </div>
 
-  <!-- ===== NEW EVALUATION ===== -->
+  <!-- NEW EVALUATION -->
   <div id="tab-evaluate" class="panel">
     <div class="card">
       <div class="card-header">
-        <div class="card-title">&#9999;&#65039; تقييم جديد — الإطار الوطني الإماراتي للمعلم</div>
+        <div class="card-title">&#9999;&#65039; تقييم جديد — الإطار الوطني الإماراتي</div>
       </div>
 
-      <!-- Staff + Type + Date -->
       <div class="grid3">
         <div class="form-group">
           <label class="form-label">الموظف/ة</label>
@@ -191,79 +218,63 @@ tr:hover td{background:#F8FAFF}
         </div>
       </div>
 
-      <!-- Scale Legend -->
-      <div class="scale-legend">
-        <span style="font-size:.78rem;font-weight:700;color:var(--txt);margin-left:8px">مقياس التقييم:</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#374151"></span>0 غير مقبول</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#dc2626"></span>1 دون التوقعات</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#d97706"></span>2 يلبي جزئياً</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#0284c7"></span>3 يلبي التوقعات</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#059669"></span>4 يفوق التوقعات</span>
-        <span class="sl-item"><span class="sl-dot" style="background:#6C3DD6"></span>5 استثنائي</span>
+      <!-- Progress -->
+      <div class="eval-progress">
+        <div class="eval-prog-bar"><div class="eval-prog-fill" id="evalProgFill"></div></div>
+        <div class="eval-prog-text" id="evalProgText">0 / 19 معيار تم تقييمه</div>
       </div>
 
-      <!-- Part 1: 6 Goals -->
       <div class="section-hd">&#127937; الجزء الأول — أهداف الأداء (6 أهداف)</div>
       <div id="goalsSection"></div>
 
-      <!-- Part 2: Competencies -->
       <div class="section-hd">&#127775; الجزء الثاني — الكفاءات (4 محاور — 13 كفاءة)</div>
       <div id="compsSection"></div>
 
-      <!-- Live Score Summary -->
+      <!-- Live Score -->
       <div class="score-summary">
-        <div style="font-size:.95rem;font-weight:700;color:rgba(255,255,255,.9)">&#128200; ملخص الدرجات — يتحدث تلقائياً</div>
+        <div style="font-size:1rem;font-weight:800;color:rgba(255,255,255,.9)">&#128200; ملخص الدرجات — يتحدث تلقائياً مع كل اختيار</div>
         <div class="score-summary-grid">
           <div class="score-box">
             <div class="score-big" id="p1score">—</div>
-            <div class="score-lbl">متوسط الجزء الأول (من 5)</div>
+            <div class="score-lbl">متوسط الجزء الأول<br>من 5</div>
           </div>
           <div class="score-box">
             <div class="score-big" id="p2score">—</div>
-            <div class="score-lbl">متوسط الجزء الثاني (من 5)</div>
+            <div class="score-lbl">متوسط الجزء الثاني<br>من 5</div>
           </div>
           <div class="score-box">
-            <div class="score-big" id="totalScore">—</div>
-            <div class="score-lbl">المجموع الكلي (من 100)</div>
-            <div id="gradePill" style="margin-top:8px"></div>
+            <div class="score-big-main" id="totalScore">—</div>
+            <div class="score-lbl">المجموع الكلي من 100</div>
+            <div id="gradePill" style="margin-top:10px"></div>
           </div>
         </div>
       </div>
 
-      <!-- Notes -->
       <div class="form-group">
         <label class="form-label">ملاحظات المقيِّم/ة</label>
-        <textarea id="evalNotes" style="min-height:80px" placeholder="ملاحظات إضافية حول أداء الموظف/ة..."></textarea>
+        <textarea id="evalNotes" style="min-height:90px" placeholder="ملاحظات إضافية حول أداء الموظف/ة..."></textarea>
       </div>
 
-      <div style="display:flex;gap:10px;justify-content:flex-end">
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:10px">
         <button class="btn btn-ol" data-tab-go="overview">إلغاء</button>
         <button class="btn btn-pr" id="saveBtn">&#128190; حفظ التقييم</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== HISTORY ===== -->
+  <!-- HISTORY -->
   <div id="tab-history" class="panel">
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#128203; سجل التقييمات</div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input type="text" id="histSearch" placeholder="بحث باسم الموظف/ة..." style="width:200px;padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem"/>
-        </div>
+        <input type="text" id="histSearch" placeholder="بحث باسم الموظف/ة..." style="width:220px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem"/>
       </div>
       <div class="tbl-wrap">
         <table>
           <thead>
             <tr>
-              <th>الموظف/ة</th>
-              <th>نوع التقييم</th>
-              <th>التاريخ</th>
-              <th>الجزء 1</th>
-              <th>الجزء 2</th>
-              <th>المجموع</th>
-              <th>التقدير</th>
-              <th>المقيِّم/ة</th>
+              <th>الموظف/ة</th><th>نوع التقييم</th><th>التاريخ</th>
+              <th>الجزء 1</th><th>الجزء 2</th><th>المجموع</th><th>التقدير</th><th>المقيِّم/ة</th>
             </tr>
           </thead>
           <tbody id="historyBody"><tr><td colspan="8" class="empty">&#8987; جار التحميل...</td></tr></tbody>
@@ -272,7 +283,7 @@ tr:hover td{background:#F8FAFF}
     </div>
   </div>
 
-  <!-- ===== PDP ===== -->
+  <!-- PDP -->
   <div id="tab-pdp" class="panel">
     <div class="card">
       <div class="card-header">
@@ -283,16 +294,14 @@ tr:hover td{background:#F8FAFF}
     </div>
   </div>
 
-
-
-  <!-- ===== REVIEW & APPROVE ===== -->
+  <!-- REVIEW -->
   <div id="tab-review" class="panel">
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#9989; مراجعة التقييمات المُرسَلة واعتمادها</div>
         <button class="btn btn-ol" onclick="loadReviewQueue()">&#8635; تحديث</button>
       </div>
-      <div id="pendingCountBanner" style="background:#fef3c7;border:1px solid #d9770633;border-radius:10px;padding:12px 16px;font-size:.88rem;font-weight:700;color:#d97706;margin-bottom:16px;display:none">
+      <div id="pendingCountBanner" style="background:#fef3c7;border:1px solid #d9770633;border-radius:10px;padding:13px 18px;font-size:.88rem;font-weight:700;color:#d97706;margin-bottom:18px;display:none">
         &#9888;&#65039; يوجد تقييمات بانتظار اعتمادك — راجعها وأعتمد أو اطلب تعديلاً
       </div>
       <div id="reviewQueueList"><div class="empty">&#8987; جار التحميل...</div></div>
@@ -305,9 +314,9 @@ tr:hover td{background:#F8FAFF}
     </div>
   </div>
 
-  <!-- ===== REVIEW MODAL ===== -->
+  <!-- REVIEW MODAL -->
   <div class="modal-overlay" id="reviewModal">
-    <div class="modal-box" id="reviewModalBox">
+    <div class="modal-box">
       <button class="modal-close" onclick="closeReviewModal()">&#10005;</button>
       <div class="modal-title" id="modalTitle">مراجعة التقييم الذاتي</div>
 
@@ -339,18 +348,26 @@ tr:hover td{background:#F8FAFF}
       </div>
     </div>
   </div>
+
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 var SB = (window.EduOS && window.EduOS.SB_URL) ? window.EduOS.SB_URL : 'https://xdkiktwuuwghvzcukvew.supabase.co';
 var KEY = (window.EduOS && window.EduOS.SB_KEY) ? window.EduOS.SB_KEY : '';
-
 var allStaff = [];
 var allEvals = [];
 var principalScores = {};
+var TOTAL_CRITERIA = 19;
 
-// UAE Framework
+var LEVELS = [
+  {val:5, icon:'&#11088;', name:'استثنائي', pts:'5 نقاط', cls:'lv-5', color:'#7c3aed'},
+  {val:4, icon:'&#128077;', name:'يفوق التوقعات', pts:'4 نقاط', cls:'lv-4', color:'#0284c7'},
+  {val:3, icon:'&#10003;', name:'يلبي التوقعات', pts:'3 نقاط', cls:'lv-3', color:'#059669'},
+  {val:2, icon:'&#9888;', name:'دون التوقعات', pts:'نقطتان', cls:'lv-2', color:'#d97706'},
+  {val:1, icon:'&#10007;', name:'غير مقبول', pts:'نقطة واحدة', cls:'lv-1', color:'#dc2626'}
+];
+
 var GOALS = [
   {key:'g1', label:'إدخال بيانات الحضور في الوقت المحدد', target:'مستهدف: 95% أو أكثر'},
   {key:'g2', label:'تنظيم نشاط وطني في الفصل الدراسي', target:'مستهدف: نشاط واحد على الأقل، مشاركة 80%'},
@@ -384,7 +401,6 @@ var DOMAINS = [
   ]}
 ];
 
-// Helpers
 function gradeInfo(avg5) {
   if (avg5 >= 4.5) return {label:'استثنائي', cls:'g-ex'};
   if (avg5 >= 3.5) return {label:'يفوق التوقعات', cls:'g-ab'};
@@ -414,7 +430,6 @@ async function apiPost(table, data) {
   return r.ok || r.status === 201;
 }
 
-// ===== INIT =====
 async function init() {
   document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
   renderForm();
@@ -431,60 +446,77 @@ async function init() {
   renderPDP();
 }
 
-// ===== FORM RENDER =====
+function renderCritCard(key, label, sub, idx) {
+  var btns = LEVELS.map(function(l) {
+    return '<button class="lvl-btn ' + l.cls + '" data-key="' + key + '" data-val="' + l.val + '">' +
+      '<span class="lvl-icon">' + l.icon + '</span>' +
+      '<span class="lvl-name">' + l.name + '</span>' +
+      '<span class="lvl-pts">' + l.pts + '</span>' +
+      '</button>';
+  }).join('');
+  return '<div class="crit-card" id="card_' + key + '">' +
+    '<div class="crit-top">' +
+    '<div class="crit-num">' + idx + '</div>' +
+    '<div class="crit-info">' +
+    '<div class="crit-label">' + label + '</div>' +
+    (sub ? '<div class="crit-sub">' + sub + '</div>' : '') +
+    '<div class="crit-selected" id="sel_' + key + '"></div>' +
+    '</div></div>' +
+    '<div class="lvl-row">' + btns + '</div>' +
+    '</div>';
+}
+
 function renderForm() {
-  // Goals
   var goalsHtml = '';
   GOALS.forEach(function(g, i) {
-    goalsHtml += '<div class="criterion-row" id="row_' + g.key + '">';
-    goalsHtml += '<div class="criterion-info">';
-    goalsHtml += '<div class="criterion-label">' + (i+1) + '. ' + g.label + '</div>';
-    goalsHtml += '<div class="criterion-key">' + g.target + '</div>';
-    goalsHtml += '</div>';
-    goalsHtml += '<div class="score-btns" id="btns_' + g.key + '">';
-    for (var n = 0; n <= 5; n++) {
-      goalsHtml += '<button class="sb" data-key="' + g.key + '" data-val="' + n + '">' + n + '</button>';
-    }
-    goalsHtml += '</div></div>';
+    goalsHtml += renderCritCard(g.key, g.label, g.target, i + 1);
   });
   document.getElementById('goalsSection').innerHTML = goalsHtml;
 
-  // Competencies
   var compsHtml = '';
+  var idx = 1;
   DOMAINS.forEach(function(d) {
-    compsHtml += '<div class="domain-hd">' + d.label + '</div>';
+    compsHtml += '<div class="domain-hd"><span>&#128205;</span>' + d.label + '</div>';
     d.items.forEach(function(c, ci) {
-      compsHtml += '<div class="criterion-row" id="row_' + c.key + '">';
-      compsHtml += '<div class="criterion-info">';
-      compsHtml += '<div class="criterion-label">' + (d.id) + '.' + (ci+1) + ' ' + c.label + '</div>';
-      compsHtml += '</div>';
-      compsHtml += '<div class="score-btns" id="btns_' + c.key + '">';
-      for (var n = 0; n <= 5; n++) {
-        compsHtml += '<button class="sb" data-key="' + c.key + '" data-val="' + n + '">' + n + '</button>';
-      }
-      compsHtml += '</div></div>';
+      compsHtml += renderCritCard(c.key, d.id + '.' + (ci + 1) + ' ' + c.label, null, idx++);
     });
   });
   document.getElementById('compsSection').innerHTML = compsHtml;
 
-  // Bind score buttons
-  document.querySelectorAll('.sb').forEach(function(btn) {
+  document.querySelectorAll('.lvl-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var key = btn.getAttribute('data-key');
       var val = parseInt(btn.getAttribute('data-val'), 10);
       principalScores[key] = val;
+
       document.querySelectorAll('[data-key="' + key + '"]').forEach(function(b) {
-        b.classList.remove('sel', 'sel-high');
-        if (parseInt(b.getAttribute('data-val'), 10) === val) {
-          b.classList.add(val >= 4 ? 'sel-high' : 'sel');
-        }
+        b.classList.remove('lv-active');
       });
+      btn.classList.add('lv-active');
+
+      var card = document.getElementById('card_' + key);
+      if (card) card.classList.add('rated');
+
+      var selEl = document.getElementById('sel_' + key);
+      var lvl = null;
+      for (var li = 0; li < LEVELS.length; li++) {
+        if (LEVELS[li].val === val) { lvl = LEVELS[li]; break; }
+      }
+      if (selEl && lvl) {
+        selEl.textContent = 'تم الاختيار: ' + lvl.name;
+        selEl.style.color = lvl.color;
+      }
       updateScoreSummary();
     });
   });
 }
 
 function updateScoreSummary() {
+  var ratedCount = Object.keys(principalScores).length;
+  var pct = TOTAL_CRITERIA ? (ratedCount / TOTAL_CRITERIA * 100) : 0;
+  document.getElementById('evalProgFill').style.width = pct + '%';
+  document.getElementById('evalProgText').textContent = ratedCount + ' / ' + TOTAL_CRITERIA + ' معيار تم تقييمه';
+
   var g1vals = GOALS.map(function(g) { return principalScores[g.key] !== undefined ? principalScores[g.key] : null; });
   var g1filled = g1vals.filter(function(v) { return v !== null; });
   var p1avg = g1filled.length ? g1filled.reduce(function(a,b){return a+b;},0)/g1filled.length : null;
@@ -510,7 +542,6 @@ function updateScoreSummary() {
   }
 }
 
-// ===== STAFF SELECT =====
 function populateStaffSelect() {
   var sel = document.getElementById('evalStaff');
   allStaff.forEach(function(s) {
@@ -521,35 +552,25 @@ function populateStaffSelect() {
   });
 }
 
-// ===== OVERVIEW =====
 function renderOverview() {
   if (!allEvals.length) {
     document.getElementById('staffList').innerHTML = '<div class="empty">لا توجد تقييمات مسجّلة حتى الآن</div>';
     return;
   }
-
-  // Aggregate by staff
   var byStaff = {};
   allEvals.forEach(function(e) {
     var sid = e.staff_id;
-    if (!byStaff[sid]) {
-      byStaff[sid] = {staff_name:e.staff_name, scores:[], last_date:'', last_grade:''};
-    }
+    if (!byStaff[sid]) { byStaff[sid] = {staff_name:e.staff_name, scores:[], last_date:''}; }
     byStaff[sid].scores.push(parseFloat(e.score) || 0);
-    if (!byStaff[sid].last_date || e.eval_date > byStaff[sid].last_date) {
-      byStaff[sid].last_date = e.eval_date;
-      byStaff[sid].last_grade = e.grade || '';
-    }
+    if (!byStaff[sid].last_date || e.eval_date > byStaff[sid].last_date) { byStaff[sid].last_date = e.eval_date; }
   });
-
   var staffArr = Object.keys(byStaff).map(function(k) {
     var d = byStaff[k];
     var avg = d.scores.reduce(function(a,b){return a+b;},0) / d.scores.length;
-    return {name:d.staff_name, avg:+avg.toFixed(1), count:d.scores.length, last_date:d.last_date, last_grade:d.last_grade};
+    return {name:d.staff_name, avg:+avg.toFixed(1), count:d.scores.length, last_date:d.last_date};
   });
   staffArr.sort(function(a,b){return b.avg - a.avg;});
 
-  // KPIs
   var totalEvals = allEvals.length;
   var avgAll = staffArr.reduce(function(a,b){return a+b.avg;},0) / (staffArr.length || 1);
   var excellent = staffArr.filter(function(s){return s.avg >= 90;}).length;
@@ -563,7 +584,7 @@ function renderOverview() {
     var avg5 = s.avg / 20;
     var gi = gradeInfo(avg5);
     var initial = s.name && s.name.length > 2 ? s.name[2] : 'م';
-    html += '<div class="staff-row" onclick="filterHistory(\'' + s.name + '\')">';
+    html += '<div class="staff-row" data-name="' + (s.name || '') + '">';
     html += '<div class="avatar">' + initial + '</div>';
     html += '<div style="flex:1">';
     html += '<div class="staff-name">' + s.name + '</div>';
@@ -572,20 +593,24 @@ function renderOverview() {
     html += '</div>';
     html += '<div style="text-align:center;min-width:90px">';
     html += '<div style="font-size:1.2rem;font-weight:900;color:var(--pr)">' + s.avg + '%</div>';
-    html += '<span class="badge ' + (s.avg >= 90 ? 'badge-green' : s.avg >= 75 ? 'badge-blue' : s.avg >= 60 ? 'badge-yellow' : 'badge-red') + '">' + gi.label + '</span>';
+    var bc = s.avg >= 90 ? 'badge-green' : s.avg >= 75 ? 'badge-blue' : s.avg >= 60 ? 'badge-yellow' : 'badge-red';
+    html += '<span class="badge ' + bc + '">' + gi.label + '</span>';
     html += '</div></div>';
   });
   document.getElementById('staffList').innerHTML = html;
+
+  document.querySelectorAll('#staffList .staff-row').forEach(function(row) {
+    row.addEventListener('click', function() { filterHistory(row.getAttribute('data-name')); });
+  });
 }
 
 function kpiBox(lbl, val, color) {
-  return '<div style="background:' + color + '18;border:1px solid ' + color + '44;border-radius:12px;padding:16px;text-align:center">' +
-    '<div style="font-size:1.6rem;font-weight:900;color:' + color + '">' + val + '</div>' +
-    '<div style="font-size:.8rem;color:var(--txt2);margin-top:4px">' + lbl + '</div>' +
+  return '<div style="background:' + color + '18;border:1px solid ' + color + '44;border-radius:12px;padding:18px;text-align:center">' +
+    '<div style="font-size:1.7rem;font-weight:900;color:' + color + '">' + val + '</div>' +
+    '<div style="font-size:.8rem;color:var(--txt2);margin-top:5px">' + lbl + '</div>' +
     '</div>';
 }
 
-// ===== HISTORY =====
 function renderHistory(evals) {
   if (!evals || !evals.length) {
     document.getElementById('historyBody').innerHTML = '<tr><td colspan="8" class="empty">لا توجد تقييمات</td></tr>';
@@ -605,7 +630,8 @@ function renderHistory(evals) {
     rows += '<td>' + sd + '</td>';
     rows += '<td>' + cd + '</td>';
     rows += '<td><strong>' + score.toFixed(1) + '%</strong></td>';
-    rows += '<td><span class="badge ' + (score >= 90 ? 'badge-green' : score >= 70 ? 'badge-blue' : score >= 50 ? 'badge-yellow' : 'badge-red') + '">' + gi.label + '</span></td>';
+    var bc = score >= 90 ? 'badge-green' : score >= 70 ? 'badge-blue' : score >= 50 ? 'badge-yellow' : 'badge-red';
+    rows += '<td><span class="badge ' + bc + '">' + gi.label + '</span></td>';
     rows += '<td>' + (e.evaluator || '—') + '</td>';
     rows += '</tr>';
   });
@@ -620,13 +646,10 @@ function filterHistory(name) {
 
 function applyHistSearch() {
   var q = (document.getElementById('histSearch').value || '').trim().toLowerCase();
-  var filtered = q ? allEvals.filter(function(e) {
-    return (e.staff_name || '').toLowerCase().includes(q);
-  }) : allEvals;
+  var filtered = q ? allEvals.filter(function(e){ return (e.staff_name||'').toLowerCase().includes(q); }) : allEvals;
   renderHistory(filtered);
 }
 
-// ===== PDP =====
 async function renderPDP() {
   var data = await apiFetch('staff_pdp', 'select=*&order=progress.desc&limit=100');
   document.getElementById('pdpCount').textContent = (data.length || 0) + ' خطة';
@@ -637,15 +660,13 @@ async function renderPDP() {
   var html = '';
   data.forEach(function(p) {
     var progress = p.progress || 0;
-    var statusBadge = progress >= 100 ? 'badge-green' : progress >= 60 ? 'badge-blue' : progress >= 30 ? 'badge-yellow' : 'badge-red';
+    var sb = progress >= 100 ? 'badge-green' : progress >= 60 ? 'badge-blue' : progress >= 30 ? 'badge-yellow' : 'badge-red';
     html += '<div class="pdp-card">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">';
     html += '<div style="font-weight:700">' + (p.staff_name || '—') + '</div>';
-    html += '<div style="display:flex;gap:8px">';
-    html += '<span class="badge ' + statusBadge + '">' + progress + '%</span>';
+    html += '<div style="display:flex;gap:8px"><span class="badge ' + sb + '">' + progress + '%</span>';
     html += '<span class="badge badge-gray">' + (p.status || 'جارٍ') + '</span>';
-    html += '<span class="badge badge-gray">' + (p.academic_year || '—') + '</span>';
-    html += '</div></div>';
+    html += '<span class="badge badge-gray">' + (p.academic_year || '—') + '</span></div></div>';
     if (p.goal_1) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_1 + '</div>'; }
     if (p.goal_2) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_2 + '</div>'; }
     if (p.goal_3) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_3 + '</div>'; }
@@ -655,7 +676,6 @@ async function renderPDP() {
   document.getElementById('pdpList').innerHTML = html;
 }
 
-// ===== SAVE EVAL =====
 document.getElementById('saveBtn').addEventListener('click', saveEval);
 
 async function saveEval() {
@@ -665,19 +685,14 @@ async function saveEval() {
   var allKeys = GOALS.map(function(g){return g.key;});
   DOMAINS.forEach(function(d){d.items.forEach(function(c){allKeys.push(c.key);});});
   var missing = allKeys.filter(function(k){return principalScores[k] === undefined;});
-  if (missing.length) {
-    showToast('يرجى تقييم جميع المعايير (' + missing.length + ' لم يُقيَّم بعد)');
-    return;
-  }
+  if (missing.length) { showToast('يرجى تقييم جميع المعايير (' + missing.length + ' لم يُقيَّم بعد)'); return; }
 
   var g1vals = GOALS.map(function(g){return principalScores[g.key];});
   var p1avg = g1vals.reduce(function(a,b){return a+b;},0) / g1vals.length;
-
   var allCompKeys = [];
   DOMAINS.forEach(function(d){d.items.forEach(function(c){allCompKeys.push(c.key);});});
   var c2vals = allCompKeys.map(function(k){return principalScores[k];});
   var p2avg = c2vals.reduce(function(a,b){return a+b;},0) / c2vals.length;
-
   var overall5 = (p1avg + p2avg) / 2;
   var score100 = +(overall5 * 20).toFixed(2);
   var gi = gradeInfo(overall5);
@@ -688,7 +703,7 @@ async function saveEval() {
 
   var selectedStaff = allStaff.find(function(s){ return s.id == staffId; });
   var user = {};
-  try { user = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(e) {}
+  try { user = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(ex) {}
 
   var payload = {
     staff_id: parseInt(staffId, 10),
@@ -696,9 +711,7 @@ async function saveEval() {
     evaluator: user.name || user.name_ar || 'المدير/ة',
     eval_date: document.getElementById('evalDate').value,
     eval_type: document.getElementById('evalType').value,
-    score: score100,
-    max_score: 100,
-    grade: gi.label,
+    score: score100, max_score: 100, grade: gi.label,
     notes: document.getElementById('evalNotes').value,
     scores_detail: scores_detail
   };
@@ -712,27 +725,28 @@ async function saveEval() {
 
   if (ok) {
     showToast('تم حفظ التقييم بنجاح — ' + gi.label + ' (' + score100 + '%)');
-    // Refresh data
     allEvals = await apiFetch('staff_evaluations', 'select=*&order=eval_date.desc&limit=500');
     allEvals = allEvals || [];
     renderOverview();
     renderHistory(allEvals);
-    // Reset form
     principalScores = {};
-    document.querySelectorAll('.sb').forEach(function(b){ b.classList.remove('sel','sel-high'); });
+    document.querySelectorAll('.lvl-btn').forEach(function(b){ b.classList.remove('lv-active'); });
+    document.querySelectorAll('.crit-card').forEach(function(c){ c.classList.remove('rated'); });
+    document.querySelectorAll('[id^="sel_"]').forEach(function(s){ s.textContent = ''; });
     document.getElementById('evalStaff').value = '';
     document.getElementById('evalNotes').value = '';
     document.getElementById('p1score').textContent = '—';
     document.getElementById('p2score').textContent = '—';
     document.getElementById('totalScore').textContent = '—';
     document.getElementById('gradePill').innerHTML = '';
+    document.getElementById('evalProgFill').style.width = '0%';
+    document.getElementById('evalProgText').textContent = '0 / 19 معيار تم تقييمه';
     switchTab('history');
   } else {
     showToast('حدث خطأ أثناء الحفظ — تحقق من الاتصال');
   }
 }
 
-// ===== TABS =====
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
@@ -740,23 +754,19 @@ function switchTab(name) {
   var panel = document.getElementById('tab-' + name);
   if (tabBtn) tabBtn.classList.add('active');
   if (panel) panel.classList.add('active');
+  if (name === 'review') loadReviewQueue();
 }
 
 function setupTabs() {
   document.querySelectorAll('[data-tab]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      switchTab(el.getAttribute('data-tab'));
-    });
+    el.addEventListener('click', function() { switchTab(el.getAttribute('data-tab')); });
   });
   document.querySelectorAll('[data-tab-go]').forEach(function(el) {
-    el.addEventListener('click', function() {
-      switchTab(el.getAttribute('data-tab-go'));
-    });
+    el.addEventListener('click', function() { switchTab(el.getAttribute('data-tab-go')); });
   });
   document.getElementById('histSearch').addEventListener('input', applyHistSearch);
 }
 
-// ===== TOAST =====
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -764,25 +774,19 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
 
-
-// ═══════════════════════════════════════
-// REVIEW & APPROVE MODULE
-// ═══════════════════════════════════════
+/* REVIEW MODULE */
 var currentReviewEval = null;
 var revisionMode = false;
 
 var CRITERIA_LABELS = {
-  'g1': 'الهدف 1 — إدخال بيانات الحضور ≥95%',
-  'g2': 'الهدف 2 — نشاط وطني ≥ مرة/فصل',
-  'g3': 'الهدف 3 — تقدم الطلاب ≥5%',
-  'g4': 'الهدف 4 — معايير الملاحظة الصفية',
-  'g5': 'الهدف 5 — المسابقات (≥5 طلاب + فوز)',
-  'g6': 'الهدف 6 — خطة الدعم الأكاديمي ≥60%',
-  'c1_1': '1.1 الوعي الثقافي', 'c1_2': '1.2 الصحة النفسية للطلاب', 'c1_3': '1.3 الأخلاقيات المهنية',
-  'c2_1': '2.1 الخبرة في المادة', 'c2_2': '2.2 ممارسات التدريس', 'c2_3': '2.3 التقييم والقياس',
-  'c2_4': '2.4 التعلم مدى الحياة', 'c2_5': '2.5 التعليم المتمايز',
-  'c3_1': '3.1 الاستعداد للمستقبل', 'c3_2': '3.2 الابتكار التكنولوجي', 'c3_3': '3.3 الثقافة المحلية والعالمية',
-  'c4_1': '4.1 مجتمعات التعلم المهنية', 'c4_2': '4.2 الشراكة مع الأسرة'
+  'g1':'الهدف 1 — إدخال بيانات الحضور','g2':'الهدف 2 — نشاط وطني',
+  'g3':'الهدف 3 — تقدم الطلاب','g4':'الهدف 4 — معايير الملاحظة الصفية',
+  'g5':'الهدف 5 — المسابقات','g6':'الهدف 6 — خطة الدعم الأكاديمي',
+  'c1_1':'1.1 الوعي الثقافي','c1_2':'1.2 الصحة النفسية للطلاب','c1_3':'1.3 الأخلاقيات المهنية',
+  'c2_1':'2.1 الخبرة في المادة','c2_2':'2.2 ممارسات التدريس','c2_3':'2.3 التقييم والقياس',
+  'c2_4':'2.4 التعلم مدى الحياة','c2_5':'2.5 التعليم المتمايز',
+  'c3_1':'3.1 الاستعداد للمستقبل','c3_2':'3.2 الابتكار التكنولوجي','c3_3':'3.3 الثقافة المحلية والعالمية',
+  'c4_1':'4.1 مجتمعات التعلم المهنية','c4_2':'4.2 الشراكة مع الأسرة'
 };
 
 var ROLE_LABELS = {
@@ -796,7 +800,8 @@ var STATUS_LABELS = {
 };
 
 function getStatusPillClass(s) {
-  return {draft:'pill-draft',submitted:'pill-submitted',revision_requested:'pill-revision',approved:'pill-approved'}[s] || 'pill-draft';
+  var map = {draft:'pill-draft',submitted:'pill-submitted',revision_requested:'pill-revision',approved:'pill-approved'};
+  return map[s] || 'pill-draft';
 }
 
 async function loadReviewQueue() {
@@ -805,30 +810,23 @@ async function loadReviewQueue() {
   var banner = document.getElementById('pendingCountBanner');
   var badge = document.getElementById('pendingBadge');
   listEl.innerHTML = '<div class="empty">&#8987; جار التحميل...</div>';
-
   try {
     var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
     var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
     var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?select=*&order=submitted_at.desc&limit=200', {
-      headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY }
+      headers: {apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY}
     });
     var allEv = await res.json();
     if (!Array.isArray(allEv)) allEv = [];
+    var pending = allEv.filter(function(e){ return e.status === 'submitted' || e.status === 'revision_requested'; });
+    var approved = allEv.filter(function(e){ return e.status === 'approved'; });
 
-    var pending = allEv.filter(function(e) { return e.status === 'submitted' || e.status === 'revision_requested'; });
-    var approved = allEv.filter(function(e) { return e.status === 'approved'; });
-
-    // Update badge
     if (pending.length > 0) {
-      badge.textContent = pending.length;
-      badge.style.display = 'inline';
-      banner.style.display = 'block';
+      badge.textContent = pending.length; badge.style.display = 'inline'; banner.style.display = 'block';
     } else {
-      badge.style.display = 'none';
-      banner.style.display = 'none';
+      badge.style.display = 'none'; banner.style.display = 'none';
     }
 
-    // Render pending
     if (!pending.length) {
       listEl.innerHTML = '<div class="empty">&#9989; لا توجد تقييمات بانتظار الاعتماد</div>';
     } else {
@@ -837,58 +835,51 @@ async function loadReviewQueue() {
         var nameLabel = e.staff_name || e.staff_db_id || '—';
         var roleLabel = ROLE_LABELS[e.role_key || e.eval_type] || (e.eval_type || '—');
         var dateLabel = e.submitted_at ? e.submitted_at.split('T')[0] : (e.eval_date || '—');
-        var pillClass = getStatusPillClass(e.status);
-        var statusLabel = STATUS_LABELS[e.status] || e.status;
+        var pillCls = getStatusPillClass(e.status);
+        var statusLbl = STATUS_LABELS[e.status] || e.status;
         html += '<div class="review-card" data-eid="' + e.id + '">';
         html += '<div class="avatar">' + (nameLabel.charAt(0) || 'م') + '</div>';
         html += '<div style="flex:1"><div class="rc-name">' + nameLabel + '</div>';
         html += '<div class="rc-meta">' + roleLabel + ' · أُرسل: ' + dateLabel + '</div></div>';
-        html += '<span class="review-status-pill ' + pillClass + '">' + statusLabel + '</span>';
+        html += '<span class="review-status-pill ' + pillCls + '">' + statusLbl + '</span>';
         html += '<button class="btn btn-pr" style="font-size:.8rem;padding:7px 16px">مراجعة</button>';
         html += '</div>';
       });
       listEl.innerHTML = html;
       pending.forEach(function(e) {
         var card = listEl.querySelector('[data-eid="' + e.id + '"]');
-        if (card) {
-          card.addEventListener('click', function() { openReviewModal(e); });
-        }
+        if (card) { card.addEventListener('click', function(){ openReviewModal(e); }); }
       });
     }
 
-    // Render approved
     if (!approved.length) {
       approvedEl.innerHTML = '<div class="empty">لا توجد تقييمات مكتملة</div>';
     } else {
       var ahtml = '<div class="tbl-wrap"><table><thead><tr><th>الموظف/ة</th><th>الدور</th><th>تاريخ الاعتماد</th><th>الحالة</th></tr></thead><tbody>';
       approved.forEach(function(e) {
-        var nameLabel = e.staff_name || e.staff_db_id || '—';
-        var roleLabel = ROLE_LABELS[e.role_key || e.eval_type] || '—';
-        var dateLabel = e.approved_at ? e.approved_at.split('T')[0] : '—';
-        ahtml += '<tr><td>' + nameLabel + '</td><td>' + roleLabel + '</td><td>' + dateLabel + '</td><td><span class="review-status-pill pill-approved">مُعتمَد</span></td></tr>';
+        var n = e.staff_name || e.staff_db_id || '—';
+        var r = ROLE_LABELS[e.role_key || e.eval_type] || '—';
+        var dt = e.approved_at ? e.approved_at.split('T')[0] : '—';
+        ahtml += '<tr><td>' + n + '</td><td>' + r + '</td><td>' + dt + '</td><td><span class="review-status-pill pill-approved">مُعتمَد</span></td></tr>';
       });
       ahtml += '</tbody></table></div>';
       approvedEl.innerHTML = ahtml;
     }
-
   } catch(err) {
     listEl.innerHTML = '<div class="empty">خطأ في التحميل</div>';
-    console.warn('loadReviewQueue:', err);
   }
 }
 
 function openReviewModal(evalObj) {
   currentReviewEval = evalObj;
   revisionMode = false;
-
   document.getElementById('reviewModal').classList.add('open');
   var nameLabel = evalObj.staff_name || evalObj.staff_db_id || '—';
   var roleLabel = ROLE_LABELS[evalObj.role_key || evalObj.eval_type] || '—';
   document.getElementById('modalTitle').textContent = 'مراجعة تقييم: ' + nameLabel + ' — ' + roleLabel;
 
-  // Self scores
   var selfScores = evalObj.self_scores || {};
-  var keys = Object.keys(selfScores).filter(function(k) { return !k.startsWith('note_'); });
+  var keys = Object.keys(selfScores).filter(function(k){ return !k.startsWith('note_'); });
   var html = '';
   if (!keys.length) {
     html = '<div style="color:var(--txt2);font-size:.85rem">لم يملأ الموظف/ة التقييم الذاتي بعد</div>';
@@ -897,30 +888,26 @@ function openReviewModal(evalObj) {
       var label = CRITERIA_LABELS[k] || k;
       var val = selfScores[k];
       var note = selfScores['note_' + k] || '';
-      var ratingLabel = val >= 4.5 ? 'استثنائي' : val >= 3.5 ? 'يفوق التوقعات' : val >= 2.5 ? 'يلبي التوقعات' : val >= 1.5 ? 'دون التوقعات' : 'غير مقبول';
+      var rLbl = val >= 4.5 ? 'استثنائي' : val >= 3.5 ? 'يفوق التوقعات' : val >= 2.5 ? 'يلبي التوقعات' : val >= 1.5 ? 'دون التوقعات' : 'غير مقبول';
       html += '<div class="self-score-row">';
       html += '<span class="self-score-label">' + label + '</span>';
-      html += '<span class="self-score-val">' + val + ' / 5 — ' + ratingLabel + '</span>';
+      html += '<span class="self-score-val">' + val + ' / 5 — ' + rLbl + '</span>';
       if (note) html += '<span class="self-score-note">ملاحظة: ' + note + '</span>';
       html += '</div>';
     });
   }
   document.getElementById('selfScoresList').innerHTML = html;
 
-  // Evidence files
   var files = evalObj.evidence_files || [];
   var filesSection = document.getElementById('modalEvidenceFiles');
   if (files.length > 0) {
-    var fhtml = files.map(function(f) {
-      return '<span class="evidence-file-pill">&#128206; ' + (f.name || 'ملف') + '</span>';
-    }).join('');
+    var fhtml = files.map(function(f){ return '<span class="evidence-file-pill">&#128206; ' + (f.name || 'ملف') + '</span>'; }).join('');
     document.getElementById('evidenceFilesList').innerHTML = fhtml;
     filesSection.style.display = 'block';
   } else {
     filesSection.style.display = 'none';
   }
 
-  // Previous revision note
   var revSection = document.getElementById('modalRevisionSection');
   if (evalObj.revision_note) {
     document.getElementById('prevRevisionNote').textContent = evalObj.revision_note;
@@ -929,7 +916,6 @@ function openReviewModal(evalObj) {
     revSection.style.display = 'none';
   }
 
-  // Reset revision input
   document.getElementById('revisionRequestSection').style.display = 'none';
   document.getElementById('revisionNoteInput').value = '';
   document.getElementById('sendRevisionBtn').style.display = 'none';
@@ -944,79 +930,49 @@ function closeReviewModal() {
 
 function toggleRevisionInput() {
   revisionMode = !revisionMode;
-  var revSection = document.getElementById('revisionRequestSection');
-  var sendBtn = document.getElementById('sendRevisionBtn');
-  var reqBtn = document.getElementById('requestRevisionBtn');
-  revSection.style.display = revisionMode ? 'block' : 'none';
-  sendBtn.style.display = revisionMode ? 'inline-block' : 'none';
-  reqBtn.textContent = revisionMode ? '&#10005; إلغاء' : '&#9998; طلب تعديل';
+  document.getElementById('revisionRequestSection').style.display = revisionMode ? 'block' : 'none';
+  document.getElementById('sendRevisionBtn').style.display = revisionMode ? 'inline-block' : 'none';
+  document.getElementById('requestRevisionBtn').innerHTML = revisionMode ? '&#10005; إلغاء' : '&#9998; طلب تعديل';
 }
 
 async function sendRevisionRequest() {
   if (!currentReviewEval) return;
   var note = document.getElementById('revisionNoteInput').value.trim();
   if (!note) { showToast('يرجى كتابة ملاحظة التعديل'); return; }
-
   var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
   var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
-
   var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?id=eq.' + currentReviewEval.id, {
-    method: 'PATCH',
-    headers: {
-      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify({ status: 'revision_requested', revision_note: note, reviewed_at: new Date().toISOString() })
+    method:'PATCH',
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify({status:'revision_requested',revision_note:note,reviewed_at:new Date().toISOString()})
   });
-
   if (res.ok || res.status === 204) {
-    showToast('&#9989; تم إرسال طلب التعديل للموظف/ة');
-    closeReviewModal();
-    loadReviewQueue();
-  } else {
-    showToast('خطأ في الإرسال');
-  }
+    showToast('تم إرسال طلب التعديل للموظف/ة');
+    closeReviewModal(); loadReviewQueue();
+  } else { showToast('خطأ في الإرسال'); }
 }
 
 async function approveEvaluation() {
   if (!currentReviewEval) return;
-  var confirmed = confirm('تأكيد اعتماد تقييم: ' + (currentReviewEval.staff_name || currentReviewEval.staff_db_id || '—') + ' ؟');
+  var confirmed = confirm('تأكيد اعتماد تقييم: ' + (currentReviewEval.staff_name || '—') + ' ؟');
   if (!confirmed) return;
-
   var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
   var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
-
   var res = await fetch(SB_URL + '/rest/v1/staff_evaluations?id=eq.' + currentReviewEval.id, {
-    method: 'PATCH',
-    headers: {
-      apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-    },
-    body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString() })
+    method:'PATCH',
+    headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body: JSON.stringify({status:'approved',approved_at:new Date().toISOString()})
   });
-
   if (res.ok || res.status === 204) {
-    showToast('&#9989; تم اعتماد التقييم بنجاح');
-    closeReviewModal();
-    loadReviewQueue();
-  } else {
-    showToast('خطأ في الاعتماد');
-  }
+    showToast('تم اعتماد التقييم بنجاح');
+    closeReviewModal(); loadReviewQueue();
+  } else { showToast('خطأ في الاعتماد'); }
 }
 
-// Close modal on overlay click
 document.addEventListener('DOMContentLoaded', function() {
   var overlay = document.getElementById('reviewModal');
-  if (overlay) {
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) closeReviewModal();
-    });
-  }
+  if (overlay) { overlay.addEventListener('click', function(e){ if (e.target === overlay) closeReviewModal(); }); }
 });
-
-// Load review queue when tab activated
-var origSwitchTab = switchTab;
-switchTab = function(name) { origSwitchTab(name); if (name === "review") loadReviewQueue(); };
 
 init();
 </script>
