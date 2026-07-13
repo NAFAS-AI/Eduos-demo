@@ -1967,6 +1967,7 @@ function autoSaveDraft() {
   if (appraisalLocked || !currentAppraisal) return;
   clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(async function() {
+    if (appraisalLocked || !currentAppraisal) return;
     var scores = collectSelfScores();
     await sb.from('staff_evaluations')
       .update({ self_scores: scores, status: 'draft' })
