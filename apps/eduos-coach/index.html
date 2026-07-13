@@ -932,6 +932,16 @@ async function coachDbPost(table, body) {
 async function loadMyAppraisal() {
   var staffId = COACH && (COACH.id || COACH.staff_db_id);
   if (!staffId) return;
+  // Check appraisal period
+  var _apS=await coachDbGet('app_settings','select=value&key=eq.appraisal_open&limit=1');
+  var _apO=_apS&&_apS[0]&&_apS[0].value===true;
+  if(!_apO){
+    document.getElementById('coachAppraisalLoading').style.display='none';
+    var _ac=document.getElementById('coachAppraisalContent');
+    _ac.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">&#x1F512;</div><p style="font-size:18px;font-weight:700">Appraisal Period Closed</p><p style="color:#64748b;margin-top:8px;font-size:14px">Please wait for the principal to open the appraisal period.</p></div>';
+    _ac.style.display='block';
+    return;
+  }
   document.getElementById('coachAppraisalLoading').style.display = 'block';
   document.getElementById('coachAppraisalContent').style.display = 'none';
 

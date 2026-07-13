@@ -380,6 +380,15 @@ async function loadAutoEvidence(){
 async function loadMyAppraisal(){
   var staffId = user&&(user.id||user.staff_db_id);
   if(!staffId)return;
+  var _apS=await dbGet('app_settings','select=value&key=eq.appraisal_open&limit=1');
+  var _apO=_apS&&_apS[0]&&_apS[0].value===true;
+  if(!_apO){
+    document.getElementById('appraisalLoading').style.display='none';
+    var _ac=document.getElementById('appraisalContent');
+    _ac.innerHTML='<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:16px">&#x1F512;</div><p style="font-size:18px;font-weight:700">&#x641;&#x62A;&#x631;&#x629; &#x627;&#x644;&#x62A;&#x642;&#x64A;&#x64A;&#x645; &#x645;&#x63A;&#x644;&#x642;&#x629; &#x62D;&#x627;&#x644;&#x64A;&#x64B;&#x627;</p><p style="color:#64748b;margin-top:8px;font-size:14px">&#x64A;&#x64F;&#x631;&#x62C;&#x649; &#x627;&#x644;&#x627;&#x646;&#x62A;&#x638;&#x627;&#x631; &#x62D;&#x62A;&#x649; &#x64A;&#x64F;&#x639;&#x644;&#x646; &#x627;&#x644;&#x645;&#x62F;&#x64A;&#x631; &#x639;&#x646; &#x628;&#x62F;&#x621; &#x641;&#x62A;&#x631;&#x629; &#x627;&#x644;&#x62A;&#x642;&#x64A;&#x64A;&#x645;</p></div>';
+    _ac.style.display='block';
+    return;
+  }
   document.getElementById("appraisalLoading").style.display="block";
   document.getElementById("appraisalContent").style.display="none";
   var acYear="2025-2026";
