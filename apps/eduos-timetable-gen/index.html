@@ -437,292 +437,6 @@ table.ttt tr.brow td{background:#FFFBEB;color:#D97706;font-weight:700;font-size:
 <div class="toast" id="toast"></div>
 
 
-/* ════════════════════════════════════════════════
-   MULTI-STAGE SUPPORT
-════════════════════════════════════════════════ */
-
-var GRADE_ORDER = ['KG1','KG2','1','2','3','4','5','6','7','8','9','10','11','12'];
-function gradeToIndex(g){ var i=GRADE_ORDER.indexOf(String(g)); return i<0?999:i; }
-
-function parseGradeKey(cls){
-  if(!cls) return null;
-  var m=String(cls).match(/^(KG\d+)/i); if(m) return m[1].toUpperCase();
-  m=String(cls).match(/^(\d+)/); if(m) return m[1];
-  return cls;
-}
-
-function getStageForClass(cls){
-  if(!STATE.multiStage||!STATE.stages.length) return null;
-  var gi=gradeToIndex(parseGradeKey(cls));
-  for(var i=0;i<STATE.stages.length;i++){
-    var s=STATE.stages[i];
-    if(gi>=gradeToIndex(s.gradeFrom)&&gi<=gradeToIndex(s.gradeTo)) return s;
-  }
-  return null;
-}
-
-function getClassPpd(cls){
-  var s=getStageForClass(cls);
-  return s?s.periodsPerDay:(parseInt(document.getElementById('periodsPerDay').value)||7);
-}
-
-function getClassFridayPpd(cls){
-  var s=getStageForClass(cls);
-  return s?(s.fridayPpd||4):(STATE.fridayPeriodsPerDay||4);
-}
-
-function computeScheduleForStage(stage){
-  var rows=[];
-  var cur=timeToMins(stage.startTime||'07:30');
-  var dur=parseInt(stage.periodDuration)||45;
-  var breaks=(stage.breaks||[]).slice().sort(function(a,b){return parseInt(a.afterPeriod)-parseInt(b.afterPeriod);});
-  for(var p=1;p<=stage.periodsPerDay;p++){
-    var end=cur+dur;
-    rows.push({type:'period',period:p,startTime:minsToTime(cur),endTime:minsToTime(end)});
-    cur=end;
-    var brk=null;
-    for(var bi=0;bi<breaks.length;bi++){ if(parseInt(breaks[bi].afterPeriod)===p){brk=breaks[bi];break;} }
-    if(brk){ var bd=parseInt(brk.duration||20); rows.push({type:'break',nameAr:brk.nameAr||'استراحة',startTime:minsToTime(cur),endTime:minsToTime(cur+bd)}); cur+=bd; }
-  }
-  return rows;
-}
-
-function onStageModeChange(val){
-  STATE.multiStage=(val==='multi');
-  var sc=document.getElementById('stagesContainer');
-  var sb=document.getElementById('stagesBtnRow');
-  sc.style.display=val==='multi'?'':'none';
-  sb.style.display=val==='multi'?'':'none';
-  if(val==='multi'&&STATE.stages.length===0){
-    STATE.stages=[
-      {id:1,name:'الحلقة الأولى',gradeFrom:'KG1',gradeTo:'4',periodsPerDay:7,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4},
-      {id:2,name:'الحلقة الثانية',gradeFrom:'5',gradeTo:'8',periodsPerDay:8,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4},
-      {id:3,name:'الحلقة الثالثة',gradeFrom:'9',gradeTo:'12',periodsPerDay:8,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4}
-    ];
-    renderStageCards();
-  }
-}
-
-/* Wire radio buttons after DOM ready */
-(function(){
-  function wireStageRadios(){
-    document.querySelectorAll('input[name="stageMode"]').forEach(function(r){
-      r.addEventListener('change',function(){onStageModeChange(this.value);});
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wireStageRadios);
-  else wireStageRadios();
-})();
-
-var _stageIdCtr=10;
-function addStageCard(preset){
-  _stageIdCtr++;
-  STATE.stages.push(preset||{id:_stageIdCtr,name:'مرحلة جديدة',gradeFrom:'1',gradeTo:'4',periodsPerDay:7,periodDuration:45,startTime:'07:30',breaks:[],fridayPpd:4});
-  renderStageCards();
-}
-
-function removeStageCard(id){
-  STATE.stages=STATE.stages.filter(function(s){return s.id!==id;});
-  renderStageCards();
-}
-
-function updateStageField(id,field,val){
-  var stage=STATE.stages.find(function(s){return s.id===id;});
-  if(!stage) return;
-  if(['periodsPerDay','periodDuration','fridayPpd'].indexOf(field)>=0) val=parseInt(val)||7;
-  stage[field]=val;
-}
-
-function renderStageCards(){
-  var cont=document.getElementById('stagesContainer');
-  if(!cont) return;
-  cont.innerHTML='';
-  var gradeOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'">'+g+'</option>';}).join('');
-  STATE.stages.forEach(function(stage){
-    var fromOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'"'+(g===stage.gradeFrom?' selected':'')+'>'+g+'</option>';}).join('');
-    var toOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'"'+(g===stage.gradeTo?' selected':'')+'>'+g+'</option>';}).join('');
-    var card=document.createElement('div');
-    card.className='stage-card';
-    card.innerHTML=
-      '<div class="stage-card-hdr">'+
-        '<span class="stage-badge">'+stage.name+'</span>'+
-        '<input type="text" value="'+stage.name+'" style="border:none;background:transparent;font-weight:800;font-size:15px;color:#6C3DD6;flex:1;margin:0 10px;outline:none;min-width:0" placeholder="اسم المرحلة" data-sid="'+stage.id+'" data-field="name">'+
-        '<button onclick="removeStageCard('+stage.id+')" style="background:#FEE2E2;border:none;border-radius:6px;padding:4px 10px;color:#DC2626;cursor:pointer;font-size:12px;white-space:nowrap">حذف ✕</button>'+
-      '</div>'+
-      '<div class="field-row" style="flex-wrap:wrap">'+
-        '<div class="fg" style="min-width:80px"><label>من الصف</label><select data-sid="'+stage.id+'" data-field="gradeFrom" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%">'+fromOpts+'</select></div>'+
-        '<div class="fg" style="min-width:80px"><label>إلى الصف</label><select data-sid="'+stage.id+'" data-field="gradeTo" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%">'+toOpts+'</select></div>'+
-        '<div class="fg" style="min-width:80px"><label>حصص/يوم</label><input type="number" value="'+stage.periodsPerDay+'" min="3" max="12" data-sid="'+stage.id+'" data-field="periodsPerDay" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
-        '<div class="fg" style="min-width:100px"><label>وقت البداية</label><input type="time" value="'+stage.startTime+'" data-sid="'+stage.id+'" data-field="startTime" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
-        '<div class="fg" style="min-width:80px"><label>مدة الحصة(د)</label><input type="number" value="'+stage.periodDuration+'" min="20" max="90" data-sid="'+stage.id+'" data-field="periodDuration" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
-        '<div class="fg" style="min-width:80px"><label>حصص الجمعة</label><input type="number" value="'+(stage.fridayPpd||4)+'" min="1" max="10" data-sid="'+stage.id+'" data-field="fridayPpd" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
-      '</div>';
-    card.querySelectorAll('[data-sid]').forEach(function(el){
-      el.addEventListener('change',function(){updateStageField(parseInt(this.dataset.sid),this.dataset.field,this.value);});
-      el.addEventListener('input',function(){updateStageField(parseInt(this.dataset.sid),this.dataset.field,this.value);});
-    });
-    cont.appendChild(card);
-  });
-}
-
-/* ════════════════════════════════════════════════
-   FULL SCHOOL VIEW
-════════════════════════════════════════════════ */
-
-function renderFullSchoolView(){
-  var wrap=document.getElementById('prevWrap');
-  wrap.innerHTML='';
-
-  var printHdr=document.createElement('div');
-  printHdr.className='full-school-print-hdr';
-  printHdr.textContent='الجدول المدرسي الكامل — Full School Timetable';
-  wrap.appendChild(printHdr);
-
-  /* Group classes by stage */
-  var groups=[];
-  var allGrouped=[];
-  if(STATE.multiStage&&STATE.stages.length){
-    STATE.stages.forEach(function(stage){
-      var stageClasses=STATE.selectedClasses.filter(function(cls){
-        var gi=gradeToIndex(parseGradeKey(cls));
-        return gi>=gradeToIndex(stage.gradeFrom)&&gi<=gradeToIndex(stage.gradeTo);
-      }).sort(function(a,b){return a.localeCompare(b);});
-      if(stageClasses.length){
-        groups.push({label:stage.name+' (الصف '+stage.gradeFrom+' – '+stage.gradeTo+')',classes:stageClasses,stage:stage});
-        stageClasses.forEach(function(c){allGrouped.push(c);});
-      }
-    });
-    var unmatched=STATE.selectedClasses.filter(function(c){return allGrouped.indexOf(c)<0;});
-    if(unmatched.length) groups.push({label:'غير مصنّف',classes:unmatched.sort(),stage:null});
-  } else {
-    groups.push({label:'جميع الفصول — All Classes',classes:STATE.selectedClasses.slice().sort(function(a,b){return a.localeCompare(b);}),stage:null});
-  }
-
-  groups.forEach(function(group){
-    var section=document.createElement('div');
-    section.className='full-school-section';
-
-    var hdr=document.createElement('div');
-    hdr.className='full-school-stage-hdr';
-    hdr.innerHTML='🏫 '+group.label+'&nbsp;<span style="background:rgba(255,255,255,.2);border-radius:10px;padding:2px 10px;font-size:13px">'+group.classes.length+' فصل</span>';
-    section.appendChild(hdr);
-
-    var grid=document.createElement('div');
-    grid.className='full-school-grid';
-    group.classes.forEach(function(cls){
-      grid.appendChild(buildMiniClassCard(cls,group.stage));
-    });
-    section.appendChild(grid);
-    wrap.appendChild(section);
-  });
-}
-
-/* Day abbreviations for mini view */
-var DAY_ABBR={'الاثنين':'ث١','الثلاثاء':'ث٢','الأربعاء':'أر','الخميس':'خم','الجمعة':'جم'};
-
-function buildMiniClassCard(cls,stage){
-  var card=document.createElement('div');
-  card.className='mini-class-card';
-
-  var hdr=document.createElement('div');
-  hdr.className='mini-class-hdr';
-  hdr.textContent='الصف '+cls;
-  card.appendChild(hdr);
-
-  var schedule=stage?computeScheduleForStage(stage):computeSchedule();
-  var days=STATE.selectedDays;
-  var tt=STATE.timetable[cls];
-  var ppd=stage?stage.periodsPerDay:STATE.periodsPerDay;
-  var frPpd=stage?(stage.fridayPpd||4):(STATE.fridayPeriodsPerDay||4);
-
-  if(!tt){
-    var nd=document.createElement('div');
-    nd.style.cssText='color:#9CA3AF;font-size:12px;text-align:center;padding:12px';
-    nd.textContent='لا بيانات';
-    card.appendChild(nd);
-    return card;
-  }
-
-  var tbl=document.createElement('table');
-  tbl.className='mini-ttt';
-
-  var thead=document.createElement('thead');
-  var hrow=document.createElement('tr');
-  var th0=document.createElement('th');
-  th0.textContent='#';
-  hrow.appendChild(th0);
-  days.forEach(function(d){
-    var th=document.createElement('th');
-    th.textContent=DAY_ABBR[d]||d.substring(0,2);
-    hrow.appendChild(th);
-  });
-  thead.appendChild(hrow);
-  tbl.appendChild(thead);
-
-  var tbody=document.createElement('tbody');
-  schedule.forEach(function(row){
-    var tr=document.createElement('tr');
-    if(row.type==='break'){
-      var btd=document.createElement('td');
-      btd.colSpan=days.length+1;
-      btd.style.cssText='text-align:center;color:#6B7280;font-size:9px;padding:2px;background:#FEF9C3';
-      btd.textContent='☕ '+row.nameAr;
-      tr.appendChild(btd);
-    } else {
-      var timeTd=document.createElement('td');
-      timeTd.style.cssText='font-size:9px;color:#6B7280;white-space:nowrap;padding:2px 3px;text-align:center;font-weight:700';
-      timeTd.textContent=row.period;
-      tr.appendChild(timeTd);
-      days.forEach(function(day){
-        var mxPd=maxPeriodsForDay(day,ppd,frPpd);
-        var td=document.createElement('td');
-        td.style.padding='2px';
-        if(row.period>mxPd){
-          var offDiv=document.createElement('div');
-          offDiv.style.cssText='background:#F1F5F9;min-height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94A3B8';
-          offDiv.textContent='—';
-          td.appendChild(offDiv);
-        } else {
-          var slot=tt[day]&&tt[day][row.period];
-          if(slot){
-            var cellDiv=document.createElement('div');
-            cellDiv.className='mini-scell';
-            cellDiv.style.background=getSubjectColor(slot.subject);
-            cellDiv.style.color=getSubjectTColor(slot.subject);
-            var subjEl=document.createElement('div');
-            subjEl.style.cssText='font-weight:700;font-size:10px';
-            subjEl.textContent=slot.subject||'';
-            cellDiv.appendChild(subjEl);
-            if(slot.isVacant){
-              var vEl=document.createElement('div');
-              vEl.style.cssText='font-size:9px;color:#EF4444;font-weight:700';
-              vEl.textContent='⬜ شاغر';
-              cellDiv.appendChild(vEl);
-            } else if(slot.teacherNameAr&&slot.teacherNameAr!=='شاغر'){
-              var tEl=document.createElement('div');
-              tEl.style.cssText='font-size:9px;opacity:.75';
-              var tName=slot.teacherNameAr.split(' ');
-              tEl.textContent=tName.length>1?tName[1]:tName[0];
-              cellDiv.appendChild(tEl);
-            }
-            td.appendChild(cellDiv);
-          } else {
-            var emptyDiv=document.createElement('div');
-            emptyDiv.className='sempty';
-            emptyDiv.style.minHeight='26px';
-            td.appendChild(emptyDiv);
-          }
-        }
-        tr.appendChild(td);
-      });
-    }
-    tbody.appendChild(tr);
-  });
-  tbl.appendChild(tbody);
-  card.appendChild(tbl);
-  return card;
-}
-
 <script src="../platform-shield.js"></script>
 <script src="../platform-lang.js"></script>
 <script src="../platform-motd.js"></script>
@@ -1910,6 +1624,294 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }).catch(function(){});
 });
+
+/* ════════════════════════════════════════════════
+   MULTI-STAGE SUPPORT
+════════════════════════════════════════════════ */
+
+var GRADE_ORDER = ['KG1','KG2','1','2','3','4','5','6','7','8','9','10','11','12'];
+function gradeToIndex(g){ var i=GRADE_ORDER.indexOf(String(g)); return i<0?999:i; }
+
+function parseGradeKey(cls){
+  if(!cls) return null;
+  var m=String(cls).match(/^(KG\d+)/i); if(m) return m[1].toUpperCase();
+  m=String(cls).match(/^(\d+)/); if(m) return m[1];
+  return cls;
+}
+
+function getStageForClass(cls){
+  if(!STATE.multiStage||!STATE.stages.length) return null;
+  var gi=gradeToIndex(parseGradeKey(cls));
+  for(var i=0;i<STATE.stages.length;i++){
+    var s=STATE.stages[i];
+    if(gi>=gradeToIndex(s.gradeFrom)&&gi<=gradeToIndex(s.gradeTo)) return s;
+  }
+  return null;
+}
+
+function getClassPpd(cls){
+  var s=getStageForClass(cls);
+  return s?s.periodsPerDay:(parseInt(document.getElementById('periodsPerDay').value)||7);
+}
+
+function getClassFridayPpd(cls){
+  var s=getStageForClass(cls);
+  return s?(s.fridayPpd||4):(STATE.fridayPeriodsPerDay||4);
+}
+
+function computeScheduleForStage(stage){
+  var rows=[];
+  var cur=timeToMins(stage.startTime||'07:30');
+  var dur=parseInt(stage.periodDuration)||45;
+  var breaks=(stage.breaks||[]).slice().sort(function(a,b){return parseInt(a.afterPeriod)-parseInt(b.afterPeriod);});
+  for(var p=1;p<=stage.periodsPerDay;p++){
+    var end=cur+dur;
+    rows.push({type:'period',period:p,startTime:minsToTime(cur),endTime:minsToTime(end)});
+    cur=end;
+    var brk=null;
+    for(var bi=0;bi<breaks.length;bi++){ if(parseInt(breaks[bi].afterPeriod)===p){brk=breaks[bi];break;} }
+    if(brk){ var bd=parseInt(brk.duration||20); rows.push({type:'break',nameAr:brk.nameAr||'استراحة',startTime:minsToTime(cur),endTime:minsToTime(cur+bd)}); cur+=bd; }
+  }
+  return rows;
+}
+
+function onStageModeChange(val){
+  STATE.multiStage=(val==='multi');
+  var sc=document.getElementById('stagesContainer');
+  var sb=document.getElementById('stagesBtnRow');
+  sc.style.display=val==='multi'?'':'none';
+  sb.style.display=val==='multi'?'':'none';
+  if(val==='multi'&&STATE.stages.length===0){
+    STATE.stages=[
+      {id:1,name:'الحلقة الأولى',gradeFrom:'KG1',gradeTo:'4',periodsPerDay:7,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4},
+      {id:2,name:'الحلقة الثانية',gradeFrom:'5',gradeTo:'8',periodsPerDay:8,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4},
+      {id:3,name:'الحلقة الثالثة',gradeFrom:'9',gradeTo:'12',periodsPerDay:8,periodDuration:45,startTime:'07:30',breaks:[{afterPeriod:2,duration:20,nameAr:'استراحة الصباح'},{afterPeriod:5,duration:10,nameAr:'استراحة قصيرة'}],fridayPpd:4}
+    ];
+    renderStageCards();
+  }
+}
+
+/* Wire radio buttons after DOM ready */
+(function(){
+  function wireStageRadios(){
+    document.querySelectorAll('input[name="stageMode"]').forEach(function(r){
+      r.addEventListener('change',function(){onStageModeChange(this.value);});
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',wireStageRadios);
+  else wireStageRadios();
+})();
+
+var _stageIdCtr=10;
+function addStageCard(preset){
+  _stageIdCtr++;
+  STATE.stages.push(preset||{id:_stageIdCtr,name:'مرحلة جديدة',gradeFrom:'1',gradeTo:'4',periodsPerDay:7,periodDuration:45,startTime:'07:30',breaks:[],fridayPpd:4});
+  renderStageCards();
+}
+
+function removeStageCard(id){
+  STATE.stages=STATE.stages.filter(function(s){return s.id!==id;});
+  renderStageCards();
+}
+
+function updateStageField(id,field,val){
+  var stage=STATE.stages.find(function(s){return s.id===id;});
+  if(!stage) return;
+  if(['periodsPerDay','periodDuration','fridayPpd'].indexOf(field)>=0) val=parseInt(val)||7;
+  stage[field]=val;
+}
+
+function renderStageCards(){
+  var cont=document.getElementById('stagesContainer');
+  if(!cont) return;
+  cont.innerHTML='';
+  var gradeOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'">'+g+'</option>';}).join('');
+  STATE.stages.forEach(function(stage){
+    var fromOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'"'+(g===stage.gradeFrom?' selected':'')+'>'+g+'</option>';}).join('');
+    var toOpts=GRADE_ORDER.map(function(g){return '<option value="'+g+'"'+(g===stage.gradeTo?' selected':'')+'>'+g+'</option>';}).join('');
+    var card=document.createElement('div');
+    card.className='stage-card';
+    card.innerHTML=
+      '<div class="stage-card-hdr">'+
+        '<span class="stage-badge">'+stage.name+'</span>'+
+        '<input type="text" value="'+stage.name+'" style="border:none;background:transparent;font-weight:800;font-size:15px;color:#6C3DD6;flex:1;margin:0 10px;outline:none;min-width:0" placeholder="اسم المرحلة" data-sid="'+stage.id+'" data-field="name">'+
+        '<button onclick="removeStageCard('+stage.id+')" style="background:#FEE2E2;border:none;border-radius:6px;padding:4px 10px;color:#DC2626;cursor:pointer;font-size:12px;white-space:nowrap">حذف ✕</button>'+
+      '</div>'+
+      '<div class="field-row" style="flex-wrap:wrap">'+
+        '<div class="fg" style="min-width:80px"><label>من الصف</label><select data-sid="'+stage.id+'" data-field="gradeFrom" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%">'+fromOpts+'</select></div>'+
+        '<div class="fg" style="min-width:80px"><label>إلى الصف</label><select data-sid="'+stage.id+'" data-field="gradeTo" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%">'+toOpts+'</select></div>'+
+        '<div class="fg" style="min-width:80px"><label>حصص/يوم</label><input type="number" value="'+stage.periodsPerDay+'" min="3" max="12" data-sid="'+stage.id+'" data-field="periodsPerDay" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
+        '<div class="fg" style="min-width:100px"><label>وقت البداية</label><input type="time" value="'+stage.startTime+'" data-sid="'+stage.id+'" data-field="startTime" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
+        '<div class="fg" style="min-width:80px"><label>مدة الحصة(د)</label><input type="number" value="'+stage.periodDuration+'" min="20" max="90" data-sid="'+stage.id+'" data-field="periodDuration" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
+        '<div class="fg" style="min-width:80px"><label>حصص الجمعة</label><input type="number" value="'+(stage.fridayPpd||4)+'" min="1" max="10" data-sid="'+stage.id+'" data-field="fridayPpd" style="padding:8px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;width:100%"></div>'+
+      '</div>';
+    card.querySelectorAll('[data-sid]').forEach(function(el){
+      el.addEventListener('change',function(){updateStageField(parseInt(this.dataset.sid),this.dataset.field,this.value);});
+      el.addEventListener('input',function(){updateStageField(parseInt(this.dataset.sid),this.dataset.field,this.value);});
+    });
+    cont.appendChild(card);
+  });
+}
+
+/* ════════════════════════════════════════════════
+   FULL SCHOOL VIEW
+════════════════════════════════════════════════ */
+
+function renderFullSchoolView(){
+  var wrap=document.getElementById('prevWrap');
+  wrap.innerHTML='';
+
+  var printHdr=document.createElement('div');
+  printHdr.className='full-school-print-hdr';
+  printHdr.textContent='الجدول المدرسي الكامل — Full School Timetable';
+  wrap.appendChild(printHdr);
+
+  /* Group classes by stage */
+  var groups=[];
+  var allGrouped=[];
+  if(STATE.multiStage&&STATE.stages.length){
+    STATE.stages.forEach(function(stage){
+      var stageClasses=STATE.selectedClasses.filter(function(cls){
+        var gi=gradeToIndex(parseGradeKey(cls));
+        return gi>=gradeToIndex(stage.gradeFrom)&&gi<=gradeToIndex(stage.gradeTo);
+      }).sort(function(a,b){return a.localeCompare(b);});
+      if(stageClasses.length){
+        groups.push({label:stage.name+' (الصف '+stage.gradeFrom+' – '+stage.gradeTo+')',classes:stageClasses,stage:stage});
+        stageClasses.forEach(function(c){allGrouped.push(c);});
+      }
+    });
+    var unmatched=STATE.selectedClasses.filter(function(c){return allGrouped.indexOf(c)<0;});
+    if(unmatched.length) groups.push({label:'غير مصنّف',classes:unmatched.sort(),stage:null});
+  } else {
+    groups.push({label:'جميع الفصول — All Classes',classes:STATE.selectedClasses.slice().sort(function(a,b){return a.localeCompare(b);}),stage:null});
+  }
+
+  groups.forEach(function(group){
+    var section=document.createElement('div');
+    section.className='full-school-section';
+
+    var hdr=document.createElement('div');
+    hdr.className='full-school-stage-hdr';
+    hdr.innerHTML='🏫 '+group.label+'&nbsp;<span style="background:rgba(255,255,255,.2);border-radius:10px;padding:2px 10px;font-size:13px">'+group.classes.length+' فصل</span>';
+    section.appendChild(hdr);
+
+    var grid=document.createElement('div');
+    grid.className='full-school-grid';
+    group.classes.forEach(function(cls){
+      grid.appendChild(buildMiniClassCard(cls,group.stage));
+    });
+    section.appendChild(grid);
+    wrap.appendChild(section);
+  });
+}
+
+/* Day abbreviations for mini view */
+var DAY_ABBR={'الاثنين':'ث١','الثلاثاء':'ث٢','الأربعاء':'أر','الخميس':'خم','الجمعة':'جم'};
+
+function buildMiniClassCard(cls,stage){
+  var card=document.createElement('div');
+  card.className='mini-class-card';
+
+  var hdr=document.createElement('div');
+  hdr.className='mini-class-hdr';
+  hdr.textContent='الصف '+cls;
+  card.appendChild(hdr);
+
+  var schedule=stage?computeScheduleForStage(stage):computeSchedule();
+  var days=STATE.selectedDays;
+  var tt=STATE.timetable[cls];
+  var ppd=stage?stage.periodsPerDay:STATE.periodsPerDay;
+  var frPpd=stage?(stage.fridayPpd||4):(STATE.fridayPeriodsPerDay||4);
+
+  if(!tt){
+    var nd=document.createElement('div');
+    nd.style.cssText='color:#9CA3AF;font-size:12px;text-align:center;padding:12px';
+    nd.textContent='لا بيانات';
+    card.appendChild(nd);
+    return card;
+  }
+
+  var tbl=document.createElement('table');
+  tbl.className='mini-ttt';
+
+  var thead=document.createElement('thead');
+  var hrow=document.createElement('tr');
+  var th0=document.createElement('th');
+  th0.textContent='#';
+  hrow.appendChild(th0);
+  days.forEach(function(d){
+    var th=document.createElement('th');
+    th.textContent=DAY_ABBR[d]||d.substring(0,2);
+    hrow.appendChild(th);
+  });
+  thead.appendChild(hrow);
+  tbl.appendChild(thead);
+
+  var tbody=document.createElement('tbody');
+  schedule.forEach(function(row){
+    var tr=document.createElement('tr');
+    if(row.type==='break'){
+      var btd=document.createElement('td');
+      btd.colSpan=days.length+1;
+      btd.style.cssText='text-align:center;color:#6B7280;font-size:9px;padding:2px;background:#FEF9C3';
+      btd.textContent='☕ '+row.nameAr;
+      tr.appendChild(btd);
+    } else {
+      var timeTd=document.createElement('td');
+      timeTd.style.cssText='font-size:9px;color:#6B7280;white-space:nowrap;padding:2px 3px;text-align:center;font-weight:700';
+      timeTd.textContent=row.period;
+      tr.appendChild(timeTd);
+      days.forEach(function(day){
+        var mxPd=maxPeriodsForDay(day,ppd,frPpd);
+        var td=document.createElement('td');
+        td.style.padding='2px';
+        if(row.period>mxPd){
+          var offDiv=document.createElement('div');
+          offDiv.style.cssText='background:#F1F5F9;min-height:26px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94A3B8';
+          offDiv.textContent='—';
+          td.appendChild(offDiv);
+        } else {
+          var slot=tt[day]&&tt[day][row.period];
+          if(slot){
+            var cellDiv=document.createElement('div');
+            cellDiv.className='mini-scell';
+            cellDiv.style.background=getSubjectColor(slot.subject);
+            cellDiv.style.color=getSubjectTColor(slot.subject);
+            var subjEl=document.createElement('div');
+            subjEl.style.cssText='font-weight:700;font-size:10px';
+            subjEl.textContent=slot.subject||'';
+            cellDiv.appendChild(subjEl);
+            if(slot.isVacant){
+              var vEl=document.createElement('div');
+              vEl.style.cssText='font-size:9px;color:#EF4444;font-weight:700';
+              vEl.textContent='⬜ شاغر';
+              cellDiv.appendChild(vEl);
+            } else if(slot.teacherNameAr&&slot.teacherNameAr!=='شاغر'){
+              var tEl=document.createElement('div');
+              tEl.style.cssText='font-size:9px;opacity:.75';
+              var tName=slot.teacherNameAr.split(' ');
+              tEl.textContent=tName.length>1?tName[1]:tName[0];
+              cellDiv.appendChild(tEl);
+            }
+            td.appendChild(cellDiv);
+          } else {
+            var emptyDiv=document.createElement('div');
+            emptyDiv.className='sempty';
+            emptyDiv.style.minHeight='26px';
+            td.appendChild(emptyDiv);
+          }
+        }
+        tr.appendChild(td);
+      });
+    }
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+  card.appendChild(tbl);
+  return card;
+}
+
+
 </script>
 </body>
 </html>
