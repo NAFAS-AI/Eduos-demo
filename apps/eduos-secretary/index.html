@@ -600,6 +600,25 @@ const LEVELS_SECRETARY = [
 const CRITERIA_SECRETARY = [{"id": "comms", "name": "إدارة المراسلات والوثائق", "evidence": ""}, {"id": "schedule", "name": "تنظيم المواعيد والاجتماعات", "evidence": ""}, {"id": "accuracy", "name": "دقة البيانات والأرشفة", "evidence": ""}, {"id": "service", "name": "خدمة المراجعين والأولياء", "evidence": ""}, {"id": "confidential", "name": "الحفاظ على السرية والخصوصية", "evidence": ""}];
 let apprSelfScores_SECRETARY = {};
 let apprNotes_SECRETARY = {};
+
+var _autoSaveTimer_SECRETARY = null;
+async function autoSaveDraft_SECRETARY() {
+  if (appraisalLocked_SECRETARY) return;
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_SECRETARY).map(function(k){ return k+': '+apprNotes_SECRETARY[k]; }).join('\n');
+    var payload = {self_scores: apprSelfScores_SECRETARY, notes_self: notes, status: 'draft'};
+    if (appraisalRow_SECRETARY && appraisalRow_SECRETARY.id) {
+      await dbPatch('staff_evaluations', 'id=eq.'+appraisalRow_SECRETARY.id, payload);
+    } else {
+      await dbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:u.role_key||'secretary', academic_year:acYear}, payload));
+    }
+    toast('✓ حُفظ تلقائياً');
+  } catch(e) {}
+}
 let appraisalRow_SECRETARY = null;
 let appraisalLocked_SECRETARY = false;
 
@@ -654,6 +673,8 @@ function renderAppraisalCriteria_SECRETARY() {
     if (appraisalLocked_SECRETARY) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_SECRETARY[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_SECRETARY);
+      _autoSaveTimer_SECRETARY = setTimeout(autoSaveDraft_SECRETARY, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);

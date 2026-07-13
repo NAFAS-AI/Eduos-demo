@@ -571,6 +571,25 @@ const LEVELS_TECHNICIAN = [
 const CRITERIA_TECHNICIAN = [{"id": "requests", "name": "الاستجابة لطلبات الصيانة", "evidence": "من سجلات الطلبات"}, {"id": "time", "name": "الالتزام بالوقت والمواعيد", "evidence": ""}, {"id": "quality", "name": "جودة الإصلاحات والصيانة", "evidence": ""}, {"id": "inventory", "name": "إدارة المخزون والمعدات", "evidence": ""}, {"id": "safety", "name": "الالتزام بمعايير الأمان", "evidence": ""}];
 let apprSelfScores_TECHNICIAN = {};
 let apprNotes_TECHNICIAN = {};
+
+var _autoSaveTimer_TECHNICIAN = null;
+async function autoSaveDraft_TECHNICIAN() {
+  if (appraisalLocked_TECHNICIAN) return;
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_TECHNICIAN).map(function(k){ return k+': '+apprNotes_TECHNICIAN[k]; }).join('\n');
+    var payload = {self_scores: apprSelfScores_TECHNICIAN, notes_self: notes, status: 'draft'};
+    if (appraisalRow_TECHNICIAN && appraisalRow_TECHNICIAN.id) {
+      await dbPatch('staff_evaluations', 'id=eq.'+appraisalRow_TECHNICIAN.id, payload);
+    } else {
+      await dbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:u.role_key||'technician', academic_year:acYear}, payload));
+    }
+    toast('✓ حُفظ تلقائياً');
+  } catch(e) {}
+}
 let appraisalRow_TECHNICIAN = null;
 let appraisalLocked_TECHNICIAN = false;
 
@@ -625,6 +644,8 @@ function renderAppraisalCriteria_TECHNICIAN() {
     if (appraisalLocked_TECHNICIAN) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_TECHNICIAN[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_TECHNICIAN);
+      _autoSaveTimer_TECHNICIAN = setTimeout(autoSaveDraft_TECHNICIAN, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);

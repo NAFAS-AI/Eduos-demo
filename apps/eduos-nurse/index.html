@@ -609,6 +609,25 @@ const LEVELS_NURSE = [
 const CRITERIA_NURSE = [{"id": "visits", "name": "عدد الزيارات الصحية المسجّلة", "evidence": "من السجلات الصحية"}, {"id": "records", "name": "دقة السجلات الصحية", "evidence": ""}, {"id": "emergency", "name": "الاستجابة للحالات الطارئة", "evidence": ""}, {"id": "parents", "name": "التواصل مع أولياء الأمور", "evidence": ""}, {"id": "referral", "name": "إدارة حالات الإحالة الخارجية", "evidence": ""}];
 let apprSelfScores_NURSE = {};
 let apprNotes_NURSE = {};
+
+var _autoSaveTimer_NURSE = null;
+async function autoSaveDraft_NURSE() {
+  if (appraisalLocked_NURSE) return;
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_NURSE).map(function(k){ return k+': '+apprNotes_NURSE[k]; }).join('\n');
+    var payload = {self_scores: apprSelfScores_NURSE, notes_self: notes, status: 'draft'};
+    if (appraisalRow_NURSE && appraisalRow_NURSE.id) {
+      await dbPatch('staff_evaluations', 'id=eq.'+appraisalRow_NURSE.id, payload);
+    } else {
+      await dbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:u.role_key||'nurse', academic_year:acYear}, payload));
+    }
+    toast('✓ حُفظ تلقائياً');
+  } catch(e) {}
+}
 let appraisalRow_NURSE = null;
 let appraisalLocked_NURSE = false;
 
@@ -663,6 +682,8 @@ function renderAppraisalCriteria_NURSE() {
     if (appraisalLocked_NURSE) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_NURSE[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_NURSE);
+      _autoSaveTimer_NURSE = setTimeout(autoSaveDraft_NURSE, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);

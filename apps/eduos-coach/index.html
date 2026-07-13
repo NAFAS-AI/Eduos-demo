@@ -1086,6 +1086,26 @@ const LEVELS_COACH = [
 const CRITERIA_COACH = [{"id": "training", "name": "Training Session Quality", "evidence": ""}, {"id": "attendance", "name": "Student Attendance Rate", "evidence": "from records"}, {"id": "safety", "name": "Safety & Discipline Standards", "evidence": ""}, {"id": "compete", "name": "Competition Participation", "evidence": ""}, {"id": "progress", "name": "Student Skill Progress", "evidence": ""}];
 let apprSelfScores_COACH = {};
 let apprNotes_COACH = {};
+
+var _autoSaveTimer_COACH = null;
+async function autoSaveDraft_COACH() {
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_COACH).map(function(k){ return k+': '+apprNotes_COACH[k]; }).join('\n');
+    var payload = {self_scores: coachScores, notes_self: notes, status: 'draft'};
+    if (coachAppraisalId) {
+      await coachDbPatch(coachAppraisalId, payload);
+    } else {
+      var existing = await coachDbGet('staff_evaluations', 'select=id&staff_db_id=eq.'+staffId+'&academic_year=eq.'+acYear+'&limit=1');
+      if (existing && existing[0]) { coachAppraisalId = existing[0].id; await coachDbPatch(coachAppraisalId, payload); }
+      else { await coachDbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:'coach', academic_year:acYear}, payload)); }
+    }
+    toast('Draft auto-saved ✓');
+  } catch(e) {}
+}
 let appraisalRow_COACH = null;
 let appraisalLocked_COACH = false;
 
@@ -1140,6 +1160,8 @@ function renderAppraisalCriteria_COACH() {
     if (appraisalLocked_COACH) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_COACH[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_COACH);
+      _autoSaveTimer_COACH = setTimeout(autoSaveDraft_COACH, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);

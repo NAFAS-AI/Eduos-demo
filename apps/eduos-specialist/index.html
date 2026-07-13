@@ -728,6 +728,25 @@ const LEVELS_SPECIALIST = [
 const CRITERIA_SPECIALIST = [{"id": "cases", "name": "إدارة حالات الدعم النفسي", "evidence": "من سجلات الحالات"}, {"id": "followup", "name": "المتابعة المنتظمة للحالات", "evidence": ""}, {"id": "plans", "name": "جودة خطط التدخل", "evidence": ""}, {"id": "coord", "name": "التنسيق مع الأسرة والمعلمين", "evidence": ""}, {"id": "docs", "name": "التوثيق والتقارير", "evidence": ""}];
 let apprSelfScores_SPECIALIST = {};
 let apprNotes_SPECIALIST = {};
+
+var _autoSaveTimer_SPECIALIST = null;
+async function autoSaveDraft_SPECIALIST() {
+  if (appraisalLocked_SPECIALIST) return;
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_SPECIALIST).map(function(k){ return k+': '+apprNotes_SPECIALIST[k]; }).join('\n');
+    var payload = {self_scores: apprSelfScores_SPECIALIST, notes_self: notes, status: 'draft'};
+    if (appraisalRow_SPECIALIST && appraisalRow_SPECIALIST.id) {
+      await dbPatch('staff_evaluations', 'id=eq.'+appraisalRow_SPECIALIST.id, payload);
+    } else {
+      await dbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:u.role_key||'specialist', academic_year:acYear}, payload));
+    }
+    toast('✓ حُفظ تلقائياً');
+  } catch(e) {}
+}
 let appraisalRow_SPECIALIST = null;
 let appraisalLocked_SPECIALIST = false;
 
@@ -782,6 +801,8 @@ function renderAppraisalCriteria_SPECIALIST() {
     if (appraisalLocked_SPECIALIST) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_SPECIALIST[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_SPECIALIST);
+      _autoSaveTimer_SPECIALIST = setTimeout(autoSaveDraft_SPECIALIST, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);

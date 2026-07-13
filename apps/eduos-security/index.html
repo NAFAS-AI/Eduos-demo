@@ -581,6 +581,25 @@ const LEVELS_SECURITY = [
 const CRITERIA_SECURITY = [{"id": "incidents", "name": "Security Incidents Response", "evidence": "from DB"}, {"id": "patrol", "name": "Campus Patrol Compliance", "evidence": ""}, {"id": "access", "name": "Access Control & Visitor Management", "evidence": ""}, {"id": "drills", "name": "Emergency Drills Participation", "evidence": ""}, {"id": "report", "name": "Daily Report Accuracy", "evidence": ""}];
 let apprSelfScores_SECURITY = {};
 let apprNotes_SECURITY = {};
+
+var _autoSaveTimer_SECURITY = null;
+async function autoSaveDraft_SECURITY() {
+  if (appraisalLocked_SECURITY) return;
+  try {
+    var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+    var staffId = u.id || u.staff_db_id;
+    if (!staffId) return;
+    var acYear = '2025-2026';
+    var notes = Object.keys(apprNotes_SECURITY).map(function(k){ return k+': '+apprNotes_SECURITY[k]; }).join('\n');
+    var payload = {self_scores: apprSelfScores_SECURITY, notes_self: notes, status: 'draft'};
+    if (appraisalRow_SECURITY && appraisalRow_SECURITY.id) {
+      await dbPatch('staff_evaluations', 'id=eq.'+appraisalRow_SECURITY.id, payload);
+    } else {
+      await dbPost('staff_evaluations', Object.assign({staff_db_id:staffId, role_key:u.role_key||'security', academic_year:acYear}, payload));
+    }
+    toast('✓ حُفظ تلقائياً');
+  } catch(e) {}
+}
 let appraisalRow_SECURITY = null;
 let appraisalLocked_SECURITY = false;
 
@@ -635,6 +654,8 @@ function renderAppraisalCriteria_SECURITY() {
     if (appraisalLocked_SECURITY) note.disabled = true;
     note.addEventListener('input', function() {
       apprNotes_SECURITY[cr.id] = note.value;
+      clearTimeout(_autoSaveTimer_SECURITY);
+      _autoSaveTimer_SECURITY = setTimeout(autoSaveDraft_SECURITY, 2000);
     });
     card.appendChild(note);
     grid.appendChild(card);
