@@ -225,6 +225,10 @@ body{overflow:hidden}
       <span class="snav-icon">&#x2B50;</span>
       <div><span class="snav-label">My Appraisal</span><span class="snav-sub">Performance review</span></div>
     </button>
+    <button class="snav" data-section="pdp" onclick="showSection('pdp',this)">
+      <span class="snav-icon">&#128203;</span>
+      <div><span class="snav-label">My PDP</span><span class="snav-sub">Development plan</span></div>
+    </button>
   </nav>
   <div class="sidebar-footer">
     <button onclick="logout()" style="width:100%;padding:9px 14px;border-radius:10px;border:1px solid rgba(225,29,72,0.2);background:rgba(225,29,72,0.06);color:#E11D48;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer">&#x1F6AA; Sign Out</button>
@@ -490,6 +494,15 @@ body{overflow:hidden}
     </div>
   </section>
 
+  <section id="sec-pdp" class="section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">&#128203; My Development Plan (PDP)</div>
+      </div>
+      <div id="pdp-container" style="padding:4px 0"></div>
+    </div>
+  </section>
+
 </div><!-- /scroll-area -->
 </div><!-- /main-area -->
 </div><!-- /app-shell -->
@@ -560,7 +573,7 @@ function showSection(name, btn) {
   if (btn) btn.classList.add('active');
   if (name === 'attendance') loadTodaySessions();
   if (name === 'achievements') { loadAchievements(); populateAchClasses(); }
-  if (name === 'appraisal') loadMyAppraisal();
+  if (name === 'appraisal') loadMyAppraisal(); if (name === 'pdp') loadMyPDP();
 }
 
 // ─── Schedule ───
@@ -1048,6 +1061,21 @@ async function submitCoachAppraisal() {
   }
 }
 
+</script>
+
+<script src="../platform-pdp.js"></script>
+<script>
+function loadMyPDP() {
+  var u = {};
+  try { u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(e) {}
+  var ctr = document.getElementById('pdp-container');
+  if (!ctr) return;
+  if (window.EduOS_PDP && u.id) {
+    EduOS_PDP.init({ containerId: 'pdp-container', staffDbId: u.id, role: 'coach' });
+  } else {
+    ctr.innerHTML = '<div class="empty">بيانات المستخدم غير متوفرة</div>';
+  }
+}
 </script>
 </body>
 </html>

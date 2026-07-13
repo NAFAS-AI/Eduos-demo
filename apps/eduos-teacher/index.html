@@ -424,6 +424,13 @@ tr:hover td{background:var(--surface2)}
       </span>
       <span class="snav-badge" id="appraisalBadge" style="display:none">!</span>
     </button>
+    <button id="nav-pdp" class="snav" onclick="switchPanel('pdp')">
+      <span class="snav-icon">&#128203;</span>
+      <span class="snav-text">
+        <span class="snav-label">خطتي</span>
+        <span class="snav-sub">My PDP</span>
+      </span>
+    </button>
   </nav>
 
   <div class="sidebar-footer">
@@ -990,6 +997,16 @@ tr:hover td{background:var(--surface2)}
       </div>
     </div>
     <!-- END APPRAISAL PANEL -->
+
+    <div class="tab-panel" id="panel-pdp">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">&#128203; خطة التطوير المهني</div>
+        </div>
+        <div id="pdp-container" style="padding:4px 0"><div class="empty">&#8987; جار التحميل...</div></div>
+      </div>
+    </div>
+
   </div><!-- end panels-area -->
 </div><!-- end main-area -->
 </div><!-- end app-shell -->
@@ -2041,7 +2058,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Hook into switchPanel to load appraisal when first opened
+// PDP panel auto-init handled by switchPanel
 var _origSwitchPanel = typeof switchPanel !== 'undefined' ? switchPanel : null;
+var _pdpLoaded = false;
+var _origSP2 = switchPanel;
+switchPanel = function(name) { _origSP2(name); if(name==='pdp' && !_pdpLoaded){_pdpLoaded=true;loadMyPDP();} };
 
 function goProfile() { window.location.href = '../eduos-pdp/'; }
 function doLogout() { sessionStorage.removeItem('edoos_user'); window.location.href = '../eduos-login/'; }
@@ -2100,6 +2121,21 @@ function setupIdleLogout() {
   const reset = () => { clearTimeout(timer); timer = setTimeout(() => { showToast('⏱️ انتهت الجلسة / Session expired'); setTimeout(doLogout, 2000); }, 15*60*1000); };
   ['mousemove','keydown','click','touchstart'].forEach(e => document.addEventListener(e, reset));
   reset();
+}
+</script>
+
+<script src="../platform-pdp.js"></script>
+<script>
+function loadMyPDP() {
+  var u = {};
+  try { u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(e) {}
+  var ctr = document.getElementById('pdp-container');
+  if (!ctr) return;
+  if (window.EduOS_PDP && u.id) {
+    EduOS_PDP.init({ containerId: 'pdp-container', staffDbId: u.id, role: u.role_key || u.role || 'موظف' });
+  } else {
+    ctr.innerHTML = '<div class="empty">بيانات المستخدم غير متوفرة</div>';
+  }
 }
 </script>
 </body>

@@ -89,6 +89,7 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
       <button class="snav" data-panel="timetable"><span class="snav-icon">🖨️</span><span class="snav-text"><span class="snav-label">طباعة الجداول | Print</span><span class="snav-sub">جداول الفصول والمعلمين</span></span></button>
     </nav>
       <button class="snav" data-panel="appraisal"><span class="snav-icon">⭐</span><span class="snav-text"><span class="snav-label">تقييمي | Appraisal</span><span class="snav-sub">التقييم الوظيفي</span></span></button>
+      <button class="snav" data-panel="pdp"><span class="snav-icon">&#128203;</span><span class="snav-text"><span class="snav-label">خطتي | My PDP</span><span class="snav-sub">خطة التطوير المهني</span></span></button>
 
     <div class="sidebar-footer">
       <button class="logout-btn" id="logoutBtn">🚪 تسجيل الخروج | Logout</button>
@@ -253,6 +254,15 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
         </div>
       </div>
 
+
+    <div class="tab-panel" id="panel-pdp">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">&#128203; خطة التطوير المهني</div>
+        </div>
+        <div id="pdp-container" style="padding:4px 0"><div class="empty">&#8987; جار التحميل...</div></div>
+      </div>
+    </div>
     </div>
   </div>
 </div>
@@ -267,7 +277,7 @@ function switchPanel(name){
   document.querySelectorAll('.snav').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const nav=document.querySelector('.snav[data-panel="'+name+'"]');if(nav)nav.classList.add('active');
   const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');
-  if(name==='staff')loadStaff();if(name==='students')loadStudents();if(name==='leaves')loadLeaves();if(name==='calendar')loadCalendar();if(name==='appraisal')loadMyAppraisal();
+  if(name==='staff')loadStaff();if(name==='students')loadStudents();if(name==='leaves')loadLeaves();if(name==='calendar')loadCalendar();if(name==='appraisal')loadMyAppraisal();if(name==='pdp')loadMyPDP();
 }
 let allStaff=[],allStudents=[];
 async function init(){
@@ -475,6 +485,21 @@ async function submitMyAppraisal(){
   } else toast("احفظ المسودة أولاً | Save draft first");
 }
 
+</script>
+
+<script src="../platform-pdp.js"></script>
+<script>
+function loadMyPDP() {
+  var u = {};
+  try { u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}'); } catch(e) {}
+  var ctr = document.getElementById('pdp-container');
+  if (!ctr) return;
+  if (window.EduOS_PDP && u.id) {
+    EduOS_PDP.init({ containerId: 'pdp-container', staffDbId: u.id, role: u.role_key || u.role || 'موظف' });
+  } else {
+    ctr.innerHTML = '<div class="empty">بيانات المستخدم غير متوفرة</div>';
+  }
+}
 </script>
 </body>
 </html>
