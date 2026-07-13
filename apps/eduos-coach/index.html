@@ -1144,6 +1144,13 @@ function updateScoreSummary_COACH() {
   if (cnt) cnt.textContent = keys.length + ' / ' + CRITERIA_COACH.length;
 }
 
+
+function loadCoachEvidence(staffDbId) {
+  var c = document.getElementById('evidence-container-coach');
+  if (!c) return;
+  c.innerHTML = '<span style="color:#16a34a;font-weight:600">Training records from system</span>';
+}
+
 function loadAppraisal_COACH(staffDbId) {
   if (!staffDbId) return;
   const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
@@ -1163,6 +1170,7 @@ function loadAppraisal_COACH(staffDbId) {
     }
     if (closedMsg) closedMsg.style.display = 'none';
     if (apprForm) apprForm.style.display = 'block';
+    loadCoachEvidence(staffDbId);
     fetch(SB_URL + '/rest/v1/staff_evaluations?staff_db_id=eq.' + encodeURIComponent(staffDbId) + '&cycle_year=eq.' + year + '&select=*&order=created_at.desc&limit=1', {
       headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY}
     }).then(function(r){return r.json();}).then(function(rows) {
@@ -1247,7 +1255,7 @@ function submitAppraisal_COACH(staffDbId, evalType) {
 (function() {
   document.querySelectorAll('[data-section="appraisal"]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var uid = window._staffDbId || '';
+      var u=JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); var uid=u.staff_db_id||u.id||'';
       renderAppraisalCriteria_COACH();
       loadAppraisal_COACH(uid);
     });

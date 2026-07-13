@@ -786,6 +786,18 @@ function updateScoreSummary_SPECIALIST() {
   if (cnt) cnt.textContent = keys.length + ' / ' + CRITERIA_SPECIALIST.length;
 }
 
+
+function loadSpecialistEvidence(staffDbId) {
+  var c = document.getElementById('evidence-container-specialist');
+  if (!c) return;
+  var SB = (window.EduOS && window.EduOS.SB_URL) || '';
+  var KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
+  fetch(SB+'/rest/v1/specialist_cases?select=count',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'count=exact','Range':'0-0'}}).then(function(r){return r.headers.get('Content-Range')||'0';}).then(function(cr){
+    var total = cr.split('/')[1] || cr.split('/')[0] || '0';
+    c.innerHTML = '<div style="text-align:center"><div style="font-size:24px;font-weight:800;color:#6366f1">'+total+'</div><div style="font-size:12px;color:#64748b">حالات الدعم</div></div>';
+  }).catch(function(){c.innerHTML='<span style="color:#94a3b8">لا بيانات</span>';});
+}
+
 function loadAppraisal_SPECIALIST(staffDbId) {
   if (!staffDbId) return;
   const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
@@ -805,6 +817,7 @@ function loadAppraisal_SPECIALIST(staffDbId) {
     }
     if (closedMsg) closedMsg.style.display = 'none';
     if (apprForm) apprForm.style.display = 'block';
+    loadSpecialistEvidence(staffDbId);
     fetch(SB_URL + '/rest/v1/staff_evaluations?staff_db_id=eq.' + encodeURIComponent(staffDbId) + '&cycle_year=eq.' + year + '&select=*&order=created_at.desc&limit=1', {
       headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY}
     }).then(function(r){return r.json();}).then(function(rows) {
@@ -890,14 +903,14 @@ function submitAppraisal_SPECIALIST(staffDbId, evalType) {
 (function() {
   document.querySelectorAll('[data-panel="appraisal"]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var uid = window._staffDbId || '';
+      var u=JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); var uid=u.staff_db_id||u.id||'';
       renderAppraisalCriteria_SPECIALIST();
       loadAppraisal_SPECIALIST(uid);
     });
   });
   var sb = document.getElementById('appraisal-submit-btn-specialist');
   if (sb) sb.addEventListener('click', function() {
-    var uid = window._staffDbId || '';
+    var u=JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); var uid=u.staff_db_id||u.id||'';
     submitAppraisal_SPECIALIST(uid, 'specialist');
   });
 })();

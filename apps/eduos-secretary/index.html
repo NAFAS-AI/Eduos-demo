@@ -658,6 +658,13 @@ function updateScoreSummary_SECRETARY() {
   if (cnt) cnt.textContent = keys.length + ' / ' + CRITERIA_SECRETARY.length;
 }
 
+
+function loadSecretaryEvidence(staffDbId) {
+  var c = document.getElementById('evidence-container-secretary');
+  if (!c) return;
+  c.innerHTML = '<span style="color:#16a34a;font-weight:600">بيانات الحضور والتوثيق من النظام</span>';
+}
+
 function loadAppraisal_SECRETARY(staffDbId) {
   if (!staffDbId) return;
   const SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
@@ -677,6 +684,7 @@ function loadAppraisal_SECRETARY(staffDbId) {
     }
     if (closedMsg) closedMsg.style.display = 'none';
     if (apprForm) apprForm.style.display = 'block';
+    loadSecretaryEvidence(staffDbId);
     fetch(SB_URL + '/rest/v1/staff_evaluations?staff_db_id=eq.' + encodeURIComponent(staffDbId) + '&cycle_year=eq.' + year + '&select=*&order=created_at.desc&limit=1', {
       headers: {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY}
     }).then(function(r){return r.json();}).then(function(rows) {
@@ -762,14 +770,14 @@ function submitAppraisal_SECRETARY(staffDbId, evalType) {
 (function() {
   document.querySelectorAll('[data-panel="appraisal"]').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var uid = window._staffDbId || '';
+      var u=JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); var uid=u.staff_db_id||u.id||'';
       renderAppraisalCriteria_SECRETARY();
       loadAppraisal_SECRETARY(uid);
     });
   });
   var sb = document.getElementById('appraisal-submit-btn-secretary');
   if (sb) sb.addEventListener('click', function() {
-    var uid = window._staffDbId || '';
+    var u=JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); var uid=u.staff_db_id||u.id||'';
     submitAppraisal_SECRETARY(uid, 'secretary');
   });
 })();
