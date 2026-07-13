@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>بوابة الأمن — EduOS</title>
+<title>بوابة حارس الأمن — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../platform-config.js"></script>
@@ -140,7 +140,7 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
       <div class="top-bar-left">
         <div class="user-chip">
           <div class="user-avatar" id="topAvatar">أ</div>
-          <div><div class="user-name" id="topName">الأمن</div><div class="user-role">Security | أمن</div></div>
+          <div><div class="user-name" id="topName">حارس الأمن</div><div class="user-role">Security Guard | حارس الأمن</div></div>
         </div>
         <button id="langBtn" data-lang-toggle="1" onclick="window.EduLang && window.EduLang.toggle()" style="font-family:'Tajawal',Arial,sans-serif;font-size:13px;font-weight:700;padding:6px 14px;border-radius:20px;border:1.5px solid #6C3DD6;background:transparent;color:#6C3DD6;cursor:pointer;transition:all .2s;white-space:nowrap">&#x1F310; EN</button>
       </div>
@@ -151,8 +151,8 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
       <div class="tab-panel active" id="panel-home">
         <div class="greeting-card">
           <div>
-            <div class="greeting-name">أهلاً، <span id="greetName">موظف الأمن</span> 🛡️</div>
-            <div class="greeting-sub">لوحة الأمن المدرسي | School Security Dashboard</div>
+            <div class="greeting-name">أهلاً، <span id="greetName">حارس الأمن</span> 🛡️</div>
+            <div class="greeting-sub">لوحة حارس الأمن المدرسي | School Security Dashboard</div>
             <div class="greeting-stats">
               <div class="g-stat"><div class="g-stat-num" id="statIn">—</div><div class="g-stat-label">دخلوا اليوم</div></div>
               <div class="g-stat"><div class="g-stat-num" id="statInc">—</div><div class="g-stat-label">حوادث مفتوحة</div></div>
@@ -334,7 +334,7 @@ function switchPanel(name){
 async function init(){
   try{user=JSON.parse(sessionStorage.getItem('edoos_user'));}catch(e){}
   if(!user){location.href='../eduos-login/';return;}
-  document.getElementById('topName').textContent=user.name||'الأمن';document.getElementById('topAvatar').textContent=(user.name||'أ')[0];document.getElementById('greetName').textContent=user.name||'موظف الأمن';
+  document.getElementById('topName').textContent=user.name||'حارس الأمن';document.getElementById('topAvatar').textContent=(user.name||'أ')[0];document.getElementById('greetName').textContent=user.name||'حارس الأمن';
   if(window.EduOSWeek)document.getElementById('weekPill').textContent='الأسبوع '+(window.EduOSWeek.week||'—');
   document.getElementById('logoutBtn').addEventListener('click',()=>{if(window.eduosLogout)window.eduosLogout();else{sessionStorage.clear();location.href='../eduos-login/';}});
   // lang managed by platform-lang.js
