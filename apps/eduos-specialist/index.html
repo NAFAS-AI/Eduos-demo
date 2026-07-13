@@ -528,7 +528,7 @@ async function loadMyAppraisal(){
   var staffId = user&&(user.id||user.staff_db_id);
   if(!staffId)return;
   var _apS=await dbGet('app_settings','select=value&key=eq.appraisal_open&limit=1');
-  var _apO=_apS&&_apS[0]&&_apS[0].value===true;
+  var _apO=_apS&&_apS[0]&&(_apS[0].value===true||_apS[0].value==='true');
   if(!_apO){
     document.getElementById('appraisalLoading').style.display='none';
     var _ac=document.getElementById('appraisalContent');
