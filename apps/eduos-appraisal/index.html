@@ -192,6 +192,17 @@ tr:hover td{background:#F8FAFF}
         <span class="badge badge-blue" id="termBadge">العام الدراسي 2025-2026</span>
       </div>
       <div id="overviewKPIs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <label style="font-size:13px;color:var(--txt2);white-space:nowrap">&#127775; فلترة بالتقدير:</label>
+        <select id="overviewGradeFilter" onchange="applyOverviewFilter()" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fff">
+          <option value="">الكل</option>
+          <option value="استثنائي">&#11088; استثنائي (90%+)</option>
+          <option value="يفوق التوقعات">&#128077; يفوق التوقعات (70–89%)</option>
+          <option value="يلبي التوقعات">&#10003; يلبي التوقعات (50–69%)</option>
+          <option value="دون التوقعات">&#9888; دون التوقعات (30–49%)</option>
+          <option value="غير مقبول">&#10007; غير مقبول (أقل من 30%)</option>
+        </select>
+      </div>
       <div id="staffList"><div class="empty">&#8987; جار التحميل...</div></div>
     </div>
   </div>
@@ -271,7 +282,17 @@ tr:hover td{background:#F8FAFF}
     <div class="card">
       <div class="card-header">
         <div class="card-title">&#128203; سجل التقييمات</div>
-        <input type="text" id="histSearch" placeholder="بحث باسم الموظف/ة..." style="width:220px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem"/>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="text" id="histSearch" placeholder="بحث باسم الموظف/ة..." style="width:200px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem"/>
+          <select id="histGradeFilter" onchange="applyHistSearch()" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:.85rem;background:#fff">
+            <option value="">كل التقديرات</option>
+            <option value="استثنائي">&#11088; استثنائي</option>
+            <option value="يفوق التوقعات">&#128077; يفوق التوقعات</option>
+            <option value="يلبي التوقعات">&#10003; يلبي التوقعات</option>
+            <option value="دون التوقعات">&#9888; دون التوقعات</option>
+            <option value="غير مقبول">&#10007; غير مقبول</option>
+          </select>
+        </div>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -294,6 +315,44 @@ tr:hover td{background:#F8FAFF}
         <div class="card-title">&#127919; خطط التطوير المهني</div>
         <span class="badge badge-blue" id="pdpCount">...</span>
       </div>
+
+      <!-- PDP Controls -->
+      <div id="pdpControls" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:20px">
+        <div style="font-weight:700;color:#1e293b;margin-bottom:12px;font-size:14px">&#9881;&#65039; إعدادات دورة الخطط التطويرية</div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:13px;color:#475569">فترة كتابة الخطة:</label>
+            <button id="pdpToggleBtn" onclick="EduOS_Appraisal.togglePDP()" style="padding:6px 16px;border-radius:8px;border:none;cursor:pointer;font-family:Tajawal,Arial,sans-serif;font-size:13px;font-weight:600">...</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <label style="font-size:13px;color:#475569">الفصل الحالي المفتوح:</label>
+            <select id="pdpTermSelect" onchange="EduOS_Appraisal.setTerm(this.value)" style="padding:6px 12px;border-radius:8px;border:1.5px solid #cbd5e1;font-family:Tajawal,Arial,sans-serif;font-size:13px;background:#fff">
+              <option value="1">الفصل الأول</option>
+              <option value="2">الفصل الثاني</option>
+              <option value="3">الفصل الثالث</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDP Filter -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <label style="font-size:13px;color:var(--txt2)">&#128269; فلترة:</label>
+        <select id="pdpStatusFilter" onchange="applyPDPFilter()" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fff">
+          <option value="">الكل</option>
+          <option value="مسودة">مسودة</option>
+          <option value="معتمد">معتمد</option>
+          <option value="جارٍ">جارٍ</option>
+          <option value="مكتمل">مكتمل</option>
+        </select>
+        <select id="pdpProgressFilter" onchange="applyPDPFilter()" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:inherit;font-size:13px;background:#fff">
+          <option value="">كل النسب</option>
+          <option value="high">تقدم عالٍ (75%+)</option>
+          <option value="mid">تقدم متوسط (40–74%)</option>
+          <option value="low">تقدم منخفض (أقل من 40%)</option>
+        </select>
+      </div>
+
       <div id="pdpList"><div class="empty">&#8987; جار التحميل...</div></div>
     </div>
   </div>
@@ -556,6 +615,8 @@ function populateStaffSelect() {
   });
 }
 
+var _allStaffArr = [];
+
 function renderOverview() {
   if (!allEvals.length) {
     document.getElementById('staffList').innerHTML = '<div class="empty">لا توجد تقييمات مسجّلة حتى الآن</div>';
@@ -568,25 +629,32 @@ function renderOverview() {
     byStaff[sid].scores.push(parseFloat(e.score) || 0);
     if (!byStaff[sid].last_date || e.eval_date > byStaff[sid].last_date) { byStaff[sid].last_date = e.eval_date; }
   });
-  var staffArr = Object.keys(byStaff).map(function(k) {
+  _allStaffArr = Object.keys(byStaff).map(function(k) {
     var d = byStaff[k];
     var avg = d.scores.reduce(function(a,b){return a+b;},0) / d.scores.length;
-    return {name:d.staff_name, avg:+avg.toFixed(1), count:d.scores.length, last_date:d.last_date};
+    var gi = gradeInfo(avg / 20);
+    return {name:d.staff_name, avg:+avg.toFixed(1), count:d.scores.length, last_date:d.last_date, grade:gi.label};
   });
-  staffArr.sort(function(a,b){return b.avg - a.avg;});
+  _allStaffArr.sort(function(a,b){return b.avg - a.avg;});
 
   var totalEvals = allEvals.length;
-  var avgAll = staffArr.reduce(function(a,b){return a+b.avg;},0) / (staffArr.length || 1);
-  var excellent = staffArr.filter(function(s){return s.avg >= 90;}).length;
+  var avgAll = _allStaffArr.reduce(function(a,b){return a+b.avg;},0) / (_allStaffArr.length || 1);
+  var excellent = _allStaffArr.filter(function(s){return s.avg >= 90;}).length;
   document.getElementById('overviewKPIs').innerHTML =
     kpiBox('إجمالي التقييمات', totalEvals, '#6C3DD6') +
     kpiBox('متوسط الأداء العام', avgAll.toFixed(1) + '%', '#059669') +
     kpiBox('درجة ممتازة (90%+)', excellent + ' موظف/ة', '#0284c7');
 
+  applyOverviewFilter();
+}
+
+function applyOverviewFilter() {
+  var grade = (document.getElementById('overviewGradeFilter') || {}).value || '';
+  var arr = grade ? _allStaffArr.filter(function(s){ return s.grade === grade; }) : _allStaffArr;
   var html = '';
-  staffArr.forEach(function(s) {
-    var avg5 = s.avg / 20;
-    var gi = gradeInfo(avg5);
+  if (!arr.length) { document.getElementById('staffList').innerHTML = '<div class="empty">لا توجد نتائج بهذا التقدير</div>'; return; }
+  arr.forEach(function(s) {
+    var gi = gradeInfo(s.avg / 20);
     var initial = s.name && s.name.length > 2 ? s.name[2] : 'م';
     html += '<div class="staff-row" data-name="' + (s.name || '') + '">';
     html += '<div class="avatar">' + initial + '</div>';
@@ -597,12 +665,11 @@ function renderOverview() {
     html += '</div>';
     html += '<div style="text-align:center;min-width:90px">';
     html += '<div style="font-size:1.2rem;font-weight:900;color:var(--pr)">' + s.avg + '%</div>';
-    var bc = s.avg >= 90 ? 'badge-green' : s.avg >= 75 ? 'badge-blue' : s.avg >= 60 ? 'badge-yellow' : 'badge-red';
+    var bc = s.avg >= 90 ? 'badge-green' : s.avg >= 70 ? 'badge-blue' : s.avg >= 50 ? 'badge-yellow' : 'badge-red';
     html += '<span class="badge ' + bc + '">' + gi.label + '</span>';
     html += '</div></div>';
   });
   document.getElementById('staffList').innerHTML = html;
-
   document.querySelectorAll('#staffList .staff-row').forEach(function(row) {
     row.addEventListener('click', function() { filterHistory(row.getAttribute('data-name')); });
   });
@@ -650,35 +717,138 @@ function filterHistory(name) {
 
 function applyHistSearch() {
   var q = (document.getElementById('histSearch').value || '').trim().toLowerCase();
-  var filtered = q ? allEvals.filter(function(e){ return (e.staff_name||'').toLowerCase().includes(q); }) : allEvals;
+  var grade = (document.getElementById('histGradeFilter') || {}).value || '';
+  var filtered = allEvals;
+  if (q) filtered = filtered.filter(function(e){ return (e.staff_name||'').toLowerCase().includes(q); });
+  if (grade) filtered = filtered.filter(function(e){ return gradeInfo((parseFloat(e.score)||0)/20).label === grade; });
   renderHistory(filtered);
 }
 
+var _allPDPData = [];
+
 async function renderPDP() {
-  var data = await apiFetch('staff_pdp', 'select=*&order=progress.desc&limit=100');
-  document.getElementById('pdpCount').textContent = (data.length || 0) + ' خطة';
-  if (!data.length) {
-    document.getElementById('pdpList').innerHTML = '<div class="empty">لا توجد خطط تطوير مسجّلة</div>';
+  // Load settings
+  var settings = await apiFetch('app_settings', 'key=in.(pdp_open,pdp_current_term)&select=key,value');
+  var sMap = {};
+  (settings || []).forEach(function(s){ sMap[s.key] = s.value; });
+  var pdpOpen = sMap['pdp_open'] === 'true';
+  var currentTerm = parseInt(sMap['pdp_current_term'] || '1', 10);
+
+  // Update controls UI
+  var btn = document.getElementById('pdpToggleBtn');
+  if (btn) {
+    btn.textContent = pdpOpen ? 'اغلاق فترة الكتابة' : 'فتح فترة الكتابة';
+    btn.style.background = pdpOpen ? '#dc2626' : '#16a34a';
+    btn.style.color = '#fff';
+    btn._pdpOpen = pdpOpen;
+  }
+  var termSel = document.getElementById('pdpTermSelect');
+  if (termSel) termSel.value = String(currentTerm);
+
+  // Load PDP data
+  _allPDPData = await apiFetch('staff_pdp', 'select=*&order=progress.desc&limit=200');
+  document.getElementById('pdpCount').textContent = (_allPDPData.length || 0) + ' خطة';
+  applyPDPFilter();
+}
+
+function applyPDPFilter() {
+  var statusF = (document.getElementById('pdpStatusFilter') || {}).value || '';
+  var progF = (document.getElementById('pdpProgressFilter') || {}).value || '';
+  var arr = _allPDPData;
+  if (statusF) arr = arr.filter(function(p){ return (p.status || '') === statusF; });
+  if (progF === 'high') arr = arr.filter(function(p){ return (p.progress || 0) >= 75; });
+  else if (progF === 'mid') arr = arr.filter(function(p){ return (p.progress || 0) >= 40 && (p.progress || 0) < 75; });
+  else if (progF === 'low') arr = arr.filter(function(p){ return (p.progress || 0) < 40; });
+
+  if (!arr.length) {
+    document.getElementById('pdpList').innerHTML = '<div class="empty">لا توجد خطط تطوير مسجّلة بهذا الفلتر</div>';
     return;
   }
-  var html = '';
-  data.forEach(function(p) {
-    var progress = p.progress || 0;
-    var sb = progress >= 100 ? 'badge-green' : progress >= 60 ? 'badge-blue' : progress >= 30 ? 'badge-yellow' : 'badge-red';
-    html += '<div class="pdp-card">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">';
-    html += '<div style="font-weight:700">' + (p.staff_name || '—') + '</div>';
-    html += '<div style="display:flex;gap:8px"><span class="badge ' + sb + '">' + progress + '%</span>';
-    html += '<span class="badge badge-gray">' + (p.status || 'جارٍ') + '</span>';
-    html += '<span class="badge badge-gray">' + (p.academic_year || '—') + '</span></div></div>';
-    if (p.goal_1) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_1 + '</div>'; }
-    if (p.goal_2) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_2 + '</div>'; }
-    if (p.goal_3) { html += '<div style="font-size:.85rem;color:var(--txt2);margin-bottom:4px">&#127937; ' + p.goal_3 + '</div>'; }
-    html += '<div class="pdp-progress"><div class="pdp-fill" style="width:' + Math.min(progress,100) + '%"></div></div>';
+
+  var html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">';
+  arr.forEach(function(p) {
+    var progress = p.progress !== null && p.progress !== undefined ? p.progress : 0;
+    var barColor = progress >= 75 ? '#16a34a' : progress >= 40 ? '#d97706' : '#dc2626';
+    var statusColor = p.status === 'معتمد' ? '#16a34a' : p.status === 'مكتمل' ? '#0284c7' : '#d97706';
+
+    // Term progress summary
+    var termHtml = '';
+    [1,2,3].forEach(function(t) {
+      var td = p['term' + t + '_data'] || {};
+      var progs = [td.goal1, td.goal2, td.goal3].map(function(g){ return g && g.progress !== undefined ? g.progress : null; }).filter(function(v){ return v !== null; });
+      var avg = progs.length ? Math.round(progs.reduce(function(a,b){return a+b;},0)/progs.length) : null;
+      var tc = avg !== null ? (avg >= 75 ? '#16a34a' : avg >= 40 ? '#d97706' : '#dc2626') : '#94a3b8';
+      termHtml += '<div style="text-align:center">';
+      termHtml += '<div style="font-size:10px;color:#94a3b8;margin-bottom:2px">ف' + t + '</div>';
+      termHtml += '<div style="font-size:13px;font-weight:700;color:' + tc + '">' + (avg !== null ? avg + '%' : '—') + '</div>';
+      termHtml += '</div>';
+    });
+
+    html += '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">';
+    // Header
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">';
+    html += '<div style="font-weight:700;color:#1e293b;font-size:14px;flex:1">' + (p.staff_name || '—') + '</div>';
+    html += '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:' + statusColor + '18;color:' + statusColor + ';font-weight:600;white-space:nowrap">' + (p.status || 'جارٍ') + '</span>';
+    html += '</div>';
+    // Year
+    html += '<div style="font-size:12px;color:#94a3b8">' + (p.academic_year || '—') + '</div>';
+    // Goals
+    var goals = [p.goal_1, p.goal_2, p.goal_3].filter(function(g){ return g; });
+    if (goals.length) {
+      html += '<div style="background:#f8fafc;border-radius:8px;padding:8px 10px;font-size:12px;color:#475569">';
+      goals.forEach(function(g,i){ html += '<div style="margin-bottom:' + (i < goals.length-1 ? '4px' : '0') + '">&#127919; ' + g + '</div>'; });
+      html += '</div>';
+    }
+    // Term grid
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border:1px solid #f1f5f9;border-radius:8px;padding:8px">' + termHtml + '</div>';
+    // Overall progress bar
+    html += '<div>';
+    html += '<div style="display:flex;justify-content:space-between;font-size:12px;color:#64748b;margin-bottom:4px"><span>الإنجاز الكلي</span><span style="font-weight:700;color:' + barColor + '">' + progress + '%</span></div>';
+    html += '<div style="height:7px;background:#e2e8f0;border-radius:4px"><div style="width:' + Math.min(progress,100) + '%;height:100%;background:' + barColor + ';border-radius:4px;transition:width .4s"></div></div>';
+    html += '</div>';
+    // Note button
+    html += '<button onclick="EduOS_Appraisal.addPDPNote(' + (p.id || 0) + ',\'' + (p.staff_name || '').replace(/'/g,'') + '\')" style="padding:6px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-family:Tajawal,Arial,sans-serif;font-size:12px;color:#475569;width:100%">&#128204; إضافة ملاحظة</button>';
     html += '</div>';
   });
+  html += '</div>';
   document.getElementById('pdpList').innerHTML = html;
 }
+
+window.EduOS_Appraisal = window.EduOS_Appraisal || {};
+
+EduOS_Appraisal.togglePDP = async function() {
+  var btn = document.getElementById('pdpToggleBtn');
+  var newVal = btn._pdpOpen ? 'false' : 'true';
+  var SB = window.EduOS || {};
+  await fetch((SB.SB_URL||'') + '/rest/v1/app_settings?key=eq.pdp_open', {
+    method: 'PATCH',
+    headers: { apikey: SB.SB_KEY||'', Authorization: 'Bearer '+(SB.SB_KEY||''), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ value: newVal })
+  });
+  renderPDP();
+  showToast('تم ' + (newVal === 'true' ? 'فتح' : 'اغلاق') + ' فترة كتابة الخطط');
+};
+
+EduOS_Appraisal.setTerm = async function(term) {
+  var SB = window.EduOS || {};
+  await fetch((SB.SB_URL||'') + '/rest/v1/app_settings?key=eq.pdp_current_term', {
+    method: 'PATCH',
+    headers: { apikey: SB.SB_KEY||'', Authorization: 'Bearer '+(SB.SB_KEY||''), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ value: String(term) })
+  });
+  showToast('تم تحديد الفصل ' + term + ' كالفصل الحالي');
+};
+
+EduOS_Appraisal.addPDPNote = function(pdpId, staffName) {
+  var note = prompt('ملاحظة المدير/ة لـ ' + staffName + ':');
+  if (!note) return;
+  var SB = window.EduOS || {};
+  fetch((SB.SB_URL||'') + '/rest/v1/staff_pdp?id=eq.' + pdpId, {
+    method: 'PATCH',
+    headers: { apikey: SB.SB_KEY||'', Authorization: 'Bearer '+(SB.SB_KEY||''), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+    body: JSON.stringify({ principal_note: note })
+  }).then(function(r){ if(r.ok){ showToast('تم حفظ الملاحظة'); renderPDP(); } });
+};
 
 document.getElementById('saveBtn').addEventListener('click', saveEval);
 
