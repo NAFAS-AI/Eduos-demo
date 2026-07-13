@@ -936,12 +936,22 @@ function updateNasabRow() { /* kept for compatibility */ }
 function getTeacherForClass(subjName, className) {
   var assignments = STATE.teacherMap[subjName];
   if (!assignments || !assignments.length) return { teacherId: null, teacherNameAr: 'شاغر', isVacant: true };
+  /* First pass: exact class match */
   for (var i = 0; i < assignments.length; i++) {
     var a = assignments[i];
-    if (a.classes && a.classes.indexOf(className) > -1) {
+    if (a.classes && a.classes.length > 0 && a.classes.indexOf(className) > -1) {
       return a.isVacant
         ? { teacherId: null, teacherNameAr: 'شاغر', isVacant: true }
         : { teacherId: a.teacherId, teacherNameAr: a.teacherNameAr || 'شاغر', isVacant: false };
+    }
+  }
+  /* Second pass: fallback — teacher with no classes specified covers all classes */
+  for (var j = 0; j < assignments.length; j++) {
+    var b = assignments[j];
+    if (!b.classes || b.classes.length === 0) {
+      return b.isVacant
+        ? { teacherId: null, teacherNameAr: 'شاغر', isVacant: true }
+        : { teacherId: b.teacherId, teacherNameAr: b.teacherNameAr || 'شاغر', isVacant: false };
     }
   }
   return { teacherId: null, teacherNameAr: 'شاغر', isVacant: true };
