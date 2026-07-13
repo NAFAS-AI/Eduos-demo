@@ -1342,7 +1342,7 @@ var panelTitles = {
   platform:   ['حالة المنصة', 'Platform State']
 };
 
-function showPanel(name, btnEl) {
+window.showPanel = function showPanel(name, btnEl) {
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.snav').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('panel-' + name);
