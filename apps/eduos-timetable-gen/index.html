@@ -120,7 +120,7 @@ table.ttt tr.brow td{background:#FFFBEB;color:#D97706;font-weight:700;font-size:
 .sempty{min-height:46px;background:#F9FAFB;border-radius:8px}
 .tt-foot{text-align:center;padding:11px 22px;font-size:11px;color:#9CA3AF;border-top:1px solid #F3F4F6}
 /* ── Class Tabs ── */
-.cls-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cls-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;margin-bottom:14px;padding-bottom:4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 .cls-tab{padding:6px 15px;border-radius:18px;border:2px solid #E5E7EB;background:#fff;color:#374151;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
 .cls-tab.active{background:#6C3DD6;border-color:#6C3DD6;color:#fff}
 /* ── Stats ── */
@@ -282,6 +282,26 @@ table.ttt tr.brow td{background:#FFFBEB;color:#D97706;font-weight:700;font-size:
       <button class="btn btn-secondary btn-sm" style="margin-top:12px" onclick="addBreak()">+ إضافة استراحة</button>
     </div>
 
+
+    <div class="card" id="fridayCard">
+      <div class="card-title">🕌 إعداد يوم الجمعة — Friday Setup</div>
+      <div class="field-row">
+        <div class="fg">
+          <label>نوع دوام الجمعة — Friday Schedule</label>
+          <select id="fridayMode" style="padding:8px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700" onchange="onFridayModeChange(this.value)">
+            <option value="short">دوام قصير — Short Day</option>
+            <option value="full">دوام كامل — Full Day</option>
+            <option value="off">إجازة — No School</option>
+          </select>
+        </div>
+        <div class="fg" id="fridayPpdFg">
+          <label>عدد حصص الجمعة — Friday Periods</label>
+          <input type="number" id="fridayPeriodsPerDay" value="4" min="1" max="10" style="padding:8px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-family:inherit;font-size:14px">
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6B7280;margin-top:6px">💡 يوم الجمعة في الإمارات يوم دوام قصير — الافتراضي 4 حصص. يمكن تعديل العدد حسب سياسة المدرسة.</div>
+    </div>
+
     <div class="wiz-nav">
       <div></div>
       <button class="btn btn-primary" onclick="goToStep(2)">التالي: المواد &#8592;</button>
@@ -393,6 +413,7 @@ var STATE = {
   selectedClasses: [],
   selectedDays: ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'],
   periodsPerDay: 7,
+  fridayPeriodsPerDay: 4,
   periodDuration: 45,
   startTime: '07:30',
   breaks: [],
@@ -494,6 +515,24 @@ function shuffleArray(arr) {
     var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
   return a;
+}
+
+
+/* Friday mode toggle */
+function onFridayModeChange(val) {
+  var fg = document.getElementById('fridayPpdFg');
+  if (fg) fg.style.display = (val === 'off' || val === 'full') ? 'none' : '';
+  /* Auto-toggle Friday day chip */
+  var chip = document.querySelector('#dayChips [data-day="الجمعة"]');
+  if (chip) {
+    if (val === 'off') chip.classList.remove('selected');
+    else chip.classList.add('selected');
+  }
+}
+
+/* Helper: max periods for a given day */
+function maxPeriodsForDay(day, ppd, fridayPpd) {
+  return (day === 'الجمعة') ? fridayPpd : ppd;
 }
 
 /* ── DB Loaders ── */
@@ -933,6 +972,8 @@ function generateTimetable() {
   STATE.periodsPerDay = ppd;
   STATE.startTime = document.getElementById('startTime').value || '07:30';
   STATE.periodDuration = parseInt(document.getElementById('periodDuration').value) || 45;
+  var fridayPpd = parseInt((document.getElementById('fridayPeriodsPerDay') || {value:'4'}).value) || 4;
+  STATE.fridayPeriodsPerDay = fridayPpd;
 
   if (!classes.length) { showAlert('genAlert','al-err','يرجى تحديد فصل واحد على الأقل'); return; }
   if (!STATE.subjects.length) { showAlert('genAlert','al-err','يرجى إضافة مادة واحدة على الأقل'); return; }
@@ -974,6 +1015,7 @@ function generateTimetable() {
 }
 
 function runGenerate(classes, days, ppd) {
+  var fridayPpd = STATE.fridayPeriodsPerDay || 4;
   var fill = document.getElementById('genProgFill');
   var tt = {};
   classes.forEach(function(cls) {
@@ -1012,7 +1054,8 @@ function runGenerate(classes, days, ppd) {
       outer:
       for (var di = 0; di < daysShuf.length; di++) {
         var day = daysShuf[di];
-        for (var p = 1; p < ppd; p++) {
+        var maxPd = maxPeriodsForDay(day, ppd, fridayPpd);
+        for (var p = 1; p < maxPd; p++) {
           if (tt[task.cls][day][p] || tt[task.cls][day][p+1]) continue;
           if (task.teacherId) {
             if (teacherBusy[task.teacherId+'_'+day+'_'+p] || teacherBusy[task.teacherId+'_'+day+'_'+(p+1)]) continue;
@@ -1032,7 +1075,8 @@ function runGenerate(classes, days, ppd) {
       if (!assigned) {
         for (var di2 = 0; di2 < daysShuf.length && !assigned; di2++) {
           var day2 = daysShuf[di2];
-          for (var p2 = 1; p2 <= ppd && !assigned; p2++) {
+          var maxPd2 = maxPeriodsForDay(day2, ppd, fridayPpd);
+            for (var p2 = 1; p2 <= maxPd2 && !assigned; p2++) {
             if (tt[task.cls][day2][p2]) continue;
             if (task.teacherId && teacherBusy[task.teacherId+'_'+day2+'_'+p2]) continue;
             tt[task.cls][day2][p2] = { subject:task.subject, teacherId:task.teacherId, teacherNameAr:task.teacherNameAr, isVacant:task.isVacant, forced:true };
@@ -1044,7 +1088,7 @@ function runGenerate(classes, days, ppd) {
     } else {
       /* Single: prefer not repeating same subject same day */
       var allSlots = [];
-      daysShuf.forEach(function(day) { for (var p=1;p<=ppd;p++) allSlots.push({day:day,period:p}); });
+      daysShuf.forEach(function(day) { var mxP = maxPeriodsForDay(day,ppd,fridayPpd); for (var p=1;p<=mxP;p++) allSlots.push({day:day,period:p}); });
       /* Preferred: slot where subject not already that day */
       var preferred = allSlots.filter(function(sl) {
         if (tt[task.cls][sl.day][sl.period]) return false;
@@ -1244,7 +1288,14 @@ function renderPreview(cls) {
       days.forEach(function(day) {
         var slot = tt[day] && tt[day][row.period];
         var td = document.createElement('td');
-        if (slot) {
+        var mxPd = maxPeriodsForDay(day, STATE.periodsPerDay, STATE.fridayPeriodsPerDay || 4);
+        if (row.period > mxPd) {
+          /* يوم الجمعة — دوام قصير — هذه الحصة لا توجد */
+          var offCell = document.createElement('div');
+          offCell.style.cssText = 'background:#F1F5F9;border-radius:8px;min-height:46px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94A3B8;font-style:italic;border:1px dashed #CBD5E1';
+          offCell.textContent = '\u0644\u0627 \u062f\u0631\u0627\u0633\u0629';
+          td.appendChild(offCell);
+        } else if (slot) {
           var cell = buildSlotCell(slot, cls, day, row.period);
           td.appendChild(cell);
         } else {
@@ -1360,7 +1411,8 @@ async function saveTimetable() {
   var ppd = STATE.periodsPerDay;
   classes.forEach(function(cls) {
     days.forEach(function(day) {
-      for (var p=1;p<=ppd;p++) {
+      var dayPpd = (day === 'الجمعة') ? (STATE.fridayPeriodsPerDay || ppd) : ppd;
+      for (var p=1;p<=dayPpd;p++) {
         var slot = STATE.timetable[cls][day][p];
         if (slot) {
           rows.push({
@@ -1398,7 +1450,7 @@ async function saveTimetable() {
       }
     }
     /* Save config to app_settings */
-    var cfg = JSON.stringify({ startTime:STATE.startTime, periodDuration:STATE.periodDuration, periodsPerDay:STATE.periodsPerDay, breaks:STATE.breaks });
+    var cfg = JSON.stringify({ startTime:STATE.startTime, periodDuration:STATE.periodDuration, periodsPerDay:STATE.periodsPerDay, fridayPeriodsPerDay:STATE.fridayPeriodsPerDay||4, breaks:STATE.breaks });
     await sbFetch('app_settings', { method:'POST', headers:{'Prefer':'resolution=merge-duplicates,return=minimal'}, body: JSON.stringify({key:'timetable_config', value:cfg}) });
   } catch(e) {
     showToast('\u062E\u0637\u0623: ' + e.message,'err');
@@ -1485,6 +1537,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (cfg.startTime) document.getElementById('startTime').value = cfg.startTime;
           if (cfg.periodDuration) document.getElementById('periodDuration').value = cfg.periodDuration;
           if (cfg.periodsPerDay) document.getElementById('periodsPerDay').value = cfg.periodsPerDay;
+          if (cfg.fridayPeriodsPerDay) { document.getElementById('fridayPeriodsPerDay').value = cfg.fridayPeriodsPerDay; STATE.fridayPeriodsPerDay = cfg.fridayPeriodsPerDay; }
           if (cfg.breaks && cfg.breaks.length) { STATE.breaks = cfg.breaks; renderBreaksTable(); }
         } catch(e) {}
       }
