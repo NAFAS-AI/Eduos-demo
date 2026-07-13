@@ -103,6 +103,22 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
 .progress-inner { height:100%; background:linear-gradient(90deg,#6366f1,#06b6d4); border-radius:99px; transition:width .4s; }
 @media(max-width:700px){ .crit-grid { grid-template-columns:1fr; } }
 
+
+/* === UX Spacing Improvements 2026-07-28 === */
+.crit-container { gap: 16px; }
+.crit-container > div { padding: 20px; gap: 12px; }
+.crit-container > div:last-child:nth-child(odd) { grid-column: 1; }
+.lv-btns { gap: 8px; margin-bottom: 4px; }
+.lv-btn { padding: 8px 10px; font-size: 13px; border-radius: 8px; }
+.ev-box { margin: 12px 0; padding: 14px 18px; border-radius: 10px; }
+.ev-num { font-size: 2rem; font-weight: 700; }
+.score-bar-wrap { margin-bottom: 20px; }
+/* nurse specific */
+.btns-visits { gap: 8px; margin-bottom: 4px; }
+.btn-visit { padding: 8px 10px; font-size: 13px; border-radius: 8px; }
+.ev-box-nurse { margin: 12px 0; padding: 14px 18px; border-radius: 10px; }
+.ev-num-nurse { font-size: 2rem; font-weight: 700; }
+.score-bar-wrap-nurse { margin-bottom: 20px; }
 </style>
 </head>
 <body>
