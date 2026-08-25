@@ -6,6 +6,7 @@
 <title>Sports Coach Portal — بوابة الجود الذكية</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../platform-auth-guard.js"></script>
 <script src="../platform-lang.js" defer></script>
 <script src="../platform-config.js"></script>
 <style>
@@ -319,7 +320,7 @@ body{overflow:hidden}
   <!-- ══ SCHEDULE ══ -->
   <section id="sec-schedule" class="section active">
     <div class="card">
-      <div class="card-title">📅 Weekly Schedule — Jiu-Jitsu (2025–2026)</div>
+      <div class="card-title" id="schedTitle">📅 Weekly Schedule — Jiu-Jitsu</div>
       <div class="sched-wrap" id="schedGrid">
         <div style="text-align:center;padding:40px"><div class="spinner"></div></div>
       </div>
@@ -534,7 +535,7 @@ const sb = window.supabase?.createClient((window.EduOS?window.EduOS.SB_URL:''), 
 
 // ─── State ───
 let COACH = null;
-let mySchedule = [];        // sport_schedule rows
+let mySchedule = [];        // schedules rows (Jiu-Jitsu)
 let myClassCodes = [];      // unique class codes from schedule
 let curSession = null;      // selected session for attendance
 let attStudents = [];       // students for current attendance session
@@ -563,6 +564,21 @@ const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Satur
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function getDoW() { return new Date().getDay(); } // 0=Sun
 
+
+async function fetchCriteriaFromDB(roleKey, fallback) {
+  try {
+    var SB_URL = (window.EduOS && window.EduOS.SB_URL) || '';
+    var SB_KEY = (window.EduOS && window.EduOS.SB_KEY) || '';
+    if (!SB_URL || !SB_KEY) return fallback;
+    var resp = await fetch(SB_URL + '/rest/v1/evaluation_criteria?role_key=eq.' + roleKey + '&is_active=eq.true&order=order_num&select=criteria_id,name_ar,evidence', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if (!resp.ok) return fallback;
+    var data = await resp.json();
+    if (!data || !data.length) return fallback;
+    return data.map(function(c) { return { id: c.criteria_id, name: c.name_ar, evidence: c.evidence || '' }; });
+  } catch(e) { return fallback; }
+}
 function initDate() {
   const n = new Date();
   document.getElementById('dateStr').textContent = `${DAYS[n.getDay()]}, ${n.getDate()} ${MONTHS[n.getMonth()]} ${n.getFullYear()}`;
@@ -583,19 +599,35 @@ function showSection(name, btn) {
 }
 
 // ─── Schedule ───
+const DAY_AR_TO_NUM = {'الاثنين':1,'الثلاثاء':2,'الأربعاء':3,'الخميس':4,'الجمعة':5};
+const PERIOD_TIMES = {1:'07:15–08:00',2:'08:00–08:45',3:'08:50–09:35',4:'09:35–10:20',5:'10:50–11:35',6:'11:35–12:20',7:'12:20–13:05',8:'13:05–13:50'};
+
 async function loadSchedule() {
-  const coachId = COACH?.staff_db_id;
-  if (!coachId || !sb) { renderSchedule([]); return; }
-  const { data, error } = await sb.from('sport_schedule')
-    .select('*')
-    .eq('coach_id', coachId)
+  if (!sb) { renderSchedule([]); return; }
+  const { data, error } = await sb.from('schedules')
+    .select('day,period,class_name,subject,teacher_id,academic_year')
+    .ilike('subject', '%جيوجيتسو%')
     .eq('is_active', true)
-    .order('day_of_week').order('start_time');
-  if (error || !data) { renderSchedule([]); return; }
-  mySchedule = data;
-  myClassCodes = [...new Set(data.map(r => r.class_code))].sort();
-  renderSchedule(data);
+    .order('day').order('period');
+  if (error || !data || !data.length) { renderSchedule([]); return; }
+  // Transform to internal format
+  const transformed = data.map(r => ({
+    day_of_week: DAY_AR_TO_NUM[r.day] || 0,
+    period_label: 'P' + r.period,
+    period_num: r.period,
+    class_code: r.class_name,
+    start_time: PERIOD_TIMES[r.period] ? PERIOD_TIMES[r.period].split('–')[0] : '',
+    end_time:   PERIOD_TIMES[r.period] ? PERIOD_TIMES[r.period].split('–')[1] : '',
+    is_after_class: false,
+    academic_year: r.academic_year
+  }));
+  mySchedule = transformed;
+  myClassCodes = [...new Set(transformed.map(r => r.class_code))].sort();
+  renderSchedule(transformed);
   populateClassPickers();
+  // Update title with academic year
+  const yr = transformed[0]?.academic_year || '';
+  if (yr) document.getElementById('schedTitle').textContent = '📅 Weekly Schedule — Jiu-Jitsu (' + yr + ')';
 }
 
 const PERIODS = [
@@ -633,28 +665,33 @@ function renderSchedule(data) {
 // ─── Today Sessions ───
 async function loadTodaySessions() {
   const todayDow = getDoW();
-  const coachId = COACH?.staff_db_id;
-  if (!coachId || !sb) { noClassesMsg(); return; }
-  const { data, error } = await sb.from('sport_schedule')
-    .select('*')
-    .eq('coach_id', coachId)
-    .eq('day_of_week', todayDow)
+  const dayAr = Object.keys(DAY_AR_TO_NUM).find(k => DAY_AR_TO_NUM[k] === todayDow);
+  if (!dayAr || !sb) { noClassesMsg(); return; }
+  const { data, error } = await sb.from('schedules')
+    .select('day,period,class_name,subject')
+    .ilike('subject', '%جيوجيتسو%')
+    .eq('day', dayAr)
     .eq('is_active', true)
-    .order('is_after_class').order('start_time');
+    .order('period');
   if (error || !data?.length) { noClassesMsg(); return; }
 
-  let html = `<div class="sessions-grid">`;
-  for (const sess of data) {
-    const { count } = await sb.from('students').select('*',{count:'exact',head:true}).eq('class_name', sess.class_code);
-    html += `<div class="sess-card${sess.is_after_class?' ac':''}" onclick='openAtt(${JSON.stringify(sess).replace(/'/g,"&#39;")})'>
-      ${sess.is_after_class?'<div class="ac-tag">AFTER CLASS</div>':''}
-      <div class="sess-class">Class ${sess.class_code}</div>
-      <div class="sess-time">⏰ ${(sess.start_time||'').slice(0,5)} – ${(sess.end_time||'').slice(0,5)} &nbsp;·&nbsp; ${sess.period_label}</div>
-      <div class="sess-students">👥 ${count||0} students</div>
-    </div>`;
+  let html = '<div class="sessions-grid">';
+  for (const row of data) {
+    const times = PERIOD_TIMES[row.period] || '';
+    const [st, en] = times.split('–');
+    const sess = { day_of_week: todayDow, period_label: 'P'+row.period, period_num: row.period, class_code: row.class_name, start_time: st, end_time: en, is_after_class: false };
+    const { count } = await sb.from('students').select('*',{count:'exact',head:true}).eq('class_name', row.class_name);
+    html += '<div class="sess-card" data-sess=\'' + JSON.stringify(sess).replace(/'/g,"&#39;") + '\' style="cursor:pointer">';
+    html += '<div class="sess-class">Class ' + row.class_name + '</div>';
+    html += '<div class="sess-time">&#x23F0; ' + (st||'') + ' – ' + (en||'') + ' &nbsp;&#183;&nbsp; P' + row.period + '</div>';
+    html += '<div class="sess-students">&#x1F465; ' + (count||0) + ' students</div>';
+    html += '</div>';
   }
-  html += `</div>`;
+  html += '</div>';
   document.getElementById('todaySessions').innerHTML = html;
+  document.querySelectorAll('[data-sess]').forEach(el => {
+    el.addEventListener('click', function(){ openAtt(JSON.parse(this.getAttribute('data-sess'))); });
+  });
 }
 
 function noClassesMsg() {
@@ -1083,7 +1120,7 @@ const LEVELS_COACH = [
   {v:2, icon:'⚠',  label:'Below Expectations', cls:'selected-2'},
   {v:1, icon:'✗',  label:'Unacceptable', cls:'selected-1'}
 ];
-const CRITERIA_COACH = [{"id": "training", "name": "Training Session Quality", "evidence": ""}, {"id": "attendance", "name": "Student Attendance Rate", "evidence": "from records"}, {"id": "safety", "name": "Safety & Discipline Standards", "evidence": ""}, {"id": "compete", "name": "Competition Participation", "evidence": ""}, {"id": "progress", "name": "Student Skill Progress", "evidence": ""}];
+let CRITERIA_COACH = [{"id": "training", "name": "Training Session Quality", "evidence": ""}, {"id": "attendance", "name": "Student Attendance Rate", "evidence": "from records"}, {"id": "safety", "name": "Safety & Discipline Standards", "evidence": ""}, {"id": "compete", "name": "Competition Participation", "evidence": ""}, {"id": "progress", "name": "Student Skill Progress", "evidence": ""}];
 let apprSelfScores_COACH = {};
 let apprNotes_COACH = {};
 
@@ -1109,7 +1146,8 @@ async function autoSaveDraft_COACH() {
 let appraisalRow_COACH = null;
 let appraisalLocked_COACH = false;
 
-function renderAppraisalCriteria_COACH() {
+async function renderAppraisalCriteria_COACH() {
+  CRITERIA_COACH = await fetchCriteriaFromDB('coach', CRITERIA_COACH);
   const container = document.getElementById('crit-container-coach');
   if (!container) return;
   const grid = document.createElement('div');
