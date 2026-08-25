@@ -6,6 +6,7 @@
 <title>بوابة السكرتيرة — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../platform-auth-guard.js"></script>
 <script src="../platform-config.js"></script>
 <script src="../platform-shield.js" defer></script>
 <script src="../platform-week.js" defer></script>
@@ -231,9 +232,55 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
 
       <!-- CORRESPONDENCE -->
       <div class="tab-panel" id="panel-correspondence">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">✉️ المراسلات الرسمية | Official Correspondence</div>
+            <button class="btn btn-primary" onclick="toggleLetterForm()" style="font-size:13px;padding:8px 16px">➕ خطاب جديد</button>
+          </div>
+          <div id="letterFormWrap" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-top:12px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div>
+                <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">الموضوع *</label>
+                <input id="ltSubject" placeholder="موضوع الخطاب..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">رقم المرجع</label>
+                <input id="ltRef" placeholder="مثال: 2026/MOE/001" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">النوع</label>
+                <select id="ltType" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px">
+                  <option value="incoming">وارد | Incoming</option>
+                  <option value="outgoing">صادر | Outgoing</option>
+                  <option value="circular">تعميم | Circular</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">من / إلى</label>
+                <input id="ltParty" placeholder="الجهة المرسلة أو المستقبلة..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+              </div>
+            </div>
+            <div style="margin-bottom:12px">
+              <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">ملاحظات</label>
+              <textarea id="ltNotes" rows="2" placeholder="ملاحظات إضافية..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;box-sizing:border-box"></textarea>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onclick="saveLetter()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 20px;font-weight:700;cursor:pointer;font-size:14px">حفظ ✅</button>
+              <button onclick="toggleLetterForm()" style="background:#f1f5f9;color:#374151;border:1px solid #ddd;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:14px">إلغاء</button>
+            </div>
+          </div>
+        </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">✉️ المراسلات الرسمية | Official Correspondence</div></div>
-          <div class="empty-state"><div class="empty-icon">✉️</div><div class="empty-text">نظام المراسلات قيد التطوير | Coming soon</div></div>
+          <div class="card-header">
+            <div class="card-title" style="font-size:14px">📋 سجل المراسلات | Log</div>
+            <select id="ltFilter" onchange="loadLetters()" style="border:1px solid #ddd;border-radius:8px;padding:6px 12px;font-size:13px">
+              <option value="">الكل | All</option>
+              <option value="incoming">وارد</option>
+              <option value="outgoing">صادر</option>
+              <option value="circular">تعميم</option>
+            </select>
+          </div>
+          <div id="lettersList" style="margin-top:8px"></div>
         </div>
       </div>
 
@@ -338,8 +385,64 @@ function switchPanel(name){
   document.querySelectorAll('.snav').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const nav=document.querySelector('.snav[data-panel="'+name+'"]');if(nav)nav.classList.add('active');
   const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');
-  if(name==='staff')loadStaff();if(name==='students')loadStudents();if(name==='leaves')loadLeaves();if(name==='calendar')loadCalendar();if(name==='appraisal'){renderAppraisalCriteria_SECRETARY();loadAppraisal_SECRETARY(window._staffDbId||'');}if(name==='pdp')loadMyPDP();
+  if(name==='staff')loadStaff();if(name==='students')loadStudents();if(name==='leaves')loadLeaves();if(name==='calendar')loadCalendar();if(name==='correspondence')loadLetters();if(name==='appraisal'){renderAppraisalCriteria_SECRETARY();loadAppraisal_SECRETARY(window._staffDbId||'');}if(name==='pdp')loadMyPDP();
 }
+function toggleLetterForm() {
+  var w = document.getElementById('letterFormWrap');
+  w.style.display = w.style.display === 'none' ? 'block' : 'none';
+}
+
+async function saveLetter() {
+  var subj = (document.getElementById('ltSubject').value || '').trim();
+  if (!subj) { toast('أدخل موضوع الخطاب | Enter subject'); return; }
+  var u = JSON.parse(sessionStorage.getItem('edoos_user') || '{}');
+  var payload = {
+    subject_ar: subj,
+    reference_number: document.getElementById('ltRef').value.trim() || null,
+    letter_type: document.getElementById('ltType').value,
+    from_party: document.getElementById('ltParty').value.trim() || null,
+    notes: document.getElementById('ltNotes').value.trim() || null,
+    created_by: u.name_ar || u.username || 'سكرتيرة',
+    status: 'active',
+    created_at: new Date().toISOString()
+  };
+  var ok = await dbPost('official_letters', payload);
+  if (ok) {
+    toast('تم حفظ الخطاب ✅');
+    document.getElementById('ltSubject').value = '';
+    document.getElementById('ltRef').value = '';
+    document.getElementById('ltParty').value = '';
+    document.getElementById('ltNotes').value = '';
+    toggleLetterForm();
+    loadLetters();
+  } else {
+    toast('❌ خطأ في الحفظ');
+  }
+}
+
+async function loadLetters() {
+  var el = document.getElementById('lettersList');
+  if (!el) return;
+  el.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div></div>';
+  var filter = document.getElementById('ltFilter').value;
+  var params = 'select=id,subject_ar,letter_type,reference_number,from_party,status,created_by,created_at&order=created_at.desc&limit=100';
+  if (filter) params += '&letter_type=eq.' + filter;
+  var data = await dbGet('official_letters', params) || [];
+  var typeLabel = {incoming:'وارد',outgoing:'صادر',circular:'تعميم'};
+  var typeColor = {incoming:'#3b82f6',outgoing:'#10b981',circular:'#f59e0b'};
+  el.innerHTML = data.length ? data.map(function(l){
+    var typ = l.letter_type || 'incoming';
+    return '<div style="padding:12px 0;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<div style="flex:1">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+      '<span style="background:' + (typeColor[typ]||'#6366f1') + '20;color:' + (typeColor[typ]||'#6366f1') + ';border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700">' + (typeLabel[typ]||typ) + '</span>' +
+      '<span style="font-weight:700;font-size:14px">' + (l.subject_ar||'—') + '</span></div>' +
+      '<div style="color:#64748b;font-size:12px">' + (l.reference_number ? 'مرجع: ' + l.reference_number + ' · ' : '') + (l.from_party || '') + '</div>' +
+      '<div style="color:#94a3b8;font-size:11px;margin-top:2px">بواسطة: ' + (l.created_by||'—') + '</div></div>' +
+      '<div style="color:#94a3b8;font-size:11px;white-space:nowrap;margin-right:8px">' + (l.created_at ? new Date(l.created_at).toLocaleDateString('ar-AE') : '') + '</div></div>';
+  }).join('') : '<div style="color:#94a3b8;text-align:center;padding:24px">لا مراسلات مسجّلة</div>';
+}
+
 let allStaff=[],allStudents=[];
 async function init(){
   try{user=JSON.parse(sessionStorage.getItem('edoos_user'));}catch(e){}

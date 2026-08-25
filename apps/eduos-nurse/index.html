@@ -6,6 +6,7 @@
 <title>بوابة الممرضة — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../platform-auth-guard.js"></script>
 <script src="../platform-config.js"></script>
 <script src="../platform-shield.js" defer></script>
 <script src="../platform-week.js" defer></script>
@@ -260,8 +261,20 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
       <!-- REPORTS -->
       <div class="tab-panel" id="panel-reports">
         <div class="card">
-          <div class="card-header"><div class="card-title">📊 التقارير الصحية | Health Reports</div></div>
-          <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">التقارير ستتوفر قريباً | Reports coming soon</div></div>
+          <div class="card-header">
+            <div class="card-title">📊 التقارير الصحية | Health Reports</div>
+            <select id="rptPeriod" onchange="loadNurseReports()" style="border:1px solid #ddd;border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer">
+              <option value="7">آخر 7 أيام</option>
+              <option value="30" selected>آخر 30 يوم</option>
+              <option value="90">آخر 3 أشهر</option>
+              <option value="365">السنة كاملة</option>
+            </select>
+          </div>
+          <div id="nurseRptKPIs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px"></div>
+          <div class="card-header" style="margin-top:8px"><div class="card-title" style="font-size:14px">🤒 الأعراض الأكثر شيوعاً | Top Symptoms</div></div>
+          <div id="nurseRptSymptoms" style="margin-bottom:16px"></div>
+          <div class="card-header" style="margin-top:8px"><div class="card-title" style="font-size:14px">📋 آخر الزيارات | Recent Visits</div></div>
+          <div id="nurseRptVisits"></div>
         </div>
       </div>
 
@@ -356,7 +369,58 @@ function switchPanel(name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const nav=document.querySelector('.snav[data-panel="'+name+'"]');if(nav)nav.classList.add('active');
   const panel=document.getElementById('panel-'+name);if(panel)panel.classList.add('active');
-  if(name==='visits')loadVisits();if(name==='health')loadHealth();if(name==='meds')loadMeds();if(name==='appraisal'){renderAppraisalCriteria_NURSE();loadAppraisal_NURSE(window._staffDbId||'');}if(name==='pdp')loadMyPDP();
+  if(name==='visits')loadVisits();if(name==='health')loadHealth();if(name==='meds')loadMeds();if(name==='reports')loadNurseReports();if(name==='appraisal'){renderAppraisalCriteria_NURSE();loadAppraisal_NURSE(window._staffDbId||'');}if(name==='pdp')loadMyPDP();
+}
+
+async function loadNurseReports() {
+  var days = parseInt(document.getElementById('rptPeriod').value || '30');
+  var since = new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
+  var kpiEl = document.getElementById('nurseRptKPIs');
+  var symEl = document.getElementById('nurseRptSymptoms');
+  var visEl = document.getElementById('nurseRptVisits');
+  if (!kpiEl) return;
+  kpiEl.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div></div>';
+
+  var visits = await dbGet('nurse_visits', 'created_at=gte.' + since + '&select=student_name,class_name,symptoms,created_at&order=created_at.desc&limit=500') || [];
+  var health = await dbGet('student_health_records', 'select=student_name,condition_type&limit=200') || [];
+
+  var today = new Date().toISOString().split('T')[0];
+  var todayCount = visits.filter(function(v){ return v.created_at && v.created_at.startsWith(today); }).length;
+  var chronicCount = health.length;
+
+  kpiEl.innerHTML = [
+    {icon:'🏥', val: visits.length, lbl:'زيارة في الفترة | Visits'},
+    {icon:'📅', val: todayCount, lbl:'زيارة اليوم | Today'},
+    {icon:'❤️', val: chronicCount, lbl:'حالة مزمنة | Chronic'}
+  ].map(function(k){
+    return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;text-align:center">' +
+      '<div style="font-size:28px">' + k.icon + '</div>' +
+      '<div style="font-size:26px;font-weight:900;color:#6366f1">' + k.val + '</div>' +
+      '<div style="font-size:12px;color:#64748b;margin-top:4px">' + k.lbl + '</div></div>';
+  }).join('');
+
+  var symMap = {};
+  visits.forEach(function(v){
+    var s = (v.symptoms || 'غير محدد').trim();
+    symMap[s] = (symMap[s] || 0) + 1;
+  });
+  var syms = Object.keys(symMap).sort(function(a,b){return symMap[b]-symMap[a];}).slice(0,8);
+  symEl.innerHTML = syms.length ? syms.map(function(s){
+    var pct = Math.round(symMap[s] / visits.length * 100);
+    return '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:600">' + s + '</span>' +
+      '<span style="font-size:13px;color:#64748b">' + symMap[s] + ' (' + pct + '%)</span></div>' +
+      '<div style="background:#e2e8f0;border-radius:6px;height:8px">' +
+      '<div style="background:#6366f1;border-radius:6px;height:8px;width:' + pct + '%"></div></div></div>';
+  }).join('') : '<div style="color:#94a3b8;font-size:14px">لا بيانات</div>';
+
+  visEl.innerHTML = visits.slice(0,10).map(function(v){
+    return '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9">' +
+      '<div><div style="font-weight:700;font-size:14px">' + (v.student_name||'—') + '</div>' +
+      '<div style="color:#64748b;font-size:12px">' + (v.class_name||'') + ' · ' + (v.symptoms||'') + '</div></div>' +
+      '<div style="color:#94a3b8;font-size:12px;white-space:nowrap">' + (v.created_at ? new Date(v.created_at).toLocaleDateString('ar-AE') : '') + '</div></div>';
+  }).join('') || '<div style="color:#94a3b8;text-align:center;padding:20px">لا زيارات في هذه الفترة</div>';
 }
 
 async function init(){

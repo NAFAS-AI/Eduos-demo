@@ -6,6 +6,7 @@
 <title>بوابة الأخصائي/ة — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../platform-auth-guard.js"></script>
 <script src="../platform-config.js"></script>
 <script src="../platform-shield.js" defer></script>
 <script src="../platform-week.js" defer></script>
@@ -309,7 +310,13 @@ label.lbl{display:block;font-size:13px;font-weight:700;color:var(--text2);margin
       <div class="tab-panel" id="panel-reports">
         <div class="card">
           <div class="card-header"><div class="card-title">📊 تقارير الأخصائي | Reports</div></div>
-          <div id="reportsList"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">التقارير ستتوفر قريباً | Reports coming soon</div></div></div>
+          <div id="reportsList">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px" id="specRptKPIs"></div>
+            <div class="card-header" style="margin-top:8px"><div class="card-title" style="font-size:14px">📊 توزيع الحالات | Case Breakdown</div></div>
+            <div id="specRptChart" style="margin-bottom:16px"></div>
+            <div class="card-header" style="margin-top:8px"><div class="card-title" style="font-size:14px">📋 الحالات المفتوحة | Open Cases</div></div>
+            <div id="specOpenCases"></div>
+          </div>
         </div>
       </div>
 
@@ -434,7 +441,54 @@ function switchPanel(name) {
   const panel = document.getElementById('panel-' + name);
   if (panel) panel.classList.add('active');
   if (name === 'cases') loadCases();
+  if (name === 'reports') loadSpecialistReports();
   if (name === 'students') loadStudents();if (name === 'appraisal') {renderAppraisalCriteria_SPECIALIST();loadAppraisal_SPECIALIST(window._staffDbId||'');}
+}
+
+async function loadSpecialistReports() {
+  var kpi = document.getElementById('specRptKPIs');
+  var chart = document.getElementById('specRptChart');
+  var open = document.getElementById('specOpenCases');
+  if (!kpi) return;
+  kpi.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div></div>';
+
+  var cases = await dbGet('behavior_incidents', 'select=id,status,degree,violation_type,student_name,class_id,created_at&order=created_at.desc&limit=500') || [];
+  var openCases = cases.filter(function(c){ return c.status !== 'closed' && c.status !== 'resolved'; });
+  var severe = cases.filter(function(c){ return c.degree === 3 || c.degree === '3'; }).length;
+
+  var degreeLabel = {1:'خفيف',2:'متوسط',3:'شديد'};
+  var degreeCols = {'1':'#22c55e','2':'#f59e0b','3':'#ef4444'};
+
+  kpi.innerHTML = [
+    {icon:'📂', val: cases.length, lbl:'إجمالي الحالات | Total'},
+    {icon:'🔴', val: openCases.length, lbl:'حالة مفتوحة | Open'},
+    {icon:'⚠️', val: severe, lbl:'حالة شديدة | Severe'}
+  ].map(function(k){
+    return '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;text-align:center">' +
+      '<div style="font-size:28px">' + k.icon + '</div>' +
+      '<div style="font-size:26px;font-weight:900;color:#6366f1">' + k.val + '</div>' +
+      '<div style="font-size:12px;color:#64748b;margin-top:4px">' + k.lbl + '</div></div>';
+  }).join('');
+
+  var degMap = {1:0,2:0,3:0};
+  cases.forEach(function(c){ var d=parseInt(c.degree)||1; degMap[d]=(degMap[d]||0)+1; });
+  chart.innerHTML = [1,2,3].filter(function(d){ return degMap[d]>0; }).map(function(d){
+    var pct = cases.length ? Math.round(degMap[d]/cases.length*100) : 0;
+    return '<div style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:600;color:' + degreeCols[d] + '">' + degreeLabel[d] + '</span>' +
+      '<span style="font-size:13px;color:#64748b">' + degMap[d] + ' (' + pct + '%)</span></div>' +
+      '<div style="background:#e2e8f0;border-radius:6px;height:10px">' +
+      '<div style="background:' + degreeCols[d] + ';border-radius:6px;height:10px;width:' + pct + '%"></div></div></div>';
+  }).join('') || '<div style="color:#94a3b8;font-size:14px">لا بيانات</div>';
+
+  open.innerHTML = openCases.slice(0,10).map(function(c){
+    var d = parseInt(c.degree)||1;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f1f5f9">' +
+      '<div><div style="font-weight:700;font-size:14px">' + (c.student_name||'—') + '</div>' +
+      '<div style="color:#64748b;font-size:12px">' + (c.class_id||'') + ' · ' + (c.violation_type||'') + '</div></div>' +
+      '<span style="background:' + degreeCols[d] + '20;color:' + degreeCols[d] + ';border:1px solid ' + degreeCols[d] + ';border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700">' + (degreeLabel[d]||'') + '</span></div>';
+  }).join('') || '<div style="color:#22c55e;text-align:center;padding:20px;font-weight:700">✅ لا حالات مفتوحة</div>';
 }
 
 async function init() {
