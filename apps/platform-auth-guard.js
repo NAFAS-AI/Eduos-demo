@@ -196,7 +196,7 @@
     'eduos-swap-builder':         ['principal', 'vice_principal', 'admin'],
     'eduos-agent-control':        ['admin'],
     'eduos-control-plane':        [],
-    'eduos-school-wizard':        [],
+    'eduos-school-wizard':        ['admin'],
   };
 
   // استخراج اسم البوابة من المسار
@@ -228,14 +228,15 @@
     // ─── التحقق من JWT مع الخادم (C-02 fix) ──────────────
     // الطلاب والوالدين قد يكون لديهم token أو لا
     const token = session.token || '';
+    const isDemo = window.EduOS?.school?.isDemo === true;
 
     if (!token) {
-      // طالب أو مستخدم بدون JWT (قديم) — تحقق بسيط من وجود الجلسة
-      if (session.role_key === 'student' || session.role_key === 'parent') {
-        document.documentElement.style.visibility = 'visible';
+      // في Demo: نقبل الجلسة بدون JWT (بيئة تجريبية)
+      if (isDemo && session.role_key) {
+        // Demo session valid — skip JWT verification
         return;
       }
-      // موظف بدون JWT = مشبوه
+      // H-03 FIX: كل الأدوار تحتاج JWT — لا استثناء للطالب أو ولي الأمر
       redirectTo('/apps/eduos-login/?err=no_token');
       return;
     }
