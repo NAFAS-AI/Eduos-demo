@@ -228,7 +228,10 @@
     // ─── التحقق من JWT مع الخادم (C-02 fix) ──────────────
     // الطلاب والوالدين قد يكون لديهم token أو لا
     const token = session.token || '';
-    const isDemo = window.EduOS?.school?.isDemo === true;
+    // Demo: تحقق من hostname مباشرة (أكثر موثوقية من window.EduOS)
+    const isDemo = window.EduOS?.school?.isDemo === true
+      || location.hostname === 'demo.eduos.ae'
+      || location.hostname === 'localhost';
 
     if (!token) {
       // في Demo: نقبل الجلسة بدون JWT (بيئة تجريبية)
