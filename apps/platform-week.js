@@ -7,21 +7,20 @@
  */
 
 const EDOOS_ACADEMIC_CALENDAR = {
-  year: '2025-2026',
+  year: '2026-2027',
 
   // ── الفصول الدراسية ──────────────────────────────────────────
   semesters: [
-    { num: 1, name: 'الفصل الأول',  start: '2025-09-01', end: '2025-12-07', weeks: 14 },
-    { num: 2, name: 'الفصل الثاني', start: '2026-01-04', end: '2026-03-15', weeks: 11 },
-    { num: 3, name: 'الفصل الثالث', start: '2026-03-30', end: '2026-07-02', weeks: 12 },
+    { num: 1, name: 'الفصل الأول',  start: '2026-09-01', end: '2026-12-14', weeks: 15 },
+    { num: 2, name: 'الفصل الثاني', start: '2027-01-03', end: '2027-03-21', weeks: 11 },
+    { num: 3, name: 'الفصل الثالث', start: '2027-04-04', end: '2027-07-02', weeks: 12 },
   ],
 
   // ── الإجازات الرسمية (لا تُحتسب كأسابيع دراسية) ─────────────
   holidays: [
-    { name: 'إجازة الشتاء',    start: '2025-12-08', end: '2026-01-03' },
-    { name: 'إجازة الربيع',    start: '2026-03-16', end: '2026-03-29' },
-    { name: 'عيد الأضحى',     start: '2026-05-25', end: '2026-05-29' },
-    { name: 'نهاية العام',     start: '2026-07-03', end: '2026-08-31' },
+    { name: 'إجازة الشتاء',    start: '2026-12-15', end: '2027-01-02' },
+    { name: 'إجازة الربيع',    start: '2027-03-22', end: '2027-04-03' },
+    { name: 'نهاية العام',     start: '2027-07-03', end: '2027-08-31' },
   ],
 
   // ── عطلة نهاية الأسبوع: الأحد والسبت ──────────────────────────────────────
@@ -168,7 +167,10 @@ function getPlatformWeek(date) {
     holidayName: info.holidayName,
   };
 }
-if (typeof window !== 'undefined') window.getPlatformWeek = getPlatformWeek;
+if (typeof window !== 'undefined') {
+  window.getPlatformWeek = getPlatformWeek;
+  window.EDOOS_ACADEMIC_CALENDAR = EDOOS_ACADEMIC_CALENDAR;
+}
 if (typeof module !== 'undefined') {
   module.exports.getPlatformWeek = getPlatformWeek;
 }
@@ -186,15 +188,31 @@ if (typeof module !== 'undefined') {
 async function loadCalendarFromDB(sb) {
   if (!sb) return false;
   try {
-    const { data, error } = await sb
+    // احسب السنة الدراسية الحالية بذكاء
+    const now = new Date();
+    const m = now.getMonth();
+    const y = now.getFullYear();
+    const currentAcadYear = m >= 8 ? `${y}-${y+1}` : `${y-1}-${y}`;
+
+    let { data, error } = await sb
       .from('academic_calendar')
       .select('*')
-      .order('academic_year', { ascending: false })
+      .eq('academic_year', currentAcadYear)
       .order('term_number');
 
-    if (error || !data || data.length === 0) return false;
+    if (error || !data || data.length === 0) {
+      const { data: allData } = await sb
+        .from('academic_calendar')
+        .select('*')
+        .order('academic_year', { ascending: false })
+        .order('term_number')
+        .limit(9);
+      if (!allData || allData.length === 0) return false;
+      data = allData;
+    }
 
-    // أحدث سنة دراسية في الجدول
+    if (!data || data.length === 0) return false;
+
     const latestYear = data[0].academic_year;
     const terms = data.filter(r => r.academic_year === latestYear);
 

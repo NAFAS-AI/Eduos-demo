@@ -71,43 +71,27 @@
   // الطبقة 1: زر التبليغ اليدوي 🚩
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function injectReportButton() {
-    // لا تُضف في صفحة login
     if (window.location.pathname.includes("login") || window.location.pathname === "/") return;
+    if (document.getElementById("shield-report-btn")) return;
 
+    const headerTools = document.getElementById("header-tools");
     const btn = document.createElement("button");
     btn.id = "shield-report-btn";
-    btn.innerHTML = "🚩";
-    btn.title = "أبلغ عن مشكلة";
+    btn.title = "أبلغ عن مشكلة تقنية";
     btn.setAttribute("aria-label", "أبلغ عن مشكلة تقنية");
-    btn.style.cssText = `
-      position: fixed;
-      bottom: 80px;
-      left: 16px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(220,38,38,0.15);
-      border: 1.5px solid rgba(220,38,38,0.4);
-      color: #ef4444;
-      font-size: 18px;
-      cursor: pointer;
-      z-index: 9997;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(8px);
-    `;
-    btn.addEventListener("mouseenter", () => {
-      btn.style.background = "rgba(220,38,38,0.3)";
-      btn.style.transform = "scale(1.1)";
-    });
-    btn.addEventListener("mouseleave", () => {
-      btn.style.background = "rgba(220,38,38,0.15)";
-      btn.style.transform = "scale(1)";
-    });
+
+    if (headerTools) {
+      // يُضاف لـ header-tools كأيقونة صغيرة
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      btn.style.cssText = "background:none;border:none;cursor:pointer;padding:7px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#dc2626;transition:background 0.2s;";
+      headerTools.appendChild(btn);
+    } else {
+      // FAB احتياطي
+      btn.innerHTML = "🚩";
+      btn.style.cssText = "position:fixed;bottom:80px;left:16px;width:40px;height:40px;border-radius:50%;background:rgba(220,38,38,0.15);border:1.5px solid rgba(220,38,38,0.4);color:#ef4444;font-size:18px;cursor:pointer;z-index:9997;display:flex;align-items:center;justify-content:center;transition:all 0.2s;backdrop-filter:blur(8px);";
+      document.body.appendChild(btn);
+    }
     btn.addEventListener("click", openReportModal);
-    document.body.appendChild(btn);
   }
 
   // نافذة التبليغ
@@ -330,9 +314,20 @@
   // التهيئة
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   function init() {
-    injectReportButton();
-    setTimeout(checkLinks, 1500); // بعد تحميل الروابط
-    console.log(`[EduOS Shield v${SHIELD_VERSION}] منظومة الجودة الذاتية تعمل ✅`);
+    // انتظر header-tools قبل الحقن
+    if (document.getElementById('header-tools')) {
+      injectReportButton();
+    } else {
+      var _sInjected = false;
+      var _sObs = new MutationObserver(function() {
+        if (document.getElementById('header-tools') && !_sInjected) {
+          _sInjected = true; _sObs.disconnect(); injectReportButton();
+        }
+      });
+      _sObs.observe(document.body, { childList: true, subtree: true });
+      setTimeout(function() { if (!_sInjected) { _sObs.disconnect(); injectReportButton(); } }, 3000);
+    }
+    setTimeout(checkLinks, 1500);
   }
 
   if (document.readyState === "loading") {

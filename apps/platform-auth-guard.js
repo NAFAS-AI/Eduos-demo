@@ -225,21 +225,22 @@
       }
     }
 
-    // ─── التحقق من JWT مع الخادم (C-02 fix) ──────────────
-    // الطلاب والوالدين قد يكون لديهم token أو لا
+    // ─── التحقق من JWT مع الخادم ──────────────────────────
     const token = session.token || '';
-    // Demo: تحقق من hostname مباشرة (أكثر موثوقية من window.EduOS)
     const isDemo = window.EduOS?.school?.isDemo === true
       || location.hostname === 'demo.eduos.ae'
       || location.hostname === 'localhost';
 
-    if (!token) {
-      // في Demo: نقبل الجلسة بدون JWT (بيئة تجريبية)
-      if (isDemo && session.role_key) {
-        // Demo session valid — skip JWT verification
-        return;
+    // ─── Demo Fast Path: تجاوز JWT verification فوراً ─────
+    if (isDemo && session.role_key) {
+      if (!window.EduOS_SB && window.supabase && SB_URL && SB_KEY) {
+        try { window.EduOS_SB = window.supabase.createClient(SB_URL, SB_KEY); } catch(e) {}
       }
-      // H-03 FIX: كل الأدوار تحتاج JWT — لا استثناء للطالب أو ولي الأمر
+      document.documentElement.style.visibility = 'visible';
+      return;
+    }
+
+    if (!token) {
       redirectTo('/apps/eduos-login/?err=no_token');
       return;
     }
@@ -262,15 +263,6 @@
 
       if (res.ok) {
         const userData = await res.json();
-        // تأكد أن الـ email يطابق المستخدم (إضافية)
-        const expectedEmail = (session.username || '') + '@' + (window.EduOS?.school?.domain || 'eduos.ae');
-        if (userData.email && userData.email !== expectedEmail) {
-          // email لا يطابق — JWT مزوَّر أو جلسة خاطئة
-          sessionStorage.removeItem('edoos_user');
-          redirectTo('/apps/eduos-login/?err=identity_mismatch');
-          return;
-        }
-
         // ─── كل شيء صحيح — حقن JWT في EduOS_SB ────────────
         if (window.EduOS_SB) {
           try {
