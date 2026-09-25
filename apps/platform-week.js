@@ -241,6 +241,13 @@ async function loadCalendarFromDB(sb) {
     EDOOS_ACADEMIC_CALENDAR.allYears = allYears;
     EDOOS_ACADEMIC_CALENDAR.allTerms = data;
 
+    // تحديث hWeek تلقائياً إذا كان موجوداً في الصفحة
+    const _hw = document.getElementById('hWeek');
+    if (_hw && typeof getEduOSWeekInfo !== 'undefined') {
+      const _wi = getEduOSWeekInfo();
+      _hw.innerHTML = (_wi.isHoliday ? _wi.holidayName : ('الأسبوع ' + _wi.weekNum + ' · ' + _wi.semesterName)) + '<br>' + EDOOS_ACADEMIC_CALENDAR.year;
+    }
+
     return true;
   } catch(e) {
     console.warn('[EduOS Week] DB load failed, using fallback calendar:', e.message);
