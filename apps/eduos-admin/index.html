@@ -157,6 +157,7 @@ tr:hover td{background:#F8FAFC;}
     <div class="h-sub">لوحة التحكم الإدارية الشاملة</div>
   </div>
   <div class="h-week" id="hWeek">— · —</div>
+  <div id="header-tools" style="display:flex;align-items:center;gap:6px;margin:0 8px;"></div>
   <div class="h-user">
     <div class="h-av" id="hAv">م</div>
     <span id="hUser">—</span>
@@ -526,12 +527,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const wEl = document.getElementById('hWeek');
     if (wEl) {
       if (w.isHoliday) {
-        wEl.innerHTML = w.holidayName + '<br>2025-2026';
+        wEl.innerHTML = w.holidayName + '<br>' + (window.EDOOS_ACADEMIC_CALENDAR?.year || '2026-2027');
       } else {
-        wEl.innerHTML = 'الأسبوع ' + w.weekNum + ' · ' + w.termName + '<br>2025-2026';
+        wEl.innerHTML = 'الأسبوع ' + w.weekNum + ' · ' + w.termName + '<br>' + (window.EDOOS_ACADEMIC_CALENDAR?.year || '2026-2027');
       }
     }
   }
+});
+
+// ── تحميل التقويم من DB ──
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(async function() {
+    if (window.loadCalendarFromDB && window.EduOS_SB) {
+      await window.loadCalendarFromDB(window.EduOS_SB);
+    }
+  }, 1000);
 });
 
 // ── DB helpers ──
