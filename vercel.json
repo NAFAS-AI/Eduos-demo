@@ -25,7 +25,7 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/apps/eduos-landing/",
+      "destination": "/apps/eduos-demo-portal/",
       "permanent": false
     },
     {
