@@ -25,6 +25,11 @@
   "redirects": [
     {
       "source": "/",
+      "destination": "/apps/eduos-landing/",
+      "permanent": false
+    },
+    {
+      "source": "/demo",
       "destination": "/apps/eduos-demo-portal/",
       "permanent": false
     },
@@ -34,7 +39,7 @@
       "permanent": false
     },
     {
-      "source": "/demo",
+      "source": "/explore",
       "destination": "/apps/eduos-demo-join/",
       "permanent": false
     }
