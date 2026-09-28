@@ -229,6 +229,7 @@
     const token = session.token || '';
     const isDemo = window.EduOS?.school?.isDemo === true
       || location.hostname === 'demo.eduos.ae'
+      || location.hostname === 'eduos.ae'
       || location.hostname === 'localhost';
 
     // ─── Demo Fast Path: تجاوز JWT verification فوراً ─────
@@ -238,6 +239,20 @@
       }
       document.documentElement.style.visibility = 'visible';
       return;
+    }
+
+    // الأدوار التي لا تستخدم JWT (طالب/ة، ولي/ة الأمر)
+    const NON_JWT_ROLES = ['student', 'parent'];
+    if (NON_JWT_ROLES.includes(roleKey)) {
+      const age = Date.now() - (session.loginTime || 0);
+      if (age < 15 * 60 * 1000) { // 15 دقيقة
+        document.documentElement.style.visibility = 'visible';
+        return;
+      } else {
+        sessionStorage.removeItem('edoos_user');
+        redirectTo('/apps/eduos-login/?err=session_expired');
+        return;
+      }
     }
 
     if (!token) {
