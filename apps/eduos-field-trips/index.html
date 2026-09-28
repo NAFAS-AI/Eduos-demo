@@ -1,160 +1,1237 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>الرحلات المدرسية | EduOS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="../platform-config.js"></script>
-  <script>
-    (function () {
-      var user = null;
-      try { user = JSON.parse(sessionStorage.getItem('edoos_user') || 'null'); } catch (_) {}
-      if (!user) { window.location.replace('../eduos-login/'); return; }
-      var role = user.role_key || user.role;
-      if (!['principal','vice_principal','teacher','coordinator','admin'].includes(role)) {
-        window.location.replace('../eduos-hub/'); return;
-      }
-      window.fieldTripUser = user;
-      document.documentElement.classList.add('authorized');
-    }());
-  </script>
-  <script src="../platform-lang.js" defer></script>
-  <style>
-    :root{font-family:'Tajawal',sans-serif;color:#243247;background:#f5f7fc;font-synthesis:none;--brand:#6C3DD6;--cyan:#22D3EE;--muted:#64748b;--line:#e2e8f0;--ink:#172554;--shadow:0 12px 32px rgba(30,41,59,.07)}
-    *{box-sizing:border-box}[hidden]{display:none!important}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:#243247;background:#f5f7fc;display:none}html.authorized body{display:block}
-    button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.53;cursor:not-allowed}a{color:var(--brand)}:focus-visible{outline:3px solid #22D3EE;outline-offset:2px}
-    .topbar{background:linear-gradient(110deg,#6C3DD6,#7549db 62%,#22D3EE);color:#fff;box-shadow:0 8px 25px rgba(108,61,214,.18)}
-    .topbar-inner{max-width:1240px;margin:auto;padding:22px 24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-    .brandrow{display:flex;align-items:center;gap:14px;color:#fff}.brandmark{display:grid;place-items:center;width:51px;height:51px;flex:none;border-radius:15px;background:#fff;color:#6C3DD6;font-size:27px;box-shadow:0 5px 16px rgba(29,28,85,.15)}
-    .brandrow h1{font-size:26px;line-height:1.25;margin:0;color:#fff}.brandrow p{margin:3px 0 0;font-size:13px;color:#fff}.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#fff}.topbar-right .user-label{font-size:14px;color:#fff;padding-inline:8px}
-    .btn{border:1px solid transparent;border-radius:11px;padding:10px 15px;font-weight:700;line-height:1.25;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:41px;text-decoration:none;white-space:normal;text-align:center}
-    .btn-primary{background:#6C3DD6;color:#fff}.btn-primary:hover{background:#5931b8}.btn-soft{background:#f0ebff;border-color:#ded4ff;color:#5b31b9}.btn-soft:hover{background:#e7ddff}.btn-outline{background:#fff;border-color:#d8dce7;color:#334155}.btn-outline:hover{background:#f8fafc}.btn-danger{background:#fff0f1;border-color:#fecdd3;color:#b42335}.btn-danger:hover{background:#ffe3e6}.btn-header{background:rgba(255,255,255,.19);border-color:rgba(255,255,255,.5);color:#fff}.btn-header:hover{background:rgba(255,255,255,.3)}.btn-light{background:#fff;color:#5931b8}.btn-sm{font-size:13px;min-height:33px;padding:6px 10px}
-    main{max-width:1240px;margin:0 auto;padding:28px 24px 58px}.intro{display:flex;justify-content:space-between;align-items:start;gap:14px;flex-wrap:wrap;margin-bottom:20px}.intro h2{font-size:23px;color:#1e293b;margin:0 0 5px}.intro p{color:#526277;margin:0;font-size:15px}
-    .banner{border:1px solid #c7d2fe;background:#eef2ff;padding:13px 17px;border-radius:13px;color:#3730a3;margin-bottom:16px;line-height:1.6}.banner.error{border-color:#fecaca;background:#fef2f2;color:#a51f2d}.banner.success{border-color:#a7f3d0;background:#ecfdf5;color:#065f46}.banner[hidden],.tab-panel[hidden],.modal[hidden],.empty[hidden],.print-only{display:none!important}
-    .tabs{display:flex;gap:6px;overflow-x:auto;border-bottom:1px solid #dbe0eb;margin-bottom:22px}.tab{background:transparent;border:0;border-bottom:3px solid transparent;padding:13px 19px;color:#526277;font-weight:800;white-space:nowrap}.tab:hover{color:#6C3DD6}.tab.active{border-bottom-color:#6C3DD6;color:#6037bf}
-    .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}.toolbar h3{font-size:19px;color:#1e293b;margin:0}.toolbar-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.toolbar-group label{font-weight:700;color:#334155}.toolbar select,.toolbar input{min-width:170px}
-    .field,.toolbar select,.toolbar input{border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#1e293b;min-height:41px;padding:9px 11px;width:100%}.field::placeholder{color:#7d8898}.field:focus,.toolbar select:focus,.toolbar input:focus{outline:2px solid #baa4fa;border-color:#6C3DD6}textarea.field{min-height:90px;resize:vertical}.hint{color:#64748b;font-size:13px;line-height:1.5}.section-heading{font-size:17px;color:#29334a;margin:22px 0 12px}
-    .trip-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.trip-card{background:#fff;border:1px solid #e4e8f0;border-right:5px solid var(--status);border-radius:15px;box-shadow:var(--shadow);padding:18px;min-width:0}.trip-card h4{font-size:19px;color:#202a44;margin:0 0 5px;overflow-wrap:anywhere}.trip-card .place{color:#6C3DD6;font-weight:700;margin:0 0 14px}.trip-meta{display:flex;flex-wrap:wrap;gap:7px 14px;color:#475569;font-size:14px;margin-bottom:13px}.trip-meta span{color:#475569}.trip-stat{border-top:1px solid #edf0f4;padding-top:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#334155;font-size:14px}.card-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.badge{border-radius:999px;padding:5px 10px;display:inline-flex;align-items:center;font-size:12px;font-weight:800}.badge.pending{color:#92400e;background:#fef3c7}.badge.approved,.badge.complete{color:#065f46;background:#d1fae5}.badge.rejected,.badge.cancelled{color:#991b1b;background:#fee2e2}.badge.draft{color:#475569;background:#e2e8f0}.badge.active{color:#5b21b6;background:#ede9fe}.badge.none{color:#475569;background:#f1f5f9}
-    .empty{background:#fff;border:1px dashed #cbd5e1;border-radius:16px;padding:45px 18px;text-align:center;color:#475569}.empty-icon{font-size:42px;line-height:1;margin-bottom:10px}.empty strong{display:block;font-size:18px;color:#28334b;margin-bottom:7px}.empty p{margin:0 0 16px;color:#64748b}
-    .stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}.stat{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:17px;color:#334155;box-shadow:var(--shadow)}.stat b{display:block;color:#6037bf;font-size:25px;margin-top:5px}.stat small{color:#64748b;font-size:12px}
-    .panel-card{background:#fff;border:1px solid #e2e8f0;border-radius:15px;padding:18px;box-shadow:var(--shadow);margin-bottom:13px;color:#334155}.panel-card h4{margin:0 0 10px;color:#1e293b;font-size:18px}.panel-card p{margin:6px 0;color:#475569}.table-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow-x:auto;box-shadow:var(--shadow)}table{border-collapse:collapse;width:100%;min-width:650px;color:#334155}th,td{text-align:right;padding:12px 14px;border-bottom:1px solid #edf0f4;vertical-align:middle}th{color:#334155;background:#f8fafc;font-size:13px}tr:last-child td{border-bottom:0}.nowrap{white-space:nowrap}.quiet{color:#64748b}.status-select{width:auto;min-width:120px}.inline-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-    .bus-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.bus-list{padding-right:20px;color:#475569;margin:8px 0}.bus-list li{padding:3px}.mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.detail-grid div{background:#f8fafc;border:1px solid #eef1f5;border-radius:9px;padding:10px;color:#334155;white-space:pre-wrap;overflow-wrap:anywhere}.detail-grid b{display:block;color:#64748b;font-size:12px;margin-bottom:3px}
-    .modal{position:fixed;inset:0;background:rgba(22,30,51,.52);display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}.modal-box{background:#fff;border-radius:17px;width:min(760px,100%);max-height:min(92vh,900px);overflow-y:auto;box-shadow:0 30px 70px rgba(15,23,42,.25);color:#243247}.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:0;background:#fff;padding:18px 22px;border-bottom:1px solid #e2e8f0;z-index:1}.modal-head h3{color:#1e293b;margin:0;font-size:20px}.modal-content{padding:22px}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.form-grid label{display:block;color:#334155;font-size:14px;font-weight:700}.form-grid label .field{margin-top:6px}.full{grid-column:1/-1}.form-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:9px;margin-top:18px}.check-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin-top:8px}.check-grid label{display:flex;align-items:center;gap:4px;padding:8px 6px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc;color:#334155;font-size:13px;cursor:pointer}.check-grid input{accent-color:#6C3DD6}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-    footer{text-align:center;color:#64748b;border-top:1px solid #dbe2eb;padding:24px 15px;font-size:13px;background:#fff}footer span{color:#64748b}
-    @media(max-width:760px){.topbar-inner{padding:17px}.brandrow h1{font-size:21px}main{padding:20px 15px 40px}.trip-grid,.bus-grid{grid-template-columns:1fr}.stat-row{gap:7px}.stat{padding:11px}.stat b{font-size:20px}.toolbar{align-items:stretch}.toolbar-group{width:100%}.toolbar-group select,.toolbar-group input{flex:1;min-width:140px}.card-actions .btn{flex:1}.check-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-    @media(max-width:520px){.form-grid,.detail-grid,.mini-grid{grid-template-columns:1fr}.check-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.topbar-right{width:100%}.modal-content{padding:16px}.modal-head{padding:15px}}
-    @media print{body{display:block!important;background:#fff;color:#111827}.topbar,.intro,.tabs,.tab-panel,.banner,footer,.modal{display:none!important}.print-only{display:block!important}.print-sheet{padding:12mm;font-size:11pt;color:#111827}.print-sheet h1{font-size:18pt;color:#6C3DD6;margin:0}.print-sheet p{color:#334155}.print-sheet table{min-width:0;font-size:9pt;box-shadow:none}.print-sheet td,.print-sheet th{border:1px solid #cbd5e1;padding:6px;color:#111827}.print-sheet .brandprint{border-bottom:3px solid #22D3EE;padding-bottom:10px}.print-sheet .signatures{margin-top:32px;display:flex;justify-content:space-between;color:#334155}main{padding:0;max-width:none}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>الرحلات المدرسية — EduOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="../platform-config.js"></script>
+<script>
+(function () {
+  var user = null;
+  try { user = JSON.parse(sessionStorage.getItem('edoos_user') || 'null'); } catch (_) {}
+  if (!user) { window.location.replace('../eduos-login/'); return; }
+  var role = user.role_key || user.role || '';
+  var ALLOWED = ['social_worker','vice_principal','principal','admin','teacher','coordinator','counselor'];
+  if (ALLOWED.indexOf(role) === -1) { window.location.replace('../eduos-hub/'); return; }
+  window.tripUser = user;
+  window.tripRole = role;
+})();
+</script>
+<script src="../platform-lang.js" defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',Arial,sans-serif;background:#F1F5F9;color:#1E293B;min-height:100vh;font-size:18px}
+button,input,select,textarea{font-family:'Tajawal',Arial,sans-serif}
+[hidden]{display:none!important}
+
+/* هيدر */
+.hdr{background:#fff;border-bottom:1px solid #E2E8F0;box-shadow:0 1px 6px rgba(0,0,0,.08);padding:0 20px;position:sticky;top:0;z-index:200}
+.hdr-inner{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{width:46px;height:46px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.brand-info h1{font-size:1.1rem;font-weight:900;color:#0F172A}
+.brand-info p{font-size:.8rem;color:#94A3B8}
+.hdr-tools{display:flex;align-items:center;gap:10px}
+.btn-back-circle{width:38px;height:38px;border-radius:50%;background:#EF4444;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;transition:.15s}
+.btn-back-circle:hover{background:#DC2626}
+.clock{font-size:.85rem;color:#64748B;background:#F1F5F9;padding:5px 12px;border-radius:20px;font-weight:600}
+#header-tools{display:flex;align-items:center;gap:8px}
+
+/* تخطيط */
+.page{max-width:1440px;margin:0 auto;padding:24px 20px}
+
+/* تبويبات */
+.tabs{display:flex;gap:4px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:24px;flex-wrap:wrap}
+.tab-btn{padding:10px 22px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:.95rem;font-weight:600;color:#64748B;transition:.15s;white-space:nowrap}
+.tab-btn.active{background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;box-shadow:0 2px 8px rgba(108,61,214,.3)}
+.tab-btn:hover:not(.active){background:#F1F5F9;color:#1E293B}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* بطاقات */
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-bottom:20px}
+.card-title{font-size:1rem;font-weight:800;color:#0F172A;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.kpi{background:#fff;border-radius:14px;padding:18px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi-num{font-size:2rem;font-weight:900;color:#6C3DD6}
+.kpi-lbl{font-size:.82rem;color:#64748B;margin-top:4px}
+
+/* قائمة الرحلات */
+.trips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.trip-card{background:#fff;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;border:1px solid #E2E8F0;cursor:pointer;transition:.15s}
+.trip-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:#C4B5FD}
+.trip-card-top{padding:18px;border-bottom:1px solid #F1F5F9}
+.trip-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:8px}
+.type-field{background:#EFF6FF;color:#1D4ED8}
+.type-reward{background:#F0FDF4;color:#15803D}
+.type-competition{background:#FFF7ED;color:#C2410C}
+.type-cultural{background:#FAF5FF;color:#7C3AED}
+.type-social{background:#FFF1F2;color:#BE123C}
+.type-other{background:#F8FAFC;color:#475569}
+.trip-title{font-size:1.05rem;font-weight:800;color:#0F172A;margin-bottom:6px}
+.trip-meta{font-size:.85rem;color:#64748B;display:flex;flex-wrap:wrap;gap:8px}
+.trip-meta span{display:flex;align-items:center;gap:4px}
+.trip-card-bottom{padding:12px 18px;display:flex;align-items:center;justify-content:space-between;background:#FAFAFA}
+.status-badge{padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700}
+.s-draft{background:#FFF7ED;color:#C2410C}
+.s-pending{background:#FEF9C3;color:#A16207}
+.s-approved{background:#F0FDF4;color:#15803D}
+.s-rejected{background:#FFF1F2;color:#BE123C}
+.s-completed{background:#F1F5F9;color:#475569}
+.trip-actions{display:flex;gap:6px}
+.btn-sm{padding:5px 12px;border-radius:8px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;transition:.15s}
+.btn-primary{background:#6C3DD6;color:#fff}
+.btn-primary:hover{background:#5B21B6}
+.btn-success{background:#16A34A;color:#fff}
+.btn-success:hover{background:#15803D}
+.btn-danger{background:#EF4444;color:#fff}
+.btn-danger:hover{background:#DC2626}
+.btn-ghost{background:#F1F5F9;color:#475569}
+.btn-ghost:hover{background:#E2E8F0}
+.btn-amber{background:#F59E0B;color:#fff}
+.btn-amber:hover{background:#D97706}
+.btn-lg{padding:12px 28px;border-radius:12px;border:none;cursor:pointer;font-size:1rem;font-weight:700;transition:.15s}
+
+/* نموذج */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:.88rem;font-weight:700;color:#374151}
+.form-input{padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:.95rem;color:#0F172A;transition:.15s}
+.form-input:focus{outline:none;border-color:#6C3DD6;box-shadow:0 0 0 3px rgba(108,61,214,.1)}
+.form-input.err{border-color:#EF4444}
+select.form-input{background:#fff}
+textarea.form-input{resize:vertical;min-height:80px}
+
+/* شبكة الصفوف */
+.classes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;padding:12px;border:1.5px solid #E2E8F0;border-radius:10px;max-height:220px;overflow-y:auto}
+.class-chk{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;cursor:pointer;transition:.12s}
+.class-chk:hover{background:#F1F5F9}
+.class-chk input{width:16px;height:16px;accent-color:#6C3DD6;cursor:pointer}
+.class-chk span{font-size:.88rem;font-weight:600}
+
+/* حافلات */
+.bus-card{background:#fff;border-radius:14px;border:1.5px solid #E2E8F0;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.bus-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.bus-num{font-size:1.1rem;font-weight:900;color:#6C3DD6}
+.bus-body{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bus-info-row{font-size:.88rem}
+.bus-info-row label{display:block;font-weight:700;color:#64748B;font-size:.8rem;margin-bottom:3px}
+.bus-info-row span{color:#0F172A;font-weight:600}
+.confirm-badge{display:inline-flex;align-items:center;gap:4px;font-size:.78rem;padding:2px 8px;border-radius:12px;font-weight:700}
+.confirmed{background:#F0FDF4;color:#15803D}
+.unconfirmed{background:#FFF7ED;color:#C2410C}
+
+/* جدول الطلاب */
+.data-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.data-table th{background:#F8FAFC;padding:10px 14px;text-align:right;font-weight:700;color:#374151;border-bottom:2px solid #E2E8F0}
+.data-table td{padding:10px 14px;border-bottom:1px solid #F1F5F9;color:#374151;vertical-align:middle}
+.data-table tr:hover td{background:#FAFAFE}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid #E2E8F0}
+
+/* موديل */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay[hidden]{display:none}
+.modal{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.modal-title{font-size:1.15rem;font-weight:900;color:#0F172A}
+.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:#94A3B8;line-height:1}
+.modal-close:hover{color:#1E293B}
+.modal-footer{display:flex;gap:10px;margin-top:24px;justify-content:flex-end}
+
+/* إشعارات */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1E293B;color:#fff;padding:12px 24px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:9999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.toast.success{background:#16A34A}
+.toast.error{background:#DC2626}
+
+/* قسيمة المنسقة */
+.specialist-invite{background:#EFF6FF;border:1.5px dashed #93C5FD;border-radius:12px;padding:14px;margin-top:12px}
+.specialist-invite label{font-size:.88rem;font-weight:700;color:#1D4ED8;display:block;margin-bottom:6px}
+
+/* تصميم متجاوب */
+@media(max-width:768px){
+  .form-grid{grid-template-columns:1fr}
+  .trips-grid{grid-template-columns:1fr}
+  .bus-body{grid-template-columns:1fr}
+}
+
+/* رسالة فارغة */
+.empty-state{text-align:center;padding:48px 20px;color:#94A3B8}
+.empty-state .icon{font-size:3rem;margin-bottom:12px}
+.empty-state p{font-size:1rem;font-weight:600}
+
+/* ألوان حسب الحالة */
+.pending-count{background:#FEF9C3;color:#A16207;padding:2px 8px;border-radius:10px;font-size:.78rem;font-weight:700;margin-right:6px}
+</style>
 </head>
 <body>
-  <header class="topbar"><div class="topbar-inner"><div class="brandrow"><div class="brandmark" aria-hidden="true">🚌</div><div><h1>الرحلات المدرسية</h1><p>EduOS · تنظيم آمن، موافقات واضحة، وقوائم جاهزة</p></div></div><div class="topbar-right" id="header-tools"><span class="user-label" id="user-label"></span><button type="button" class="btn btn-header" id="eduos-lang-toggle" data-lang-toggle="1" aria-label="تغيير اللغة">🌐 English</button><a class="btn btn-header" href="../eduos-hub/">العودة للبوابة</a><button type="button" class="btn btn-light manager-only" id="header-new">+ رحلة جديدة</button></div></div></header>
-  <main>
-    <div class="intro"><div><h2>إدارة الرحلات والزيارات</h2><p>تابع/ي الرحلات والموافقات وتوزيع الحافلات من مكان واحد.</p></div><span class="badge active" id="year-label"></span></div>
-    <div id="notice" class="banner" role="status" aria-live="polite" hidden></div>
-    <nav class="tabs" role="tablist" aria-label="أقسام الرحلات">
-      <button class="tab active" type="button" role="tab" aria-selected="true" aria-controls="tab-trips" id="tab-btn-trips" data-tab="trips">🚌 الرحلات</button>
-      <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="tab-consents" id="tab-btn-consents" data-tab="consents">✅ الموافقات</button>
-      <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="tab-buses" id="tab-btn-buses" data-tab="buses">🚍 الحافلات</button>
-      <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="tab-report" id="tab-btn-report" data-tab="report">📊 التقرير</button>
-    </nav>
-    <section class="tab-panel" id="tab-trips" role="tabpanel" aria-labelledby="tab-btn-trips"><div class="toolbar"><h3>الرحلات القادمة والمنتهية</h3><button type="button" class="btn btn-primary manager-only" id="toolbar-new">+ رحلة جديدة</button></div><div id="trips-loading" class="panel-card">جارٍ تحميل الرحلات…</div><div id="trips-content"></div></section>
-    <section class="tab-panel" id="tab-consents" role="tabpanel" aria-labelledby="tab-btn-consents" hidden><div class="toolbar"><h3>موافقات أولياء/ات الأمر</h3><div class="toolbar-group"><label for="consent-trip">الرحلة</label><select id="consent-trip" class="field trip-picker"></select></div></div><div id="consents-content"></div></section>
-    <section class="tab-panel" id="tab-buses" role="tabpanel" aria-labelledby="tab-btn-buses" hidden><div class="toolbar"><h3>توزيع الحافلات</h3><div class="toolbar-group"><label for="bus-trip">الرحلة</label><select id="bus-trip" class="field trip-picker"></select></div></div><div id="buses-content"></div></section>
-    <section class="tab-panel" id="tab-report" role="tabpanel" aria-labelledby="tab-btn-report" hidden><div class="toolbar"><h3>التقرير والقوائم الرسمية</h3><div class="toolbar-group"><label for="report-trip">الرحلة</label><select id="report-trip" class="field trip-picker"></select></div></div><div id="report-content"></div></section>
-    <article class="print-only print-sheet" id="print-sheet" aria-label="القائمة الرسمية للرحلة"></article>
-  </main>
-  <footer><span>NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712 · أبوظبي</span><br><span>© 2026 NAFAS FOR ARTIFICIAL INTELLIGENCE. جميع الحقوق محفوظة.</span></footer>
-  <div class="modal" id="trip-modal" role="dialog" aria-modal="true" aria-labelledby="trip-modal-title" hidden><div class="modal-box"><div class="modal-head"><h3 id="trip-modal-title">رحلة جديدة</h3><button type="button" class="btn btn-outline btn-sm modal-close" aria-label="إغلاق">✕</button></div><div class="modal-content"><form id="trip-form"><div class="form-grid">
-    <label>اسم الرحلة <span aria-hidden="true">*</span><input class="field" name="name" type="text" maxlength="180" required></label>
-    <label>الوجهة<input class="field" name="destination" type="text" maxlength="180"></label>
-    <label>تاريخ الرحلة <span aria-hidden="true">*</span><input class="field" id="trip-date" name="trip_date" type="date" required></label>
-    <label>وقت المغادرة<input class="field" name="departure_time" type="time"></label>
-    <label>وقت العودة<input class="field" name="return_time" type="time"></label>
-    <label>الحافلات المطلوبة<input class="field" name="bus_count" type="number" min="1" max="100" step="1" value="1" required></label>
-    <div class="full"><strong>الصفوف المستهدفة</strong><div class="check-grid" id="grade-checks"></div><div class="hint">حدّد/ي صفاً واحداً على الأقل. يمكن كتابة الشعبة عند إضافة الطالب/ة.</div></div>
-    <label>التكلفة للطالب/ة (درهم)<input class="field" name="cost_per_student" type="number" min="0" max="100000" step="0.01" value="0" required></label>
-    <label>الحد الأقصى للمشاركين<input class="field" name="max_participants" type="number" min="1" max="10000" step="1" required></label>
-    <label class="full">وصف الرحلة<textarea class="field" name="description" maxlength="3000"></textarea></label>
-    <label class="full">المرافقون/ات (أسماء)<input class="field" name="companions" type="text" maxlength="1000"></label>
-    <label class="full">ملاحظات لولي/ة الأمر<textarea class="field" name="parent_notes" maxlength="3000"></textarea></label>
-    <label class="full">طلب موافقة ولي/ة الأمر<select class="field" name="requires_consent"><option value="true">نعم</option><option value="false">لا</option></select></label>
-  </div><div class="form-actions"><button type="button" class="btn btn-outline modal-close">إلغاء</button><button type="submit" class="btn btn-primary" id="trip-save">حفظ الرحلة</button></div></form></div></div></div>
-  <div class="modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title" hidden><div class="modal-box"><div class="modal-head"><h3 id="detail-title">تفاصيل الرحلة</h3><button type="button" class="btn btn-outline btn-sm modal-close" aria-label="إغلاق">✕</button></div><div class="modal-content" id="detail-content"></div></div></div>
-  <div class="modal" id="student-modal" role="dialog" aria-modal="true" aria-labelledby="student-modal-title" hidden><div class="modal-box"><div class="modal-head"><h3 id="student-modal-title">إضافة طالب/ة</h3><button type="button" class="btn btn-outline btn-sm modal-close" aria-label="إغلاق">✕</button></div><div class="modal-content"><form id="student-form"><div class="form-grid"><label>اسم الطالب/ة <input class="field" name="student_name" maxlength="180" required></label><label>الشعبة <input class="field" name="class_name" maxlength="40" placeholder="G5A" required></label><label>الرقم المدرسي (اختياري)<input class="field" name="student_id" type="number" min="1" step="1"></label><label>حالة الموافقة<select class="field" name="consent_status"><option value="pending">لا رد</option><option value="approved">موافق</option><option value="rejected">رافض</option></select></label></div><p class="hint">تسجيل الموافقة الإداري ينبغي أن يستند إلى إذن موثّق من ولي/ة الأمر.</p><div class="form-actions"><button class="btn btn-outline modal-close" type="button">إلغاء</button><button class="btn btn-primary" type="submit" id="student-save">إضافة الطالب/ة</button></div></form></div></div></div>
-  <div class="modal" id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="upload-title" hidden><div class="modal-box"><div class="modal-head"><h3 id="upload-title">رفع إذن الطالب/ة</h3><button type="button" class="btn btn-outline btn-sm modal-close" aria-label="إغلاق">✕</button></div><div class="modal-content"><p class="hint">تُحفَظ الوثيقة في مساحة تخزين خاصة. رفع الملف لا يغيّر حالة الموافقة تلقائياً؛ راجع/ي الوثيقة أولاً.</p><form id="upload-form"><label for="consent-file">ملف الإذن (PDF أو صورة، بحد أقصى 5 ميغابايت)</label><input id="consent-file" name="consent_file" class="field" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" required><div class="form-actions"><button class="btn btn-outline modal-close" type="button">إلغاء</button><button class="btn btn-primary" type="submit" id="upload-save">رفع الإذن</button></div></form></div></div></div>
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const user = window.fieldTripUser;
-    if (user) {
-      const role = user.role_key || user.role;
-      const canManage = ['principal','vice_principal','coordinator','admin'].includes(role);
-      const roleLabels = {principal:'مدير/ة المدرسة',vice_principal:'نائب/ة المدير/ة',coordinator:'منسق/ة',admin:'مسؤول/ة النظام',teacher:'معلم/ة'};
-      const $ = id => document.getElementById(id);
-      const state = {db:null,trips:[],participants:[],selected:null,editing:null,activeTab:'trips',busy:false,uploadParticipant:null,previousFocus:null};
-      const statuses = {draft:'مسودة',active:'نشطة',completed:'منتهية',cancelled:'ملغاة'};
-      const consentLabels = {pending:'لا رد',approved:'موافق',rejected:'رافض'};
-      const grades = ['KG1','KG2','G1','G2','G3','G4','G5','G6','G7','G8'];
-      const today = () => { const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'); };
-      const schoolYear = () => {const d=new Date(), y=d.getFullYear()-(d.getMonth()<7?1:0);return String(y)+'-'+String(y+1);};
-      const academicYear = String(window.EduOS?.ACADEMIC_YEAR || user.academic_year || schoolYear());
-      const val = (x, fallback='—') => x === null || x === undefined || x === '' ? fallback : String(x);
-      function node(tag, className, text) {const el=document.createElement(tag);if(className)el.className=className;if(text !== undefined)el.textContent=String(text);return el;}
-      function addButton(parent, label, className, onClick, disabled=false) {const b=node('button','btn '+className,label);b.type='button';b.disabled=disabled;b.addEventListener('click',onClick);parent.append(b);return b;}
-      function clear(el){el.replaceChildren();}
-      function notify(text,kind='info'){const el=$('notice');el.textContent=text;el.className='banner'+(kind==='info'?'':' '+kind);el.hidden=false;}
-      function dismissNotice(){$('notice').hidden=true;}
-      function fmtDate(iso){if(!iso)return '—';const p=String(iso).slice(0,10).split('-');return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : val(iso);}
-      function statusBadge(text,kind){return node('span','badge '+kind,text);}
-      function empty(icon,title,subtitle,buttonLabel,action){const box=node('div','empty');box.append(node('div','empty-icon',icon),node('strong','',title),node('p','',subtitle));if(buttonLabel && action)addButton(box,buttonLabel,'btn-primary',action);return box;}
-      function todayOrFuture(trip){return trip.trip_date>=today() && trip.status!=='completed' && trip.status!=='cancelled';}
-      function eligibility(trip,p){return !trip.requires_consent || p.consent_status==='approved';}
-      function eligibleParticipants(trip){return state.participants.filter(p=>eligibility(trip,p));}
-      function getTrip(){return state.trips.find(t=>t.id===state.selected);}
-      function participantsOf(id){return state.participants.filter(p=>p.trip_id===id);}
-      function responseError(err){return err && err.message ? err.message : 'حدث خطأ غير متوقع.';}
-      function showError(err,context){console.error(context,err);notify(context+' لم تكتمل. '+responseError(err),'error');}
-      function working(button,on){if(button)button.disabled=on;state.busy=on;}
-      function chooseTrip(id){state.selected=id;for(const el of document.querySelectorAll('.trip-picker'))el.value=id||'';renderCurrent();}
-      function renderPickers(){for(const sel of document.querySelectorAll('.trip-picker')){clear(sel);if(!state.trips.length){const o=node('option','', 'لا توجد رحلات');o.value='';sel.append(o);sel.disabled=true;}else{sel.disabled=false;state.trips.forEach(t=>{const o=node('option','',t.name+' · '+fmtDate(t.trip_date));o.value=t.id;sel.append(o);});sel.value=state.selected||state.trips[0].id;}}}
-      function renderCurrent(){if(state.activeTab==='trips')renderTrips();if(state.activeTab==='consents')renderConsents();if(state.activeTab==='buses')renderBuses();if(state.activeTab==='report')renderReport();}
-      function switchTab(tab){state.activeTab=tab;for(const b of document.querySelectorAll('.tab')){const active=b.dataset.tab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));$(b.getAttribute('aria-controls')).hidden=!active;}renderCurrent();}
-      async function readAll(table,query){let all=[];const columns=table==='field_trips'?'id,name,destination,trip_date,departure_time,return_time,target_classes,bus_count,cost_per_student,max_participants,description,companions,parent_notes,requires_consent,status,created_by,created_at,academic_year':'id,trip_id,student_id,student_name,class_name,consent_status,consent_date,bus_number,notes';for(let from=0;from<100000;from+=500){const {data,error}=await query(state.db.from(table).select(columns).range(from,from+499));if(error)throw error;all=all.concat(data||[]);if((data||[]).length<500)return all;}throw new Error('عدد السجلات يتجاوز حد القراءة؛ يلزم تضييق نطاق البحث.');}
-      async function load(){if(!state.db)return;try{const trips=await readAll('field_trips',q=>q.order('trip_date',{ascending:false}));state.trips=trips;const ids=trips.map(t=>t.id),participants=[];for(let i=0;i<ids.length;i+=50)participants.push(...await readAll('field_trip_participants',q=>q.in('trip_id',ids.slice(i,i+50)).order('student_name',{ascending:true})));state.participants=participants;if(!trips.some(t=>t.id===state.selected))state.selected=(trips.find(todayOrFuture)||trips[0]||{}).id||null;$('trips-loading').hidden=true;renderPickers();renderCurrent();}catch(err){$('trips-loading').hidden=true;showError(err,'تعذر تحميل بيانات الرحلات');$('trips-content').replaceChildren(empty('⚠️','تعذر تحميل الرحلات','تحقق/ي من الاتصال والجداول والصلاحيات، ثم أعد/ي المحاولة.','إعادة المحاولة',load));}}
-      function consentSummary(trip,list){if(!trip.requires_consent)return {text:'لا تتطلب موافقة',kind:'none'};if(!list.length)return {text:'بانتظار إضافة الطلاب/ات',kind:'pending'};if(list.some(p=>p.consent_status==='rejected'))return {text:'توجد موافقات مرفوضة',kind:'rejected'};if(list.every(p=>p.consent_status==='approved'))return {text:'مكتملة',kind:'complete'};return {text:'قيد الانتظار',kind:'pending'};}
-      function tripCard(t){const list=participantsOf(t.id), approved=list.filter(p=>eligibility(t,p)).length, badge=consentSummary(t,list);const c=node('article','trip-card');c.style.setProperty('--status',({draft:'#94a3b8',active:'#6C3DD6',completed:'#10b981',cancelled:'#ef4444'})[t.status]||'#94a3b8');c.append(node('h4','',t.name),node('p','place','📍 '+val(t.destination)));const meta=node('div','trip-meta');for(const text of ['📅 '+fmtDate(t.trip_date),'🕒 '+val(t.departure_time,'—')+' – '+val(t.return_time,'—'),'🏫 '+((t.target_classes||[]).join('، ')||'غير محدد')])meta.append(node('span','',text));c.append(meta);const summary=node('div','trip-stat');summary.append(node('span','',approved+' مشارك/ة مؤهل/ة / '+list.length+' طالب/ة مسجّل/ة'),statusBadge(statuses[t.status]||'غير محددة',t.status||'draft'),statusBadge(badge.text,badge.kind));c.append(summary);const actions=node('div','card-actions');addButton(actions,'عرض التفاصيل','btn-soft',()=>openDetail(t.id));if(canManage && t.status!=='cancelled' && t.status!=='completed'){addButton(actions,'تعديل','btn-outline',()=>openTripForm(t));addButton(actions,'إلغاء الرحلة','btn-danger',()=>cancelTrip(t));}c.append(actions);return c;}
-      function renderTrips(){const root=$('trips-content');clear(root);if(!state.trips.length){root.append(empty('🚌','لا توجد رحلات مجدولة — أضف/ي رحلة جديدة','ابدأ/ي بإنشاء رحلة لتظهر الموافقات والحافلات والتقرير هنا.',canManage?'رحلة جديدة':'',canManage?()=>openTripForm():null));return;}const upcoming=state.trips.filter(todayOrFuture).sort((a,b)=>a.trip_date.localeCompare(b.trip_date)),past=state.trips.filter(t=>!todayOrFuture(t));for(const [title,items] of [['الرحلات القادمة',upcoming],['الرحلات السابقة أو الملغاة',past]]){root.append(node('h3','section-heading',title));if(!items.length){root.append(node('div','panel-card quiet','لا توجد رحلات في هذا القسم.'));continue;}const grid=node('div','trip-grid');items.forEach(t=>grid.append(tripCard(t)));root.append(grid);}}
-      function detailField(grid,label,value){const box=node('div');box.append(node('b','',label),node('span','',val(value)));grid.append(box);}
-      function openDetail(id){const t=state.trips.find(x=>x.id===id);if(!t)return;chooseTrip(id);$('detail-title').textContent=t.name;const content=$('detail-content');clear(content);const grid=node('div','detail-grid');for(const [label,value] of [['الوجهة',t.destination],['التاريخ',fmtDate(t.trip_date)],['المغادرة / العودة',val(t.departure_time)+' / '+val(t.return_time)],['الصفوف',(t.target_classes||[]).join('، ')],['الحافلات',t.bus_count],['التكلفة للطالب/ة',val(t.cost_per_student,0)+' درهم'],['الحد الأقصى',t.max_participants],['وصف الرحلة',t.description],['المرافقون/ات',t.companions],['ملاحظات لولي/ة الأمر',t.parent_notes],['طلب الموافقة',t.requires_consent?'نعم':'لا'],['الحالة',statuses[t.status]||t.status]])detailField(grid,label,value);content.append(grid);const actions=node('div','form-actions');if(canManage && ['draft','active'].includes(t.status)){if(t.status==='draft')addButton(actions,'تنشيط الرحلة','btn-primary',()=>updateTripStatus(t,'active'));if(t.status==='active')addButton(actions,'إنهاء الرحلة','btn-soft',()=>updateTripStatus(t,'completed'));addButton(actions,'إضافة طالب/ة','btn-outline',()=>{closeModal('detail-modal');openModal('student-modal');});}addButton(actions,'عرض الموافقات','btn-outline',()=>{closeModal('detail-modal');switchTab('consents');});content.append(actions);openModal('detail-modal');}
-      function openModal(id){state.previousFocus=document.activeElement;$(id).hidden=false;document.body.style.overflow='hidden';const target=$(id).querySelector('input:not([type="hidden"]),button');if(target)target.focus();}
-      function closeModal(id){$(id).hidden=true;if(!document.querySelector('.modal:not([hidden])'))document.body.style.overflow='';if(state.previousFocus?.isConnected)state.previousFocus.focus();}
-      function openTripForm(t=null){if(!canManage)return;state.editing=t?.id||null;const form=$('trip-form');form.reset();$('trip-modal-title').textContent=t?'تعديل الرحلة':'رحلة جديدة';$('trip-date').min=today();for(const c of $('grade-checks').querySelectorAll('input'))c.checked=!!t && (t.target_classes||[]).includes(c.value);if(t)for(const name of ['name','destination','trip_date','departure_time','return_time','bus_count','cost_per_student','max_participants','description','companions','parent_notes'])form.elements[name].value=t[name]??'';if(t)form.elements.requires_consent.value=String(t.requires_consent);openModal('trip-modal');}
-      function tripPayload(form){const f=form.elements;return {name:f.name.value.trim(),destination:f.destination.value.trim()||null,trip_date:f.trip_date.value,departure_time:f.departure_time.value||null,return_time:f.return_time.value||null,target_classes:[...$('grade-checks').querySelectorAll('input:checked')].map(x=>x.value),bus_count:Number(f.bus_count.value),cost_per_student:Number(f.cost_per_student.value),max_participants:Number(f.max_participants.value),description:f.description.value.trim()||null,companions:f.companions.value.trim()||null,parent_notes:f.parent_notes.value.trim()||null,requires_consent:f.requires_consent.value==='true'};}
-      async function saveTrip(event){event.preventDefault();if(!canManage||state.busy)return;const form=event.currentTarget,p=tripPayload(form),old=state.trips.find(t=>t.id===state.editing);if(!p.name||!p.trip_date||!p.target_classes.length){notify('أدخل/ي اسم الرحلة وتاريخها وصفاً مستهدفاً على الأقل.','error');return;}if(p.trip_date<today()){notify('لا يمكن اختيار تاريخ ماضٍ.','error');return;}if(p.departure_time && p.return_time && p.return_time<=p.departure_time){notify('يجب أن يكون وقت العودة بعد وقت المغادرة في اليوم نفسه.','error');return;}if(!Number.isInteger(p.bus_count)||p.bus_count<1||!Number.isInteger(p.max_participants)||p.max_participants<1||!Number.isFinite(p.cost_per_student)||p.cost_per_student<0){notify('تحقق/ي من قيم الحافلات والتكلفة وحدّ المشاركين.','error');return;}if(old && p.max_participants<participantsOf(old.id).length){notify('الحد الأقصى أقل من عدد الطلاب/ات المسجّلين/ات حالياً.','error');return;}const btn=$('trip-save');working(btn,true);try{let result;if(old)result=await state.db.from('field_trips').update(p).eq('id',old.id).select('id').single();else result=await state.db.from('field_trips').insert({...p,status:'draft',created_by:String(user.username||user.name_ar||user.id||role),academic_year:academicYear}).select('id').single();if(result.error)throw result.error;closeModal('trip-modal');state.selected=result.data.id;notify(old?'حُفظت تعديلات الرحلة.':'أُنشئت الرحلة كمسودة.','success');await load();}catch(err){showError(err,'حفظ الرحلة');}finally{working(btn,false);}}
-      async function updateTripStatus(t,status){if(!canManage||state.busy)return;if(status==='completed' && t.trip_date>today()){notify('لا يمكن إنهاء رحلة بتاريخ مستقبلي.','error');return;}if(!confirm(status==='active'?'هل تريد/ين تنشيط الرحلة؟':'هل تريد/ين إنهاء الرحلة؟'))return;state.busy=true;try{const {data,error}=await state.db.from('field_trips').update({status}).eq('id',t.id).select('id').single();if(error)throw error;closeModal('detail-modal');notify('تم تحديث حالة الرحلة.','success');await load();}catch(err){showError(err,'تحديث حالة الرحلة');}finally{state.busy=false;}}
-      async function cancelTrip(t){if(!canManage||state.busy||!confirm('هل تريد/ين إلغاء الرحلة؟ ستبقى بياناتها محفوظة للرجوع إليها.'))return;state.busy=true;try{const {error}=await state.db.from('field_trips').update({status:'cancelled'}).eq('id',t.id).select('id').single();if(error)throw error;notify('أُلغيت الرحلة مع الاحتفاظ بسجلها.','success');await load();}catch(err){showError(err,'إلغاء الرحلة');}finally{state.busy=false;}}
-      async function addStudent(event){event.preventDefault();if(!canManage||state.busy)return;const trip=getTrip(),f=event.currentTarget.elements;if(!trip || !['draft','active'].includes(trip.status)){notify('اختر/ي رحلة قابلة للتعديل.','error');return;}const list=participantsOf(trip.id);if(trip.max_participants && list.length>=trip.max_participants){notify('بلغت الرحلة الحد الأقصى للمشاركين/ات.','error');return;}const id=f.student_id.value?Number(f.student_id.value):null;const name=f.student_name.value.trim(),className=f.class_name.value.trim().toUpperCase();if(!name||!className||id!==null&&(!Number.isInteger(id)||id<1)){notify('تحقق/ي من بيانات الطالب/ة.','error');return;}const classGrade=grades.find(g=>className===g||className.startsWith(g)&&/^[A-Z][A-Z0-9-]*$/.test(className.slice(g.length)));if(trip.target_classes?.length && !trip.target_classes.includes(classGrade)){notify('الشعبة لا تطابق الصفوف المستهدفة لهذه الرحلة.','error');return;}if(id!==null && list.some(p=>p.student_id===id)){notify('الرقم المدرسي مسجّل بالفعل في هذه الرحلة.','error');return;}const btn=$('student-save');working(btn,true);try{const payload={trip_id:trip.id,student_id:id,student_name:name,class_name:className,consent_status:f.consent_status.value};if(payload.consent_status!=='pending')payload.consent_date=new Date().toISOString();const {error}=await state.db.from('field_trip_participants').insert(payload).select('id').single();if(error)throw error;closeModal('student-modal');event.currentTarget.reset();notify('أُضيف/ت الطالب/ة إلى الرحلة.','success');await load();}catch(err){showError(err,'إضافة الطالب/ة');}finally{working(btn,false);}}
-      function renderConsents(){const root=$('consents-content');clear(root);const t=getTrip();if(!t){root.append(empty('✅','لا توجد رحلة محددة','أنشئ/ي رحلة أولاً لعرض الموافقات.'));return;}const list=participantsOf(t.id),stats=node('div','stat-row');for(const [label,n] of [['موافق',list.filter(p=>p.consent_status==='approved').length],['رافض',list.filter(p=>p.consent_status==='rejected').length],['لا رد',list.filter(p=>p.consent_status==='pending').length]]){const s=node('div','stat');s.append(node('span','',label),node('b','',n));stats.append(s);}root.append(stats);if(!t.requires_consent)root.append(node('div','banner','هذه الرحلة لا تتطلب موافقة ولي/ة الأمر؛ تعرض الحالات المسجّلة للمتابعة فقط.'));const controls=node('div','toolbar');const filters=node('div','toolbar-group');const selector=node('select','field');selector.setAttribute('aria-label','فلتر الموافقات');for(const [value,label] of [['all','كل الحالات'],['approved','موافق'],['rejected','رافض'],['pending','لا رد']]){const o=node('option','',label);o.value=value;selector.append(o);}const search=node('input','field');search.type='search';search.placeholder='بحث باسم الطالب/ة أو الشعبة';search.setAttribute('aria-label','بحث باسم الطالب/ة أو الشعبة');filters.append(selector,search);controls.append(filters);const reminders=node('div','toolbar-group');addButton(reminders,'إرسال تذكير لغير المستجيبين','btn-soft',()=>sendReminder(t),!list.some(p=>p.consent_status==='pending')||!t.requires_consent);if(canManage && ['draft','active'].includes(t.status))addButton(reminders,'+ إضافة طالب/ة','btn-primary',()=>openModal('student-modal'));controls.append(reminders);root.append(controls);const area=node('div');root.append(area);const renderRows=()=>{clear(area);const term=search.value.trim().toLocaleLowerCase();const filtered=list.filter(p=>(selector.value==='all'||p.consent_status===selector.value)&&(String(p.student_name||'').toLocaleLowerCase().includes(term)||String(p.class_name||'').toLocaleLowerCase().includes(term)));if(!filtered.length){area.append(empty('📋','لا توجد نتائج مطابقة','جرّب/ي تغيير الفلتر أو البحث.'));return;}const wrap=node('div','table-wrap'),table=node('table'),thead=node('thead'),tr=node('tr');for(const h of ['الطالب/ة','الشعبة','الموافقة','تاريخ الموافقة','الإذن'])tr.append(node('th','',h));thead.append(tr);const tbody=node('tbody');for(const p of filtered){const row=node('tr');row.append(node('td','',val(p.student_name)),node('td','nowrap',val(p.class_name)));const status=node('td');status.append(statusBadge(consentLabels[p.consent_status]||'لا رد',p.consent_status||'pending'));row.append(status,node('td','nowrap',p.consent_date?fmtDate(p.consent_date):'—'));const actions=node('td');const buttons=node('div','inline-actions');if(canManage && ['draft','active'].includes(t.status)){const sel=node('select','field status-select');sel.setAttribute('aria-label','حالة موافقة '+val(p.student_name));for(const [key,label] of Object.entries(consentLabels)){const o=node('option','',label);o.value=key;sel.append(o);}sel.value=p.consent_status||'pending';sel.addEventListener('change',async()=>{const prior=p.consent_status;sel.disabled=true;try{const {error}=await state.db.from('field_trip_participants').update({consent_status:sel.value,consent_date:sel.value==='pending'?null:new Date().toISOString(),bus_number:sel.value==='approved'||!t.requires_consent?p.bus_number:null}).eq('id',p.id).select('id').single();if(error)throw error;notify('حُفظت حالة الموافقة الموثّقة.','success');await load();}catch(err){sel.value=prior;showError(err,'تحديث الموافقة');}finally{sel.disabled=false;}});buttons.append(sel);}addButton(buttons,'رفع الإذن','btn-outline btn-sm',()=>{state.uploadParticipant=p;openModal('upload-modal');});if(p.notes?.startsWith('consent-file:'))addButton(buttons,'عرض الإذن','btn-soft btn-sm',()=>viewPermission(p));actions.append(buttons);row.append(actions);tbody.append(row);}table.append(thead,tbody);wrap.append(table);area.append(wrap);};selector.addEventListener('change',renderRows);search.addEventListener('input',renderRows);renderRows();}
-      async function sendReminder(t){const ids=participantsOf(t.id).filter(p=>p.consent_status==='pending').map(p=>p.id);if(!ids.length)return;if(!confirm('إرسال تذكير عبر خدمة الإشعارات للطلاب/ات الذين لم يرد أولياء/ات أمورهم؟'))return;try{const {data,error}=await state.db.functions.invoke('field-trip-reminder',{body:{trip_id:t.id,participant_ids:ids}});if(error)throw error;if(!data || data.sent!==ids.length)throw new Error('لم تؤكّد خدمة الإشعارات إرسال جميع التذكيرات؛ تحقّق/ي من سجل الإرسال.');notify('أُرسلت '+ids.length+' تذكيرات بنجاح.','success');}catch(err){showError(err,'إرسال التذكيرات؛ تتطلب هذه الميزة خدمة إشعارات مفعّلة');}}
-      async function uploadPermission(event){event.preventDefault();const p=state.uploadParticipant,t=getTrip(),file=$('consent-file').files[0];if(!p||!t||p.trip_id!==t.id||!file)return;if(file.size>5*1024*1024||!['application/pdf','image/png','image/jpeg','image/webp'].includes(file.type)){notify('اختر/ي PDF أو صورة بحجم لا يتجاوز 5 ميغابايت.','error');return;}const ext={'application/pdf':'pdf','image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[file.type];const path=t.id+'/'+p.id+'/'+crypto.randomUUID()+'.'+ext;const btn=$('upload-save');working(btn,true);try{const {error}=await state.db.storage.from('field-trip-consents').upload(path,file,{contentType:file.type,upsert:false});if(error)throw error;const priorNotes=String(p.notes||'');const otherNotes=priorNotes.startsWith('consent-file:')?priorNotes.split('\n').slice(1).join('\n'):priorNotes;const {error:dbError}=await state.db.from('field_trip_participants').update({notes:'consent-file:'+path+(otherNotes?'\n'+otherNotes:'')}).eq('id',p.id).select('id').single();if(dbError){await state.db.storage.from('field-trip-consents').remove([path]);throw dbError;}if(priorNotes.startsWith('consent-file:')){const previousPath=priorNotes.split('\n')[0].slice('consent-file:'.length);if(previousPath.startsWith(t.id+'/'+p.id+'/'))await state.db.storage.from('field-trip-consents').remove([previousPath]);}closeModal('upload-modal');event.currentTarget.reset();notify('حُفظ ملف الإذن. راجع/ي محتواه قبل تسجيل حالة الموافقة.','success');await load();}catch(err){showError(err,'رفع الإذن؛ يلزم وجود مساحة تخزين خاصة وصلاحية رفع');}finally{working(btn,false);}}
-      async function viewPermission(p){const path=String(p.notes||'').split('\n')[0].slice('consent-file:'.length);if(!path.startsWith(p.trip_id+'/'+p.id+'/')){notify('مسار الإذن غير صالح.','error');return;}try{const {data,error}=await state.db.storage.from('field-trip-consents').createSignedUrl(path,60);if(error)throw error;window.open(data.signedUrl,'_blank','noopener,noreferrer');}catch(err){showError(err,'عرض الإذن');}}
-      function capacity(t){return t.max_participants && t.bus_count?Math.ceil(t.max_participants/t.bus_count):null;}
-      function renderBuses(){const root=$('buses-content');clear(root);const t=getTrip();if(!t){root.append(empty('🚍','لا توجد رحلة محددة','أنشئ/ي رحلة أولاً لتوزيع الحافلات.'));return;}const all=participantsOf(t.id),ready=eligibleParticipants(t),busCount=Math.max(0,Number(t.bus_count)||0),cap=capacity(t);const intro=node('div','panel-card');intro.append(node('h4','',busCount+' حافلة مخصصة'),node('p','',ready.length+' طالب/ة مؤهل/ة للتوزيع · '+all.filter(p=>p.bus_number).length+' موزع/ة حالياً'));intro.append(node('p','hint',cap?'الطاقة المعروضة حدّ تخطيطي مشتق من الحد الأقصى للمشاركين/ات، وليست سعة الحافلة الفعلية. يُرجى التأكد من السعة الفعلية قبل الاعتماد.':'لم تُحدَّد طاقة للحافلات؛ أدخل/ي الحد الأقصى للمشاركين/ات أولاً.'));const tools=node('div','inline-actions');if(canManage && ['draft','active'].includes(t.status))addButton(tools,'توزيع تلقائي للمؤهلين/ات','btn-primary',()=>autoDistribute(t),!cap||ready.length>Number(t.max_participants)||ready.length>busCount*cap);intro.append(tools);root.append(intro);if(!busCount){root.append(empty('🚍','لا توجد حافلات مخصصة','عدّل/ي الرحلة لتحديد عدد الحافلات.'));return;}const grid=node('div','bus-grid');for(let n=1;n<=busCount;n++){const card=node('div','panel-card'),assigned=all.filter(p=>p.bus_number===n);card.append(node('h4','', 'حافلة '+n),node('p','', 'الطاقة التخطيطية: '+val(cap,'غير محددة')+' · المعيّنون/ات: '+assigned.length));if(cap && assigned.length>cap)card.append(statusBadge('تجاوز الحد التخطيطي','rejected'));if(assigned.length){const ol=node('ol','bus-list');assigned.forEach(p=>ol.append(node('li','',val(p.student_name)+' · '+val(p.class_name)+(eligibility(t,p)?'':' · موافقته/ا غير مكتملة'))));card.append(ol);}else card.append(node('p','hint','لم يُعيَّن طلاب/ات لهذه الحافلة.'));grid.append(card);}root.append(grid);const unassigned=ready.filter(p=>!p.bus_number);if(unassigned.length)root.append(node('p','hint',unassigned.length+' طالب/ة مؤهل/ة غير موزّع/ة.'));if(canManage && ['draft','active'].includes(t.status)){root.append(node('h4','section-heading','التوزيع اليدوي'));const wrap=node('div','table-wrap'),table=node('table'),head=node('tr');for(const h of ['الطالب/ة','الشعبة','الحافلة'])head.append(node('th','',h));const thead=node('thead');thead.append(head);const body=node('tbody');ready.forEach(p=>{const row=node('tr');row.append(node('td','',val(p.student_name)),node('td','',val(p.class_name)));const td=node('td'),sel=node('select','field status-select');sel.setAttribute('aria-label','الحافلة للطالب/ة '+val(p.student_name));for(let i=0;i<=busCount;i++){const o=node('option','',i?'حافلة '+i:'غير موزع/ة');o.value=String(i);sel.append(o);}sel.value=String(p.bus_number||0);sel.addEventListener('change',async()=>{const prior=p.bus_number||0,n=Number(sel.value),count=all.filter(x=>x.bus_number===n && x.id!==p.id).length;if(n&&cap&&count>=cap){notify('بلغت الحافلة حدّها التخطيطي.','error');sel.value=String(prior);return;}sel.disabled=true;try{const {error}=await state.db.from('field_trip_participants').update({bus_number:n||null}).eq('id',p.id).select('id').single();if(error)throw error;notify('حُفظ تعيين الحافلة.','success');await load();}catch(err){sel.value=String(prior);showError(err,'حفظ توزيع الحافلة');}finally{sel.disabled=false;}});td.append(sel);row.append(td);body.append(row);});table.append(thead,body);wrap.append(table);root.append(wrap);}}
-      async function autoDistribute(t){const ready=eligibleParticipants(t),count=Number(t.bus_count),cap=capacity(t);if(!canManage||state.busy||!cap||ready.length>Number(t.max_participants)||ready.length>cap*count)return;if(!confirm('إعادة توزيع الطلاب/ات المؤهلين/ات بالتتابع على الحافلات؟'))return;state.busy=true;try{const sorted=[...ready].sort((a,b)=>String(a.class_name||'').localeCompare(String(b.class_name||''))||String(a.student_name||'').localeCompare(String(b.student_name||'')));for(let i=0;i<sorted.length;i++){const bus=(i%count)+1;if(sorted[i].bus_number===bus)continue;const {error}=await state.db.from('field_trip_participants').update({bus_number:bus}).eq('id',sorted[i].id).select('id').single();if(error)throw error;}notify('اكتمل التوزيع التلقائي. تحقّق/ي من سعة كل حافلة الفعلية.','success');}catch(err){showError(err,'التوزيع التلقائي؛ قد تكون بعض التعيينات حُفظت');}finally{state.busy=false;await load();}}
-      function renderReport(){const root=$('report-content');clear(root);const t=getTrip();if(!t){root.append(empty('📊','لا توجد رحلة محددة','أنشئ/ي رحلة أولاً لإعداد التقرير.'));return;}const list=participantsOf(t.id),ready=eligibleParticipants(t),stats=node('div','stat-row');for(const [label,count,foot] of [['إجمالي المشاركين/ات',ready.length,'من '+list.length+' مسجّل/ة'],['الغائبون/ات','غير متاح','لا يوجد سجل حضور في جدول الرحلات'],['الموافقات',list.filter(p=>p.consent_status==='approved').length,'من '+list.length+' حالة']]){const s=node('div','stat');s.append(node('span','',label),node('b','',count),node('small','',foot));stats.append(s);}root.append(stats);const card=node('div','panel-card');card.append(node('h4','',t.name+' · '+fmtDate(t.trip_date)),node('p','', 'الوجهة: '+val(t.destination)+' · الحافلات: '+val(t.bus_count)),node('p','hint','لا تُسجّل جداول الرحلات حضوراً فعلياً؛ لذلك لا يجوز احتساب الغياب تلقائياً. PDF عبر نافذة الطباعة، وExcel بصيغة CSV متوافقة.'));const actions=node('div','inline-actions');addButton(actions,'طباعة القائمة الرسمية (PDF)','btn-primary',()=>printReport(t));addButton(actions,'تصدير Excel','btn-soft',()=>exportExcel(t));card.append(actions);root.append(card);}
-      function reportRows(t){return participantsOf(t.id).sort((a,b)=>String(a.class_name||'').localeCompare(String(b.class_name||''))||String(a.student_name||'').localeCompare(String(b.student_name||'')));}
-      function printReport(t){const sheet=$('print-sheet');clear(sheet);const heading=node('div','brandprint');heading.append(node('h1','', '🎓 الجود · بوابة الجود الذكية · Powered by EduOS'),node('p','', 'NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712 · أبوظبي'),node('h2','', 'القائمة الرسمية للرحلة: '+t.name),node('p','', 'الوجهة: '+val(t.destination)+' · التاريخ: '+fmtDate(t.trip_date)+' · المرافقون/ات: '+val(t.companions)));sheet.append(heading);const table=node('table'),head=node('tr');for(const h of ['#','الطالب/ة','الشعبة','موافقة ولي/ة الأمر','الحافلة','الحضور'])head.append(node('th','',h));const thead=node('thead');thead.append(head);const body=node('tbody');reportRows(t).forEach((p,i)=>{const r=node('tr');for(const v of [i+1,val(p.student_name),val(p.class_name),t.requires_consent?consentLabels[p.consent_status]||'لا رد':'غير مطلوبة',p.bus_number?'حافلة '+p.bus_number:'—','____________'])r.append(node('td','',v));body.append(r);});table.append(thead,body);sheet.append(table);sheet.append(node('p','', 'إجمالي المسجّلين/ات: '+participantsOf(t.id).length+' · مؤهلون/ات للمشاركة: '+eligibleParticipants(t).length));const signs=node('div','signatures');signs.append(node('span','', 'توقيع المسؤول/ة: ______________'),node('span','', 'التاريخ: ______________'));sheet.append(signs,node('p','', '© 2026 NAFAS FOR ARTIFICIAL INTELLIGENCE. جميع الحقوق محفوظة.'));window.print();}
-      function safeCell(value){let s=String(value??'').replace(/\r\n?/g,' ').replace(/\n/g,' ');if(/^[\s\u0000-\u001f]*[=+@\-]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}
-      function exportExcel(t){const header=['اسم الرحلة','الوجهة','التاريخ','الطالب/ة','الشعبة','الموافقة','الحافلة'];const lines=[header.map(safeCell).join(',')];for(const p of reportRows(t))lines.push([t.name,t.destination,t.trip_date,p.student_name,p.class_name,t.requires_consent?consentLabels[p.consent_status]||'لا رد':'غير مطلوبة',p.bus_number||''].map(safeCell).join(','));const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='field-trip-'+t.trip_date+'.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
-      function config(){const c=typeof window.getSupabaseConfig==='function'?window.getSupabaseConfig():null;return {url:c?.url||c?.supabaseUrl||c?.SB_URL||window.EduOS?.SB_URL,key:c?.anonKey||c?.key||c?.supabaseKey||c?.SB_KEY||window.EduOS?.SB_KEY};}
-      function validJWT(){const tk=(typeof window.eduosGetJWT==='function'&&window.eduosGetJWT())||user.access_token||user.token;if(!tk||tk.split('.').length!==3)return null;try{const payload=JSON.parse(atob(tk.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));return payload.exp && payload.exp>Date.now()/1000+30?tk:null;}catch(_){return null;}}
-      function init(){document.querySelectorAll('.manager-only').forEach(x=>x.hidden=!canManage);$('user-label').textContent=val(user.name_ar||user.username,'الحساب')+' · '+roleLabels[role];$('year-label').textContent='العام الأكاديمي '+academicYear;for(const g of grades){const l=node('label'),input=node('input');input.type='checkbox';input.value=g;input.name='grades';l.append(input,document.createTextNode(g));$('grade-checks').append(l);}document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));document.querySelectorAll('.trip-picker').forEach(el=>el.addEventListener('change',e=>chooseTrip(e.target.value)));for(const id of ['header-new','toolbar-new'])$(id).addEventListener('click',()=>openTripForm());document.querySelectorAll('.modal-close').forEach(b=>b.addEventListener('click',()=>closeModal(b.closest('.modal').id)));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('mousedown',e=>{if(e.target===m)closeModal(m.id);}));document.addEventListener('keydown',e=>{if(e.key==='Escape'){const open=document.querySelector('.modal:not([hidden])');if(open)closeModal(open.id);}});$('trip-form').addEventListener('submit',saveTrip);$('student-form').addEventListener('submit',addStudent);$('upload-form').addEventListener('submit',uploadPermission);const c=config();if(!c.url||!c.key){$('trips-loading').hidden=true;notify('إعداد الاتصال بقاعدة البيانات غير متاح. تحقق/ي من ملف إعدادات المنصة.','error');return;}const jwt=validJWT();state.db=createClient(c.url,c.key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},global:{fetch:(input,options={})=>{const headers=new Headers(options.headers||{});if(jwt)headers.set('Authorization','Bearer '+jwt);return fetch(input,{...options,headers});}}});load();}
-      init();
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="brand">
+      <div class="brand-logo">🎓</div>
+      <div class="brand-info">
+        <h1>بوابة الجود الذكية</h1>
+        <p id="hdrSub">الرحلات المدرسية</p>
+      </div>
+    </div>
+    <div class="hdr-tools">
+      <div class="clock" id="liveClock"></div>
+      <div id="header-tools"></div>
+      <button class="btn-back-circle" onclick="history.back()" title="رجوع">←</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- KPIs -->
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi"><div class="kpi-num" id="kpiTotal">—</div><div class="kpi-lbl">إجمالي الرحلات</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiUpcoming">—</div><div class="kpi-lbl">قادمة</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiPending">—</div><div class="kpi-lbl">طلبات معلقة</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiParticipants">—</div><div class="kpi-lbl">طالب/ة مشارك/ة</div></div>
+  </div>
+
+  <!-- تبويبات -->
+  <div class="tabs" id="mainTabs">
+    <button class="tab-btn active" data-tab="trips" onclick="switchTab('trips',this)">🚌 الرحلات</button>
+    <button class="tab-btn" data-tab="requests" onclick="switchTab('requests',this)">📋 الطلبات <span class="pending-count" id="pendingBadge" hidden>0</span></button>
+    <button class="tab-btn" data-tab="buses" onclick="switchTab('buses',this)" id="tabBuses">🚍 الحافلات</button>
+    <button class="tab-btn" data-tab="students" onclick="switchTab('students',this)" id="tabStudents">👥 قائمة الطلاب</button>
+    <button class="tab-btn" data-tab="report" onclick="switchTab('report',this)">📊 تقرير</button>
+  </div>
+
+  <!-- ══ تبويب الرحلات ══ -->
+  <div class="tab-panel active" id="panel-trips">
+
+    <!-- شريط البحث والإضافة -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+      <input class="form-input" id="tripSearch" placeholder="🔍 بحث..." style="flex:1;min-width:200px" oninput="renderTrips()">
+      <select class="form-input" id="tripFilter" style="width:160px" onchange="renderTrips()">
+        <option value="">كل الحالات</option>
+        <option value="draft">مسودة</option>
+        <option value="pending">بانتظار الموافقة</option>
+        <option value="approved">معتمدة</option>
+        <option value="completed">مكتملة</option>
+        <option value="rejected">مرفوضة</option>
+      </select>
+      <button class="btn-lg btn-primary" id="btnAddTrip" onclick="openTripModal()">+ إنشاء رحلة</button>
+      <button class="btn-lg btn-ghost" id="btnAddRequest" onclick="openRequestModal()" hidden>+ طلب رحلة</button>
+    </div>
+
+    <div class="trips-grid" id="tripsGrid">
+      <div class="empty-state"><div class="icon">🚌</div><p>جاري التحميل...</p></div>
+    </div>
+  </div>
+
+  <!-- ══ تبويب الطلبات ══ -->
+  <div class="tab-panel" id="panel-requests">
+    <div class="card">
+      <div class="card-title">📋 طلبات رحلات من المعلمات</div>
+      <div id="requestsList">
+        <div class="empty-state"><div class="icon">📋</div><p>جاري التحميل...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ تبويب الحافلات ══ -->
+  <div class="tab-panel" id="panel-buses">
+    <div class="card">
+      <div class="card-title">🚍 إدارة الحافلات</div>
+      <div style="margin-bottom:16px">
+        <label class="form-group" style="flex-direction:row;align-items:center;gap:10px">
+          <span style="font-weight:700;font-size:.9rem">اختر رحلة:</span>
+          <select class="form-input" id="buseTripSelect" onchange="loadBuses()" style="flex:1;max-width:400px">
+            <option value="">— اختر رحلة —</option>
+          </select>
+        </label>
+      </div>
+      <div id="busesContent">
+        <div class="empty-state"><div class="icon">🚍</div><p>اختر رحلة لعرض حافلاتها</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ تبويب الطلاب ══ -->
+  <div class="tab-panel" id="panel-students">
+    <div class="card">
+      <div class="card-title">👥 قائمة المشاركين</div>
+      <div style="margin-bottom:16px;display:flex;gap:12px;flex-wrap:wrap">
+        <select class="form-input" id="studTripSelect" onchange="loadStudents()" style="flex:1;max-width:400px">
+          <option value="">— اختر رحلة —</option>
+        </select>
+        <button class="btn-sm btn-ghost" onclick="exportStudents()">⬇ تصدير</button>
+      </div>
+      <div id="studentsContent">
+        <div class="empty-state"><div class="icon">👥</div><p>اختر رحلة لعرض المشاركين</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ تبويب التقرير ══ -->
+  <div class="tab-panel" id="panel-report">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-num" id="rptTotal">—</div><div class="kpi-lbl">إجمالي رحلات السنة</div></div>
+      <div class="kpi"><div class="kpi-num" id="rptParticipants">—</div><div class="kpi-lbl">إجمالي المشاركين</div></div>
+      <div class="kpi"><div class="kpi-num" id="rptApproval">—%</div><div class="kpi-lbl">نسبة موافقة أولياء الأمور</div></div>
+      <div class="kpi"><div class="kpi-num" id="rptBuses">—</div><div class="kpi-lbl">حافلات مُشغَّلة</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 توزيع الرحلات حسب النوع</div>
+      <div id="rptTypeList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 رحلات هذا الشهر</div>
+      <div id="rptMonthList"></div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ══ موديل إنشاء رحلة ══ -->
+<div class="modal-overlay" id="modalTrip" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTripTitle">إنشاء رحلة جديدة</div>
+      <button class="modal-close" onclick="closeModal('modalTrip')">×</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>عنوان الرحلة *</label>
+        <input class="form-input" id="fTitle" placeholder="مثال: زيارة المتحف الوطني">
+      </div>
+      <div class="form-group">
+        <label>الوجهة *</label>
+        <input class="form-input" id="fDest" placeholder="اسم المكان">
+      </div>
+      <div class="form-group">
+        <label>نوع الرحلة *</label>
+        <select class="form-input" id="fType">
+          <option value="">— اختر —</option>
+          <option value="field">ميدانية</option>
+          <option value="reward">مكافأة التزام وتميز</option>
+          <option value="competition">مسابقة</option>
+          <option value="cultural">ثقافية ووطنية</option>
+          <option value="social">مجتمعية وخدمية</option>
+          <option value="other">أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>تاريخ الرحلة *</label>
+        <input class="form-input" id="fDate" type="date">
+      </div>
+      <div class="form-group">
+        <label>وقت المغادرة *</label>
+        <input class="form-input" id="fDepart" type="time" value="07:00">
+      </div>
+      <div class="form-group">
+        <label>وقت العودة المتوقع *</label>
+        <input class="form-input" id="fReturn" type="time" value="13:00">
+      </div>
+      <div class="form-group">
+        <label>طاقة الحافلة (عدد المقاعد) *</label>
+        <input class="form-input" id="fBusCap" type="number" min="10" max="60" value="45" placeholder="45">
+      </div>
+      <div class="form-group">
+        <label>سبب الرحلة</label>
+        <input class="form-input" id="fReason" placeholder="الهدف التربوي من الرحلة">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>الصفوف المشاركة *</label>
+      <div class="classes-grid" id="classesCheckboxes">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:16px">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>ملاحظات</label>
+      <textarea class="form-input" id="fNotes" placeholder="أي معلومات إضافية..."></textarea>
+    </div>
+
+    <div class="specialist-invite" id="coSwSection">
+      <label>👥 دعوة أخصائية اجتماعية مشاركة (اختياري)</label>
+      <select class="form-input" id="fCoSw" style="margin-top:4px">
+        <option value="">— لا أحد —</option>
+      </select>
+      <div style="font-size:.8rem;color:#1D4ED8;margin-top:6px">ستتلقى دعوة لإضافة صفوفها إلى الرحلة</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-lg btn-ghost" onclick="closeModal('modalTrip')">إلغاء</button>
+      <button class="btn-lg btn-primary" id="btnSaveTrip" onclick="saveTrip()">💾 حفظ الرحلة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ موديل طلب رحلة (معلمة) ══ -->
+<div class="modal-overlay" id="modalRequest" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">تقديم طلب رحلة</div>
+      <button class="modal-close" onclick="closeModal('modalRequest')">×</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>عنوان الرحلة المقترحة *</label>
+        <input class="form-input" id="rqTitle" placeholder="مثال: رحلة جبل حفيت">
+      </div>
+      <div class="form-group">
+        <label>الوجهة *</label>
+        <input class="form-input" id="rqDest" placeholder="اسم المكان">
+      </div>
+      <div class="form-group">
+        <label>نوع الرحلة *</label>
+        <select class="form-input" id="rqType">
+          <option value="">— اختر —</option>
+          <option value="field">ميدانية</option>
+          <option value="reward">مكافأة التزام وتميز</option>
+          <option value="competition">مسابقة</option>
+          <option value="cultural">ثقافية ووطنية</option>
+          <option value="social">مجتمعية وخدمية</option>
+          <option value="other">أخرى</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>التاريخ المقترح *</label>
+        <input class="form-input" id="rqDate" type="date">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>الصفوف المعنية *</label>
+      <div class="classes-grid" id="rqClassesGrid">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:16px">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>سبب الطلب وهدفه التربوي *</label>
+      <textarea class="form-input" id="rqReason" placeholder="اشرحي الهدف التربوي وأهمية الرحلة..." style="min-height:100px"></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-lg btn-ghost" onclick="closeModal('modalRequest')">إلغاء</button>
+      <button class="btn-lg btn-primary" onclick="saveRequest()">📤 إرسال الطلب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ موديل إضافة حافلة ══ -->
+<div class="modal-overlay" id="modalBus" hidden>
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title" id="busMdTitle">إضافة حافلة</div>
+      <button class="modal-close" onclick="closeModal('modalBus')">×</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>اسم السائق *</label>
+        <input class="form-input" id="bDriver" placeholder="الاسم الكامل">
+      </div>
+      <div class="form-group">
+        <label>رقم موبايل السائق *</label>
+        <input class="form-input" id="bDriverPhone" placeholder="05XXXXXXXX" dir="ltr" style="text-align:right">
+      </div>
+      <div class="form-group">
+        <label>اسم المشرفة *</label>
+        <input class="form-input" id="bSuper" placeholder="اسم المشرفة المرافقة">
+      </div>
+      <div class="form-group">
+        <label>رقم موبايل المشرفة *</label>
+        <input class="form-input" id="bSuperPhone" placeholder="05XXXXXXXX" dir="ltr" style="text-align:right">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-lg btn-ghost" onclick="closeModal('modalBus')">إلغاء</button>
+      <button class="btn-lg btn-success" onclick="saveBus()">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ موديل تفاصيل رحلة ══ -->
+<div class="modal-overlay" id="modalDetail" hidden>
+  <div class="modal" style="max-width:700px">
+    <div class="modal-header">
+      <div class="modal-title" id="detailTitle">تفاصيل الرحلة</div>
+      <button class="modal-close" onclick="closeModal('modalDetail')">×</button>
+    </div>
+    <div id="detailBody"></div>
+    <div class="modal-footer" id="detailFooter"></div>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+var SB_URL = '', SB_KEY = '';
+(function(){
+  var cfg = (typeof window.getSupabaseConfig === 'function') ? window.getSupabaseConfig() : {url:(window.EduOS&&window.EduOS.SB_URL)||'', key:(window.EduOS&&window.EduOS.SB_KEY)||''};
+  SB_URL = cfg.url; SB_KEY = cfg.key;
+})();
+
+var user = window.tripUser || {};
+var role = window.tripRole || '';
+var schoolId = (window.EduOS && window.EduOS.school && window.EduOS.school.id) || 'aljood';
+
+// الأكاديمية
+var YEAR = '2026-2027';
+
+// ساعة
+(function tick(){
+  var d = new Date();
+  var el = document.getElementById('liveClock');
+  if(el) el.textContent = d.toLocaleTimeString('ar-AE',{hour:'2-digit',minute:'2-digit',hour12:true});
+  setTimeout(tick, 1000);
+})();
+
+// JWT
+function getJWT(){
+  var sbKey = 'sb-' + SB_URL.replace('https://','').split('.')[0] + '-auth-token';
+  try { var r = localStorage.getItem(sbKey); if(r){var p=JSON.parse(r);if(p&&p.access_token)return p.access_token;} } catch(_){}
+  try { var s = JSON.parse(sessionStorage.getItem('edoos_user')||'{}'); if(s.token)return s.token; } catch(_){}
+  return '';
+}
+
+function authH(write){
+  var jwt = getJWT();
+  var h = {'Content-Type':'application/json','apikey':SB_KEY};
+  if(jwt){ h['Authorization']='Bearer '+jwt; }
+  else { h['Authorization']='Bearer '+SB_KEY; }
+  if(write) h['Prefer']='return=representation';
+  return h;
+}
+
+// ──────────────────────────
+// نوع الرحلة
+// ──────────────────────────
+var TRIP_TYPES = {
+  field:{label:'ميدانية',css:'type-field',icon:'🏛'},
+  reward:{label:'مكافأة تميز',css:'type-reward',icon:'🏆'},
+  competition:{label:'مسابقة',css:'type-competition',icon:'🥇'},
+  cultural:{label:'ثقافية',css:'type-cultural',icon:'🎭'},
+  social:{label:'مجتمعية',css:'type-social',icon:'🤝'},
+  other:{label:'أخرى',css:'type-other',icon:'📌'}
+};
+
+function typeInfo(t){ return TRIP_TYPES[t]||{label:t||'أخرى',css:'type-other',icon:'📌'}; }
+
+// ──────────────────────────
+// صلاحيات حسب الدور
+// ──────────────────────────
+var canCreate = ['social_worker','counselor','principal','admin'].indexOf(role) !== -1;
+var canApprove = ['vice_principal','principal','admin'].indexOf(role) !== -1;
+var isTeacher = role === 'teacher';
+var isSW = ['social_worker','counselor'].indexOf(role) !== -1;
+
+// إظهار/إخفاء الأزرار
+if(canCreate){ document.getElementById('btnAddTrip').hidden = false; }
+else { document.getElementById('btnAddTrip').hidden = true; }
+if(isTeacher){ document.getElementById('btnAddRequest').hidden = false; }
+if(isTeacher){
+  // المعلمة: تخفي بعض التبويبات
+  document.getElementById('tabBuses').hidden = true;
+  document.getElementById('tabStudents').hidden = true;
+}
+
+// ──────────────────────────
+// تحميل البيانات
+// ──────────────────────────
+var allTrips = [];
+var allRequests = [];
+
+async function loadAll(){
+  await Promise.all([loadTrips(), loadRequests()]);
+  updateKPIs();
+  fillTripSelects();
+}
+
+async function loadTrips(){
+  var url = SB_URL + '/rest/v1/field_trips?is_active=eq.true&academic_year=eq.' + YEAR + '&order=trip_date.desc&select=*';
+  // المعلمة لا ترى الرحلات في هذا التبويب
+  if(isTeacher){ allTrips = []; renderTrips(); return; }
+  try{
+    var r = await fetch(url, {headers: authH(false)});
+    allTrips = r.ok ? (await r.json()) : [];
+  } catch(_){ allTrips = []; }
+  renderTrips();
+}
+
+async function loadRequests(){
+  var url = SB_URL + '/rest/v1/field_trip_requests?order=created_at.desc&select=*&academic_year=eq.' + YEAR;
+  if(isTeacher) url += '&requested_by=eq.' + encodeURIComponent(user.staff_db_id || user.username || '');
+  else if(isSW) url += '&status=in.(pending,forwarded_to_vp)';
+  else if(canApprove) url += '&status=eq.forwarded_to_vp';
+  try{
+    var r = await fetch(url, {headers: authH(false)});
+    allRequests = r.ok ? (await r.json()) : [];
+  } catch(_){ allRequests = []; }
+  renderRequests();
+  var pending = allRequests.filter(function(x){ return x.status === 'pending' || x.status === 'forwarded_to_vp'; }).length;
+  var badge = document.getElementById('pendingBadge');
+  if(pending > 0){ badge.textContent = pending; badge.hidden = false; } else { badge.hidden = true; }
+}
+
+// ──────────────────────────
+// عرض الرحلات
+// ──────────────────────────
+function renderTrips(){
+  var grid = document.getElementById('tripsGrid');
+  var srch = (document.getElementById('tripSearch').value||'').toLowerCase();
+  var flt  = document.getElementById('tripFilter').value;
+
+  var filtered = allTrips.filter(function(t){
+    if(flt && t.status !== flt) return false;
+    if(srch && !(t.title||'').toLowerCase().includes(srch) && !(t.destination||'').toLowerCase().includes(srch)) return false;
+    return true;
+  });
+
+  if(!filtered.length){
+    grid.innerHTML = '<div class="empty-state"><div class="icon">🚌</div><p>لا توجد رحلات</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(function(t){
+    var ti = typeInfo(t.trip_type);
+    var d = t.trip_date ? new Date(t.trip_date).toLocaleDateString('ar-AE',{day:'numeric',month:'long',year:'numeric'}) : '—';
+    var cls = (t.classes||[]).slice(0,3).join('، ') + ((t.classes||[]).length>3?' +'+((t.classes||[]).length-3):'');
+    return '<div class="trip-card" onclick="showDetail(\''+t.id+'\')">'
+      + '<div class="trip-card-top">'
+      + '<div class="trip-type-badge '+ti.css+'">'+ti.icon+' '+ti.label+'</div>'
+      + '<div class="trip-title">'+esc(t.title)+'</div>'
+      + '<div class="trip-meta"><span>📍 '+esc(t.destination)+'</span><span>📅 '+d+'</span><span>🏫 '+esc(cls)+'</span></div>'
+      + '</div>'
+      + '<div class="trip-card-bottom">'
+      + '<span class="status-badge s-'+esc(t.status||'draft')+'">'+statusLabel(t.status)+'</span>'
+      + '<div class="trip-actions">'
+      + (canApprove && t.status==='pending' ? '<button class="btn-sm btn-success" onclick="approveTrip(event,\''+t.id+'\')">✓ اعتماد</button>' : '')
+      + (canCreate ? '<button class="btn-sm btn-ghost" onclick="editTrip(event,\''+t.id+'\')">✎</button>' : '')
+      + '</div></div></div>';
+  }).join('');
+}
+
+function statusLabel(s){
+  var m = {draft:'مسودة',pending:'بانتظار الاعتماد',approved:'معتمدة',rejected:'مرفوضة',completed:'مكتملة'};
+  return m[s]||s||'مسودة';
+}
+
+// ──────────────────────────
+// تفاصيل رحلة
+// ──────────────────────────
+async function showDetail(id){
+  var t = allTrips.find(function(x){return x.id===id;});
+  if(!t) return;
+  var ti = typeInfo(t.trip_type);
+  var d = t.trip_date ? new Date(t.trip_date).toLocaleDateString('ar-AE',{day:'numeric',month:'long',year:'numeric',weekday:'long'}) : '—';
+
+  // إحصاءات الموافقة
+  var countUrl = SB_URL + '/rest/v1/field_trip_participants?trip_id=eq.'+id+'&select=parent_approval';
+  var parts = [];
+  try { var pr = await fetch(countUrl,{headers:authH(false)}); parts = pr.ok ? await pr.json() : []; } catch(_){}
+  var approved = parts.filter(function(p){return p.parent_approval==='approved';}).length;
+  var total = parts.length;
+  var buses = t.bus_capacity ? Math.ceil((t.total_approved||total||0) / t.bus_capacity) : '—';
+
+  document.getElementById('detailTitle').textContent = t.title;
+  document.getElementById('detailBody').innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">'
+    +'<div class="bus-info-row"><label>نوع الرحلة</label><span class="trip-type-badge '+ti.css+'" style="display:inline-flex">'+ti.icon+' '+ti.label+'</span></div>'
+    +'<div class="bus-info-row"><label>الوجهة</label><span>'+esc(t.destination)+'</span></div>'
+    +'<div class="bus-info-row"><label>التاريخ</label><span>'+d+'</span></div>'
+    +'<div class="bus-info-row"><label>المغادرة → العودة</label><span>'+(t.departure_time||'—')+' ← '+(t.return_time||'—')+'</span></div>'
+    +'<div class="bus-info-row"><label>الصفوف</label><span>'+((t.classes||[]).join(' · ') || '—')+'</span></div>'
+    +'<div class="bus-info-row"><label>طاقة الحافلة</label><span>'+(t.bus_capacity||'—')+' مقعد</span></div>'
+    +'<div class="bus-info-row"><label>موافقات أولياء الأمور</label><span>'+approved+' / '+total+'</span></div>'
+    +'<div class="bus-info-row"><label>عدد الحافلات المتوقع</label><span>'+buses+'</span></div>'
+    +'<div class="bus-info-row"><label>الحالة</label><span class="status-badge s-'+(t.status||'draft')+'">'+statusLabel(t.status)+'</span></div>'
+    +'</div>'
+    +(t.notes?'<div class="bus-info-row"><label>ملاحظات</label><span>'+esc(t.notes)+'</span></div>':'');
+
+  var footer = '<button class="btn-lg btn-ghost" onclick="closeModal(\'modalDetail\')">إغلاق</button>';
+  if(canApprove && t.status==='pending') footer += '<button class="btn-lg btn-success" onclick="approveTrip(null,\''+id+'\');closeModal(\'modalDetail\')">✓ اعتماد</button><button class="btn-lg btn-danger" onclick="rejectTripPrompt(\''+id+'\')">✗ رفض</button>';
+  if(isSW && t.status==='draft') footer += '<button class="btn-lg btn-amber" onclick="sendForApproval(\''+id+'\')">📤 إرسال للاعتماد</button>';
+  document.getElementById('detailFooter').innerHTML = footer;
+  document.getElementById('modalDetail').hidden = false;
+}
+
+// ──────────────────────────
+// عرض الطلبات
+// ──────────────────────────
+function renderRequests(){
+  var el = document.getElementById('requestsList');
+  if(!allRequests.length){
+    el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>لا توجد طلبات</p></div>';
+    return;
+  }
+  el.innerHTML = '<div class="table-wrap"><table class="data-table">'
+    +'<thead><tr><th>العنوان</th><th>الوجهة</th><th>النوع</th><th>التاريخ</th><th>مقدّمة من</th><th>الحالة</th><th>إجراء</th></tr></thead>'
+    +'<tbody>'+allRequests.map(function(r){
+      var ti = typeInfo(r.trip_type);
+      var d = r.trip_date ? new Date(r.trip_date).toLocaleDateString('ar-AE',{day:'numeric',month:'short',year:'numeric'}) : '—';
+      var actions = '';
+      if((isSW||canApprove) && r.status==='pending'){
+        actions = '<button class="btn-sm btn-success" onclick="approveRequest(\''+r.id+'\')">✓ قبول</button> '
+          + '<button class="btn-sm btn-amber" onclick="forwardRequest(\''+r.id+'\')">↑ رفع للنائبة</button> '
+          + '<button class="btn-sm btn-danger" onclick="rejectRequest(\''+r.id+'\')">✗ رفض</button>';
+      }
+      if(canApprove && r.status==='forwarded_to_vp'){
+        actions = '<button class="btn-sm btn-success" onclick="approveRequest(\''+r.id+'\')">✓ اعتماد</button> '
+          + '<button class="btn-sm btn-danger" onclick="rejectRequest(\''+r.id+'\')">✗ رفض</button>';
+      }
+      return '<tr>'
+        +'<td style="font-weight:700">'+esc(r.trip_title)+'</td>'
+        +'<td>'+esc(r.destination)+'</td>'
+        +'<td><span class="trip-type-badge '+ti.css+'">'+ti.icon+' '+ti.label+'</span></td>'
+        +'<td>'+d+'</td>'
+        +'<td>'+esc(r.requester_name||r.requested_by||'—')+'</td>'
+        +'<td><span class="status-badge s-'+(r.status==='forwarded_to_vp'?'pending':r.status||'draft')+'">'+reqStatusLabel(r.status)+'</span></td>'
+        +'<td>'+actions+'</td>'
+        +'</tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
+function reqStatusLabel(s){
+  var m = {pending:'بانتظار المراجعة',forwarded_to_vp:'مُحوَّل للنائبة',approved:'مقبول',rejected:'مرفوض'};
+  return m[s]||s||'—';
+}
+
+// ──────────────────────────
+// تحميل الصفوف
+// ──────────────────────────
+var assignedClasses = [];
+
+async function loadAssignedClasses(gridId){
+  var grid = document.getElementById(gridId);
+  // المعلمة: صفوفها المعيّنة (teacher_assignments)
+  // الأخصائية: coord_classes
+  // المديرة/الأدمن: كل الصفوف
+  try {
+    if(isSW || isTeacher){
+      var staffId = user.staff_db_id || '';
+      var col = isSW ? 'coord_classes' : null;
+      if(isSW && staffId){
+        var r = await fetch(SB_URL+'/rest/v1/staff_profiles?staff_db_id=eq.'+encodeURIComponent(staffId)+'&select=coord_classes', {headers:authH(false)});
+        var data = r.ok ? await r.json() : [];
+        if(data.length && data[0].coord_classes && data[0].coord_classes.length){
+          assignedClasses = data[0].coord_classes;
+        } else {
+          assignedClasses = [];
+        }
+      } else if(isTeacher && staffId){
+        var r2 = await fetch(SB_URL+'/rest/v1/teacher_assignments?staff_db_id=eq.'+encodeURIComponent(staffId)+'&academic_year=eq.'+YEAR+'&select=class_name', {headers:authH(false)});
+        var d2 = r2.ok ? await r2.json() : [];
+        var seen = {};
+        assignedClasses = d2.filter(function(x){ if(seen[x.class_name]) return false; seen[x.class_name]=true; return true; }).map(function(x){return x.class_name;});
+      }
     }
-  </script>
+    // كل الأدوار الأخرى: اجلب كل الفصول من students
+    if(!isSW && !isTeacher){
+      var r3 = await fetch(SB_URL+'/rest/v1/students?select=class_name&order=class_name.asc', {headers:authH(false)});
+      var d3 = r3.ok ? await r3.json() : [];
+      var seen2 = {};
+      assignedClasses = d3.filter(function(x){ if(!x.class_name||seen2[x.class_name]) return false; seen2[x.class_name]=true; return true; }).map(function(x){return x.class_name;});
+    }
+  } catch(_){ assignedClasses = []; }
+
+  if(!assignedClasses.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:16px">لا توجد صفوف مُعيَّنة</div>';
+    return;
+  }
+  grid.innerHTML = assignedClasses.map(function(c){
+    return '<label class="class-chk"><input type="checkbox" value="'+esc(c)+'"><span>'+esc(c)+'</span></label>';
+  }).join('');
+}
+
+// ──────────────────────────
+// تحميل الأخصائيات للدعوة
+// ──────────────────────────
+async function loadCoSW(){
+  var sel = document.getElementById('fCoSw');
+  if(!isSW){ document.getElementById('coSwSection').hidden = true; return; }
+  try {
+    var myId = user.staff_db_id || '';
+    var r = await fetch(SB_URL+'/rest/v1/staff_profiles?role_key=in.(social_worker,counselor)&is_active=eq.true&select=staff_db_id,name_ar', {headers:authH(false)});
+    var data = r.ok ? await r.json() : [];
+    var others = data.filter(function(x){ return x.staff_db_id !== myId; });
+    if(!others.length){ document.getElementById('coSwSection').hidden = true; return; }
+    sel.innerHTML = '<option value="">— لا أحد —</option>' + others.map(function(x){
+      return '<option value="'+esc(x.staff_db_id)+'">'+esc(x.name_ar)+'</option>';
+    }).join('');
+  } catch(_){ document.getElementById('coSwSection').hidden = true; }
+}
+
+// ──────────────────────────
+// فتح موديل إنشاء رحلة
+// ──────────────────────────
+window.currentEditId = null;
+async function openTripModal(id){
+  window.currentEditId = id || null;
+  document.getElementById('modalTripTitle').textContent = id ? 'تعديل الرحلة' : 'إنشاء رحلة جديدة';
+  // تحميل الصفوف
+  await loadAssignedClasses('classesCheckboxes');
+  await loadCoSW();
+  // إذا تعديل
+  if(id){
+    var t = allTrips.find(function(x){return x.id===id;});
+    if(t){
+      document.getElementById('fTitle').value = t.title||'';
+      document.getElementById('fDest').value = t.destination||'';
+      document.getElementById('fType').value = t.trip_type||'';
+      document.getElementById('fDate').value = t.trip_date||'';
+      document.getElementById('fDepart').value = t.departure_time||'07:00';
+      document.getElementById('fReturn').value = t.return_time||'13:00';
+      document.getElementById('fBusCap').value = t.bus_capacity||45;
+      document.getElementById('fReason').value = t.reason||'';
+      document.getElementById('fNotes').value = t.notes||'';
+      // تحديد الصفوف
+      var chks = document.querySelectorAll('#classesCheckboxes input[type=checkbox]');
+      var sel = t.classes||[];
+      chks.forEach(function(c){ c.checked = sel.indexOf(c.value) !== -1; });
+    }
+  } else {
+    ['fTitle','fDest','fReason','fNotes'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('fType').value='';
+    document.getElementById('fDate').value='';
+    document.getElementById('fDepart').value='07:00';
+    document.getElementById('fReturn').value='13:00';
+    document.getElementById('fBusCap').value=45;
+  }
+  document.getElementById('modalTrip').hidden = false;
+}
+
+window.editTrip = async function(e, id){
+  if(e) e.stopPropagation();
+  await openTripModal(id);
+};
+
+// ──────────────────────────
+// حفظ الرحلة
+// ──────────────────────────
+async function saveTrip(){
+  var title = document.getElementById('fTitle').value.trim();
+  var dest  = document.getElementById('fDest').value.trim();
+  var type  = document.getElementById('fType').value;
+  var date  = document.getElementById('fDate').value;
+  var depart= document.getElementById('fDepart').value;
+  var ret   = document.getElementById('fReturn').value;
+  var cap   = parseInt(document.getElementById('fBusCap').value)||45;
+  var reason= document.getElementById('fReason').value.trim();
+  var notes = document.getElementById('fNotes').value.trim();
+  var coSw  = document.getElementById('fCoSw').value;
+
+  if(!title||!dest||!type||!date){ showToast('يرجى ملء الحقول الإلزامية','error'); return; }
+
+  var chks = Array.from(document.querySelectorAll('#classesCheckboxes input[type=checkbox]:checked')).map(function(c){return c.value;});
+  if(!chks.length){ showToast('يرجى اختيار صف واحد على الأقل','error'); return; }
+
+  var btn = document.getElementById('btnSaveTrip');
+  btn.disabled = true; btn.textContent = '...';
+
+  var payload = {
+    title: title, destination: dest, trip_type: type,
+    trip_date: date, departure_time: depart||null, return_time: ret||null,
+    bus_capacity: cap, reason: reason||null, notes: notes||null,
+    classes: chks, status: 'draft',
+    created_by: user.staff_db_id||user.username||'',
+    created_by_role: role,
+    school_id: schoolId, academic_year: YEAR, is_active: true,
+    co_sw_id: coSw||null, co_sw_accepted: coSw ? false : null
+  };
+
+  try {
+    var method = 'POST';
+    var url = SB_URL + '/rest/v1/field_trips';
+    if(window.currentEditId){
+      method = 'PATCH';
+      url += '?id=eq.'+window.currentEditId;
+      delete payload.created_by; delete payload.created_by_role;
+    }
+    var r = await fetch(url, {method:method, headers:Object.assign({},authH(true)), body:JSON.stringify(window.currentEditId ? payload : [payload])});
+    if(!r.ok){
+      var err = await r.text();
+      showToast('خطأ: '+err, 'error');
+    } else {
+      showToast(window.currentEditId ? 'تم تحديث الرحلة' : 'تم إنشاء الرحلة', 'success');
+      closeModal('modalTrip');
+      await loadAll();
+    }
+  } catch(ex){ showToast('خطأ في الاتصال','error'); }
+  finally { btn.disabled=false; btn.textContent='💾 حفظ الرحلة'; }
+}
+
+// ──────────────────────────
+// إرسال للاعتماد
+// ──────────────────────────
+window.sendForApproval = async function(id){
+  var r = await fetch(SB_URL+'/rest/v1/field_trips?id=eq.'+id, {
+    method:'PATCH', headers:authH(true), body:JSON.stringify({status:'pending'})
+  });
+  if(r.ok){ showToast('تم إرسال الرحلة للاعتماد','success'); closeModal('modalDetail'); await loadAll(); }
+  else showToast('حدث خطأ','error');
+};
+
+// ──────────────────────────
+// اعتماد/رفض
+// ──────────────────────────
+window.approveTrip = async function(e, id){
+  if(e) e.stopPropagation();
+  var r = await fetch(SB_URL+'/rest/v1/field_trips?id=eq.'+id, {
+    method:'PATCH', headers:authH(true),
+    body:JSON.stringify({status:'approved', approved_by:user.staff_db_id||user.username||'', approved_at:new Date().toISOString()})
+  });
+  if(r.ok){ showToast('تم اعتماد الرحلة','success'); await loadAll(); }
+  else showToast('حدث خطأ','error');
+};
+
+window.rejectTripPrompt = function(id){
+  var reason = prompt('سبب الرفض:');
+  if(reason === null) return;
+  fetch(SB_URL+'/rest/v1/field_trips?id=eq.'+id, {
+    method:'PATCH', headers:authH(true),
+    body:JSON.stringify({status:'rejected', rejection_reason:reason||null, approved_by:user.staff_db_id||user.username||''})
+  }).then(function(r){
+    if(r.ok){ showToast('تم رفض الرحلة','success'); closeModal('modalDetail'); loadAll(); }
+    else showToast('حدث خطأ','error');
+  });
+};
+
+// ──────────────────────────
+// موديل طلب المعلمة
+// ──────────────────────────
+async function openRequestModal(){
+  await loadAssignedClasses('rqClassesGrid');
+  document.getElementById('modalRequest').hidden = false;
+}
+
+async function saveRequest(){
+  var title = document.getElementById('rqTitle').value.trim();
+  var dest  = document.getElementById('rqDest').value.trim();
+  var type  = document.getElementById('rqType').value;
+  var date  = document.getElementById('rqDate').value;
+  var reason= document.getElementById('rqReason').value.trim();
+  if(!title||!dest||!type||!date||!reason){ showToast('يرجى ملء الحقول الإلزامية','error'); return; }
+  var chks = Array.from(document.querySelectorAll('#rqClassesGrid input[type=checkbox]:checked')).map(function(c){return c.value;});
+  if(!chks.length){ showToast('يرجى اختيار صف','error'); return; }
+
+  var payload = {
+    trip_title:title, destination:dest, trip_type:type, trip_date:date,
+    classes:chks, reason:reason,
+    requested_by:user.staff_db_id||user.username||'',
+    requester_name:user.name_ar||user.username||'',
+    status:'pending', school_id:schoolId, academic_year:YEAR
+  };
+  var r = await fetch(SB_URL+'/rest/v1/field_trip_requests', {
+    method:'POST', headers:authH(true), body:JSON.stringify([payload])
+  });
+  if(r.ok){ showToast('تم إرسال الطلب للأخصائية','success'); closeModal('modalRequest'); await loadRequests(); }
+  else showToast('حدث خطأ','error');
+}
+
+// ──────────────────────────
+// إجراءات على الطلبات
+// ──────────────────────────
+window.approveRequest = async function(id){
+  // تحويل الطلب إلى رحلة
+  var req = allRequests.find(function(x){return x.id===id;});
+  if(!req) return;
+  // إنشاء رحلة من الطلب
+  var tripPayload = {
+    title:req.trip_title, destination:req.destination, trip_type:req.trip_type,
+    trip_date:req.trip_date, classes:req.classes||[], status:'approved',
+    reason:req.reason, created_by:user.staff_db_id||user.username||'',
+    created_by_role:role, school_id:schoolId, academic_year:YEAR, is_active:true,
+    approved_by:user.staff_db_id||user.username||'', approved_at:new Date().toISOString()
+  };
+  var r1 = await fetch(SB_URL+'/rest/v1/field_trips', {method:'POST',headers:authH(true),body:JSON.stringify([tripPayload])});
+  var tripId = null;
+  if(r1.ok){ var d=await r1.json(); tripId=d[0]&&d[0].id; }
+  // تحديث الطلب
+  await fetch(SB_URL+'/rest/v1/field_trip_requests?id=eq.'+id, {
+    method:'PATCH', headers:authH(true),
+    body:JSON.stringify({status:'approved', reviewed_by:user.staff_db_id||user.username||'', reviewed_at:new Date().toISOString(), result_trip_id:tripId})
+  });
+  showToast('تم قبول الطلب وإنشاء الرحلة','success');
+  await loadAll();
+};
+
+window.forwardRequest = async function(id){
+  var r = await fetch(SB_URL+'/rest/v1/field_trip_requests?id=eq.'+id, {
+    method:'PATCH', headers:authH(true),
+    body:JSON.stringify({status:'forwarded_to_vp', reviewed_by:user.staff_db_id||user.username||'', reviewed_at:new Date().toISOString()})
+  });
+  if(r.ok){ showToast('تم رفع الطلب للنائبة','success'); await loadRequests(); }
+  else showToast('حدث خطأ','error');
+};
+
+window.rejectRequest = async function(id){
+  var reason = prompt('سبب الرفض:');
+  if(reason===null) return;
+  var r = await fetch(SB_URL+'/rest/v1/field_trip_requests?id=eq.'+id, {
+    method:'PATCH', headers:authH(true),
+    body:JSON.stringify({status:'rejected', reviewed_by:user.staff_db_id||user.username||'', reviewed_at:new Date().toISOString(), rejection_reason:reason||null})
+  });
+  if(r.ok){ showToast('تم رفض الطلب','success'); await loadRequests(); }
+  else showToast('حدث خطأ','error');
+};
+
+// ──────────────────────────
+// إدارة الحافلات
+// ──────────────────────────
+var currentBusTripId = null;
+var allBuses = [];
+var editBusId = null;
+
+function fillTripSelects(){
+  var approved = allTrips.filter(function(t){return t.status==='approved'||t.status==='pending';});
+  var opts = '<option value="">— اختر رحلة —</option>' + approved.map(function(t){
+    return '<option value="'+t.id+'">'+esc(t.title)+'</option>';
+  }).join('');
+  document.getElementById('buseTripSelect').innerHTML = opts;
+  document.getElementById('studTripSelect').innerHTML = opts;
+}
+
+async function loadBuses(){
+  var id = document.getElementById('buseTripSelect').value;
+  if(!id){ document.getElementById('busesContent').innerHTML='<div class="empty-state"><div class="icon">🚍</div><p>اختر رحلة لعرض حافلاتها</p></div>'; return; }
+  currentBusTripId = id;
+  var trip = allTrips.find(function(t){return t.id===id;});
+  var cap = trip ? (trip.bus_capacity||45) : 45;
+  var total = trip ? (trip.total_approved||0) : 0;
+  var needed = total ? Math.ceil(total/cap) : '—';
+
+  var r = await fetch(SB_URL+'/rest/v1/field_trip_buses?trip_id=eq.'+id+'&order=bus_number.asc', {headers:authH(false)});
+  allBuses = r.ok ? await r.json() : [];
+
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">'
+    +'<div style="font-size:.9rem;color:#64748B">طاقة الحافلة: <strong>'+cap+'</strong> مقعد · الطلاب المعتمدون: <strong>'+(total||'—')+'</strong> · الحافلات المطلوبة: <strong>'+needed+'</strong></div>'
+    +'<button class="btn-sm btn-primary" onclick="openBusModal()">+ إضافة حافلة</button></div>';
+
+  if(!allBuses.length){
+    html += '<div class="empty-state"><div class="icon">🚍</div><p>لم تُضَف حافلات بعد</p></div>';
+  } else {
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">'
+      + allBuses.map(function(b){
+        return '<div class="bus-card">'
+          +'<div class="bus-header"><span class="bus-num">حافلة رقم '+b.bus_number+'</span>'
+          +'<button class="btn-sm btn-ghost" onclick="openBusModal(\''+b.id+'\')">✎ تعديل</button></div>'
+          +'<div class="bus-body">'
+          +'<div class="bus-info-row"><label>السائق</label><span>'+esc(b.driver_name||'—')+'</span></div>'
+          +'<div class="bus-info-row"><label>موبايل السائق</label><span dir="ltr">'+esc(b.driver_contact||'—')+'</span></div>'
+          +'<div class="bus-info-row"><label>المشرفة</label><span>'+esc(b.supervisor_name||'—')+'</span></div>'
+          +'<div class="bus-info-row"><label>موبايل المشرفة</label><span dir="ltr">'+esc(b.supervisor_contact||'—')+'</span></div>'
+          +'</div>'
+          +'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'
+          +'<span class="confirm-badge '+(b.driver_confirmed?'confirmed':'unconfirmed')+'">'+(b.driver_confirmed?'✓ السائق أكّد':'⏳ انتظار السائق')+'</span>'
+          +'<span class="confirm-badge '+(b.supervisor_confirmed?'confirmed':'unconfirmed')+'">'+(b.supervisor_confirmed?'✓ المشرفة أكّدت':'⏳ انتظار المشرفة')+'</span>'
+          +'</div>'
+          +'</div>';
+      }).join('')+'</div>';
+  }
+  document.getElementById('busesContent').innerHTML = html;
+}
+
+function openBusModal(busId){
+  editBusId = busId || null;
+  document.getElementById('busMdTitle').textContent = busId ? 'تعديل حافلة' : 'إضافة حافلة';
+  if(busId){
+    var b = allBuses.find(function(x){return x.id===busId;});
+    if(b){
+      document.getElementById('bDriver').value = b.driver_name||'';
+      document.getElementById('bDriverPhone').value = b.driver_contact||'';
+      document.getElementById('bSuper').value = b.supervisor_name||'';
+      document.getElementById('bSuperPhone').value = b.supervisor_contact||'';
+    }
+  } else {
+    ['bDriver','bDriverPhone','bSuper','bSuperPhone'].forEach(function(id){ document.getElementById(id).value=''; });
+  }
+  document.getElementById('modalBus').hidden = false;
+}
+
+async function saveBus(){
+  var driver = document.getElementById('bDriver').value.trim();
+  var dPhone = document.getElementById('bDriverPhone').value.trim();
+  var super_ = document.getElementById('bSuper').value.trim();
+  var sPhone = document.getElementById('bSuperPhone').value.trim();
+  if(!driver||!dPhone||!super_||!sPhone){ showToast('يرجى ملء جميع الحقول','error'); return; }
+
+  var payload = {
+    driver_name:driver, driver_contact:dPhone,
+    supervisor_name:super_, supervisor_contact:sPhone,
+    trip_id:currentBusTripId, school_id:schoolId
+  };
+
+  var method = 'POST', url = SB_URL+'/rest/v1/field_trip_buses';
+  if(editBusId){ method='PATCH'; url+='?id=eq.'+editBusId; }
+  else {
+    var num = (allBuses.length||0)+1;
+    payload.bus_number = num;
+  }
+
+  var r = await fetch(url, {method:method,headers:authH(true),body:JSON.stringify(editBusId?payload:[payload])});
+  if(r.ok){
+    showToast('تم حفظ الحافلة','success');
+    closeModal('modalBus');
+    await loadBuses();
+    // هنا يمكن إرسال إشعار للسائق (مستقبلاً عبر WhatsApp)
+  } else showToast('حدث خطأ','error');
+}
+
+// ──────────────────────────
+// قائمة الطلاب
+// ──────────────────────────
+async function loadStudents(){
+  var id = document.getElementById('studTripSelect').value;
+  if(!id){ document.getElementById('studentsContent').innerHTML='<div class="empty-state"><div class="icon">👥</div><p>اختر رحلة</p></div>'; return; }
+
+  var r = await fetch(SB_URL+'/rest/v1/field_trip_participants?trip_id=eq.'+id+'&order=class_name.asc,student_name.asc&select=*', {headers:authH(false)});
+  var parts = r.ok ? await r.json() : [];
+
+  if(!parts.length){
+    document.getElementById('studentsContent').innerHTML='<div class="empty-state"><div class="icon">👥</div><p>لا يوجد طلاب مسجّلون في هذه الرحلة</p></div>';
+    return;
+  }
+
+  var html = '<div class="table-wrap"><table class="data-table">'
+    +'<thead><tr><th>#</th><th>اسم الطالب/ة</th><th>الصف</th><th>حافلة</th><th>موافقة ولي الأمر</th><th>إذن التصوير</th><th>اسم ولي الأمر</th><th>موبايل ولي الأمر</th><th>الحضور</th></tr></thead>'
+    +'<tbody>'
+    + parts.map(function(p, i){
+      var appBadge = p.parent_approval==='approved'
+        ? '<span class="status-badge s-approved">✓ موافق</span>'
+        : (p.parent_approval==='rejected' ? '<span class="status-badge s-rejected">✗ رافض</span>'
+           : '<span class="status-badge s-pending">⏳ انتظار</span>');
+      var mediaBadge = p.media_permission_override===true ? '<span style="color:#16A34A;font-weight:700">✓</span>' : (p.media_permission_override===false ? '<span style="color:#DC2626">✗</span>' : '<span style="color:#94A3B8">—</span>');
+      var attBadge = p.attendance_status==='present' ? '<span style="color:#16A34A;font-weight:700">حضر</span>' : (p.attendance_status==='absent' ? '<span style="color:#DC2626">غائب</span>' : '<span style="color:#94A3B8">—</span>');
+      return '<tr>'
+        +'<td>'+(i+1)+'</td>'
+        +'<td style="font-weight:700">'+esc(p.student_name||'—')+'</td>'
+        +'<td>'+esc(p.class_name||'—')+'</td>'
+        +'<td>'+(p.bus_number||'—')+'</td>'
+        +'<td>'+appBadge+'</td>'
+        +'<td>'+mediaBadge+'</td>'
+        +'<td>'+esc(p.parent_name||'—')+'</td>'
+        +'<td dir="ltr" style="text-align:right">'+esc(p.parent_contact||'—')+'</td>'
+        +'<td>'+attBadge+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div>';
+
+  document.getElementById('studentsContent').innerHTML = html;
+}
+
+function exportStudents(){
+  showToast('ميزة التصدير قريباً','success');
+}
+
+// ──────────────────────────
+// التقرير
+// ──────────────────────────
+async function loadReport(){
+  document.getElementById('rptTotal').textContent = allTrips.length;
+  // مشاركون
+  try {
+    var r = await fetch(SB_URL+'/rest/v1/field_trip_participants?select=parent_approval,trip_id', {headers:authH(false)});
+    var parts = r.ok ? await r.json() : [];
+    document.getElementById('rptParticipants').textContent = parts.length;
+    var approved = parts.filter(function(p){return p.parent_approval==='approved';}).length;
+    var pct = parts.length ? Math.round(approved/parts.length*100) : 0;
+    document.getElementById('rptApproval').textContent = pct+'%';
+  } catch(_){}
+
+  // حافلات
+  try {
+    var r2 = await fetch(SB_URL+'/rest/v1/field_trip_buses?select=id', {headers:authH(false)});
+    var buses = r2.ok ? await r2.json() : [];
+    document.getElementById('rptBuses').textContent = buses.length;
+  } catch(_){}
+
+  // توزيع الأنواع
+  var byType = {};
+  allTrips.forEach(function(t){ byType[t.trip_type]=(byType[t.trip_type]||0)+1; });
+  document.getElementById('rptTypeList').innerHTML = Object.keys(byType).map(function(k){
+    var ti = typeInfo(k);
+    var pct = Math.round(byType[k]/allTrips.length*100);
+    return '<div style="display:flex;align-items:center;gap:10px">'
+      +'<span class="trip-type-badge '+ti.css+'" style="min-width:120px">'+ti.icon+' '+ti.label+'</span>'
+      +'<div style="flex:1;background:#F1F5F9;border-radius:20px;height:12px">'
+      +'<div style="width:'+pct+'%;background:#6C3DD6;border-radius:20px;height:12px;transition:.3s"></div></div>'
+      +'<span style="font-weight:700;min-width:40px;text-align:center">'+byType[k]+'</span></div>';
+  }).join('') || '<div style="color:#94A3B8">لا بيانات</div>';
+
+  // رحلات هذا الشهر
+  var now = new Date();
+  var thisMonth = allTrips.filter(function(t){
+    if(!t.trip_date) return false;
+    var d = new Date(t.trip_date);
+    return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+  });
+  document.getElementById('rptMonthList').innerHTML = thisMonth.length
+    ? '<div class="table-wrap"><table class="data-table"><thead><tr><th>العنوان</th><th>الوجهة</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>'
+      +thisMonth.map(function(t){
+        return '<tr><td style="font-weight:700">'+esc(t.title)+'</td><td>'+esc(t.destination)+'</td>'
+          +'<td>'+new Date(t.trip_date).toLocaleDateString('ar-AE',{day:'numeric',month:'long'})+'</td>'
+          +'<td><span class="status-badge s-'+(t.status||'draft')+'">'+statusLabel(t.status)+'</span></td></tr>';
+      }).join('')+'</tbody></table></div>'
+    : '<div style="color:#94A3B8;text-align:center;padding:20px">لا رحلات هذا الشهر</div>';
+}
+
+// ──────────────────────────
+// KPIs
+// ──────────────────────────
+function updateKPIs(){
+  document.getElementById('kpiTotal').textContent = allTrips.length;
+  var today = new Date().toISOString().slice(0,10);
+  document.getElementById('kpiUpcoming').textContent = allTrips.filter(function(t){return t.trip_date && t.trip_date>=today && t.status!=='rejected';}).length;
+  document.getElementById('kpiPending').textContent = allRequests.filter(function(r){return r.status==='pending'||r.status==='forwarded_to_vp';}).length;
+  // المشاركين يُحدَّث عند التقرير
+}
+
+// ──────────────────────────
+// تبويبات
+// ──────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='report') loadReport();
+}
+
+// ──────────────────────────
+// مساعدات
+// ──────────────────────────
+function closeModal(id){ document.getElementById(id).hidden = true; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+var toastTimer = null;
+function showToast(msg, type){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' '+type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.className='toast'; }, 3500);
+}
+
+// ──────────────────────────
+// بدء التشغيل
+// ──────────────────────────
+loadAll();
+
+// إغلاق الموديل بالنقر خارجه
+document.querySelectorAll('.modal-overlay').forEach(function(o){
+  o.addEventListener('click', function(e){ if(e.target===o) closeModal(o.id); });
+});
+</script>
 </body>
 </html>

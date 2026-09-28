@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>بوابة ولي الأمر | Parent Portal — EduOS</title>
+<title>بوابة ولي/ة الأمر | Parent Portal — EduOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
 <script src="/apps/platform-config.js"></script>
 <script src="/apps/platform-shield.js"></script>
@@ -11,6 +11,7 @@
 <script src="/apps/platform-autologout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/apps/platform-auth-guard.js"></script>
+<script src="/apps/platform-rubric.js"></script>
 <style>
 :root {
   --bg: #F0F4F8;
@@ -258,6 +259,36 @@ tr:hover td { background: #FAFBFC; }
   z-index: 9999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 .toast.show { display: block; }
+
+/* PREFERENCE MODAL */
+.pref-modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.55); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.pref-modal { background: #fff; border-radius: 20px; padding: 32px; max-width: 520px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+.pref-modal-title { font-size: 20px; font-weight: 900; color: var(--text); text-align: center; margin-bottom: 8px; }
+.pref-modal-sub { font-size: 14px; color: var(--text3); text-align: center; margin-bottom: 24px; line-height: 1.7; }
+.pref-options { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.pref-btn { border: none; border-radius: 14px; padding: 20px 12px; cursor: pointer; font-family: 'Tajawal', sans-serif; font-size: 16px; font-weight: 800; color: #fff; line-height: 1.6; transition: transform .15s; }
+.pref-btn:hover { transform: translateY(-2px); }
+.pref-btn span { display: block; font-size: 12px; font-weight: 600; opacity: .9; margin-top: 4px; }
+.pref-immediate { background: linear-gradient(135deg, #DC2626, #F87171); }
+.pref-daily { background: linear-gradient(135deg, #2563EB, #60A5FA); }
+.pref-weekly { background: linear-gradient(135deg, #7C3AED, #A78BFA); }
+.pref-escalation { background: linear-gradient(135deg, #D97706, #FBBF24); }
+
+/* TIMELINE */
+.tl-wrap { position: relative; padding-right: 28px; }
+.tl-wrap::before { content: ''; position: absolute; right: 9px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+.tl-event { position: relative; margin-bottom: 18px; padding-right: 8px; }
+.tl-dot { position: absolute; right: -24px; top: 2px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px currentColor; }
+.tl-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.tl-title { font-weight: 800; font-size: 14px; color: var(--text); }
+.tl-meta { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.tl-body { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.6; }
+
+/* STUDENT INFO CARD */
+.stu-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+.stu-info-item { background: #F8FAFC; border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.stu-info-lbl { font-size: 12px; color: var(--text3); font-weight: 700; margin-bottom: 4px; }
+.stu-info-val { font-size: 15px; color: var(--text); font-weight: 800; }
 </style>
 </head>
 <body>
@@ -267,7 +298,7 @@ tr:hover td { background: #FAFBFC; }
   <div class="hdr-left">
     <div class="hdr-logo">🎓</div>
     <div>
-      <div class="hdr-title">بوابة ولي الأمر | Parent Portal</div>
+      <div class="hdr-title">بوابة ولي/ة الأمر | Parent Portal</div>
       <div class="hdr-sub" id="hdrSub">بوابة الجود الذكية — EduOS</div>
     </div>
   </div>
@@ -288,6 +319,9 @@ tr:hover td { background: #FAFBFC; }
     <div class="sb-item" data-tab="grades" onclick="switchTab('grades', this)">
       <span class="sb-icon">📊</span> الدرجات | Grades
     </div>
+    <div class="sb-item" data-tab="skills" onclick="switchTab('skills', this)">
+      <span class="sb-icon">🎯</span> المهارات | Skills
+    </div>
     <div class="sb-item" data-tab="attendance" onclick="switchTab('attendance', this)">
       <span class="sb-icon">📅</span> الحضور | Attendance
     </div>
@@ -304,6 +338,28 @@ tr:hover td { background: #FAFBFC; }
     </div>
     <div class="sb-item" data-tab="announcements" onclick="switchTab('announcements', this)">
       <span class="sb-icon">📢</span> الإعلانات | News
+    </div>
+    <div class="sb-item" data-tab="reports" onclick="switchTab('reports', this)">
+      <span class="sb-icon">📄</span> التقارير | Reports
+    </div>
+    <div class="sb-item" data-tab="objections" onclick="switchTab('objections', this)">
+      <span class="sb-icon">⚖️</span> الاعتراضات | Objections
+    </div>
+    <div class="sb-item" data-tab="referrals" onclick="switchTab('referrals', this)">
+      <span class="sb-icon">📋</span> سجل التواصل والمخالفات
+    </div>
+    <div class="sb-label">التعليم</div>
+    <div class="sb-item" data-tab="staff" onclick="switchTab('staff', this)">
+      <span class="sb-icon">👩‍🏫</span> الكادر التعليمي
+    </div>
+    <div class="sb-item" data-tab="weekly" onclick="switchTab('weekly', this)">
+      <span class="sb-icon">📖</span> المسار الأسبوعي
+    </div>
+    <div class="sb-item" data-tab="trips" onclick="switchTab('trips', this)">
+      <span class="sb-icon">🚌</span> الرحلات المدرسية
+    </div>
+    <div class="sb-item" data-tab="media" onclick="switchTab('media', this)">
+      <span class="sb-icon">📸</span> إذن التصوير
     </div>
   </nav>
 
@@ -345,6 +401,15 @@ tr:hover td { background: #FAFBFC; }
     </div>
 
     <!-- TAB: ATTENDANCE -->
+    <div id="tab-skills" class="tab-content">
+      <div class="page-title">🎯 مستوى الصف في المهارات | Skills Report</div>
+      <div class="child-tabs" id="skillsChildTabs"></div>
+      <div class="card" style="padding:16px">
+        <div class="card-title">📊 تقرير المهارات من الحصص الفعلية</div>
+        <div id="skillsContent"><div style="text-align:center;padding:32px;color:#94A3B8">جارٍ التحميل...</div></div>
+      </div>
+    </div>
+
     <div id="tab-attendance" class="tab-content">
       <div class="page-title">📅 الحضور | Attendance</div>
       <div class="child-tabs" id="attChildTabs"></div>
@@ -378,19 +443,45 @@ tr:hover td { background: #FAFBFC; }
     <div id="tab-messages" class="tab-content">
       <div class="page-title">💬 الرسائل | Messages</div>
       <div class="card">
-        <div class="card-title">💬 إرسال رسالة لمعلم/ة | Send Message to Teacher</div>
+        <div class="card-title">💬 إرسال رسالة | Send Message</div>
         <div class="msg-form">
-          <div style="margin-bottom:12px">
-            <label style="font-size:14px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px">المعلم/ة | Teacher</label>
-            <select id="msgTeacher" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 16px;font-family:'Tajawal',sans-serif;font-size:15px;background:#fff">
-              <option value="">اختر المعلم/ة...</option>
-            </select>
+          <!-- صف 1: الابن + الجهة -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">الابن/البنت | Student</label>
+              <select id="msgChild" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Tajawal',sans-serif;font-size:14px;background:#fff">
+                <option value="">— اختر —</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">التوجيه إلى | Send To</label>
+              <select id="msgTeacher" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Tajawal',sans-serif;font-size:14px;background:#fff">
+                <option value="الإدارة">🏫 الإدارة</option>
+                <option value="مربية الصف">🏡 مربي/ة الصف</option>
+                <option value="الأخصائي/ة الاجتماعية">💙 الأخصائي/ة الاجتماعي/ة</option>
+              </select>
+            </div>
           </div>
-          <div style="margin-bottom:14px">
-            <label style="font-size:14px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px">الرسالة | Message</label>
-            <textarea id="msgText" placeholder="اكتب رسالتك هنا..."></textarea>
+          <!-- صف 2: الموضوع + السبب -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+            <div>
+              <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">الموضوع | Topic</label>
+              <select id="msgTopic" onchange="msgTopicChanged()" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Tajawal',sans-serif;font-size:14px;background:#fff">
+                <option value="">— اختر —</option>
+                <option value="academic">📚 أكاديمي</option>
+                <option value="behavior">🟡 سلوكي</option>
+                <option value="social">💙 اجتماعي / نفسي</option>
+                <option value="appointment">📅 تنسيق موعد</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">السبب | Reason</label>
+              <select id="msgReason" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:'Tajawal',sans-serif;font-size:14px;background:#fff">
+                <option value="">— اختر الموضوع أولاً —</option>
+              </select>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="sendMessage()">📤 إرسال | Send</button>
+          <button class="btn btn-primary" id="sendMsgBtn" onclick="sendMessage()">📤 إرسال | Send</button>
         </div>
       </div>
       <div class="card">
@@ -405,7 +496,105 @@ tr:hover td { background: #FAFBFC; }
       <div id="announceList"><div class="empty"><div class="empty-icon">📢</div>جاري التحميل...</div></div>
     </div>
 
+    <!-- TAB: REPORTS -->
+    <div id="tab-reports" class="tab-content">
+      <div class="page-title">📄 التقارير | Reports</div>
+      <div class="child-tabs" id="reportsChildTabs"></div>
+      <div class="card">
+        <div class="card-title">📄 تقارير المدرسة | School Reports</div>
+        <div id="parentReportsList"><div class="empty"><div class="empty-icon">📄</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: STAFF -->
+    <div id="tab-staff" class="tab-content">
+      <div class="page-title">👩‍🏫 الكادر التعليمي | Teaching Staff</div>
+      <div class="child-tabs" id="staffChildTabs"></div>
+
+      <!-- مربية الصف -->
+      <div class="card" id="homeroomCard">
+        <div class="card-title">🏡 مربية الصف | Homeroom Teacher</div>
+        <div id="homeroomInfo"><div class="empty"><div class="empty-icon">⏳</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+
+      <!-- الأخصائي/ة -->
+      <div class="card">
+        <div class="card-title">💙 الأخصائي/ة الاجتماعية | Social Worker</div>
+        <div id="counselorInfo"><div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div></div>
+      </div>
+
+      <!-- معلمات المواد -->
+      <div class="card">
+        <div class="card-title">📚 معلمات المواد | Subject Teachers</div>
+        <div id="subjectTeachersTable"><div class="empty"><div class="empty-icon">⏳</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: WEEKLY TRACK -->
+    <div id="tab-weekly" class="tab-content">
+      <div class="page-title">📖 المسار الأسبوعي | Weekly Track</div>
+      <div class="child-tabs" id="weeklyChildTabs"></div>
+      <div class="card">
+        <div class="card-title">📖 خطط الدروس هذا الأسبوع | This Week's Lesson Plans</div>
+        <div id="weeklyPlansList"><div class="empty"><div class="empty-icon">⏳</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+    </div>
+
+    <!-- TAB: OBJECTIONS -->
+    <div id="tab-objections" class="tab-content">
+      <div class="page-title">⚖️ الاعتراضات | Objections</div>
+      <div class="child-tabs" id="objectionsChildTabs"></div>
+      <div class="card">
+        <div class="card-title">⚖️ رفع اعتراض رسمي | Submit Official Objection</div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:14px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px">نوع الاعتراض | Type</label>
+          <select id="objType" style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 16px;font-family:'Tajawal',sans-serif;font-size:15px;background:#fff">
+            <option value="general">عام</option>
+            <option value="grades">الدرجات</option>
+            <option value="attendance">الحضور</option>
+            <option value="behavior">السلوك</option>
+            <option value="other">أخرى</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:14px;font-weight:700;color:var(--text2);display:block;margin-bottom:6px">نص الاعتراض | Objection</label>
+          <textarea id="objText" placeholder="اكتب/ي تفاصيل الاعتراض هنا..."></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitObjection()">📤 رفع الاعتراض | Submit</button>
+      </div>
+    </div>
+
+    <!-- TAB: REFERRALS TIMELINE -->
+    <div id="tab-referrals" class="tab-content">
+      <div class="page-title">📋 سجل التواصل والمخالفات | Communication &amp; Behavior Timeline</div>
+      <div class="child-tabs" id="refChildTabs"></div>
+
+      <div class="card">
+        <div class="card-title">🪪 معلومات الطالب/ة | Student Info</div>
+        <div id="refStudentInfo"><div class="empty"><div class="empty-icon">⏳</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🕐 الخط الزمني | Timeline</div>
+        <div id="refTimeline"><div class="empty"><div class="empty-icon">🕐</div>اختر الابن/البنت أولاً</div></div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+<!-- PREFERENCE MODAL -->
+<div class="pref-modal-overlay" id="prefModalOverlay">
+  <div class="pref-modal">
+    <div class="pref-modal-title">🔔 كيف تودّ استقبال إشعارات المدرسة؟</div>
+    <div class="pref-modal-sub">اختر/ي طريقة التواصل المفضّلة بخصوص مخالفات وإحالات الطالب/ة — يمكنك تغييرها لاحقاً</div>
+    <div class="pref-options">
+      <button class="pref-btn pref-immediate" onclick="savePref('immediate')">🔔 فوري<span>عند كل مخالفة</span></button>
+      <button class="pref-btn pref-daily" onclick="savePref('daily')">📅 يومي<span>ملخص آخر اليوم</span></button>
+      <button class="pref-btn pref-weekly" onclick="savePref('weekly')">📊 أسبوعي<span>ملخص نهاية الأسبوع</span></button>
+      <button class="pref-btn pref-escalation" onclick="savePref('escalation_only')">⚠️ عند التصعيد فقط<span>الإحالة للأخصائية</span></button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -456,8 +645,11 @@ async function loadChildren() {
   const sessionIds = Array.isArray(user.student_ids) ? user.student_ids.filter(Boolean) : [];
 
   if (sessionIds.length) {
-    // Query students by TEXT student_id column
-    children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${sessionIds.join(',')})`);
+    // Try student_number first, fallback to id
+    children = await dbGet('students', `select=id,student_number,name,class_name,grade&student_number=in.(${sessionIds.join(',')})`);
+    if (!children.length) {
+      children = await dbGet('students', `select=id,student_number,name,class_name,grade&id=in.(${sessionIds.join(',')})`);
+    }
   } else {
     // Fallback: query parent_credentials by national_id
     const nat = user.national_id;
@@ -465,16 +657,21 @@ async function loadChildren() {
       const pc = await dbGet('parent_credentials', `select=student_ids&national_id=eq.${nat}&limit=1`);
       const ids2 = (pc[0] && pc[0].student_ids) ? pc[0].student_ids : [];
       if (ids2.length) {
-        children = await dbGet('students', `select=student_id,name,class_name,grade_level&student_id=in.(${ids2.join(',')})`);
+        children = await dbGet('students', `select=id,student_number,name,class_name,grade&student_number=in.(${ids2.join(',')})`);
+        if (!children.length) {
+          children = await dbGet('students', `select=id,student_number,name,class_name,grade&id=in.(${ids2.join(',')})`);
+        }
       }
     }
   }
+  // normalize: use student_number as child uid, fallback to id
+  children = children.map(c => ({ ...c, uid: c.student_number || String(c.id) }));
 
   renderChildTabs();
 }
 
 function renderChildTabs() {
-  const containers = ['childTabs', 'gradesChildTabs', 'attChildTabs', 'schedChildTabs', 'behChildTabs'];
+  const containers = ['childTabs', 'gradesChildTabs', 'attChildTabs', 'schedChildTabs', 'behChildTabs', 'reportsChildTabs', 'objectionsChildTabs', 'staffChildTabs', 'weeklyChildTabs', 'refChildTabs'];
   if (!children.length) {
     containers.forEach(id => {
       const el = document.getElementById(id);
@@ -484,7 +681,7 @@ function renderChildTabs() {
   }
 
   const html = children.map((c, i) =>
-    `<button class="child-tab${i===0?' active':''}" data-sid="${c.student_id}" onclick="selectChild('${c.student_id}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
+    `<button class="child-tab${i===0?' active':''}" data-sid="${c.uid}" onclick="selectChild('${c.uid}', this, '${c.name}')">${c.name} · ${c.class_name || ''}</button>`
   ).join('');
 
   containers.forEach(id => {
@@ -493,19 +690,31 @@ function renderChildTabs() {
   });
 
   // auto-select first child
-  if (children.length) selectChild(children[0].student_id, null, children[0].name);
+  if (children.length) selectChild(children[0].uid, null, children[0].name);
 }
 
 async function selectChild(id, btn, name) {
   selectedChild = id;
   // update active buttons
   document.querySelectorAll('.child-tab').forEach(b => {
-    if (b.textContent.includes(name)) b.classList.add('active');
+    if (b.dataset.sid === String(id)) b.classList.add('active');
     else b.classList.remove('active');
   });
 
-  document.getElementById('parentName').textContent = `· ${name}`;
+  document.getElementById('parentName').textContent = '· ' + name;
   await loadChildData(id);
+
+  var reportsTab = document.getElementById('tab-reports');
+  if (reportsTab && reportsTab.classList.contains('active')) loadParentReports();
+
+  var staffTab = document.getElementById('tab-staff');
+  if (staffTab && staffTab.classList.contains('active')) loadStaffInfo(id);
+
+  var weeklyTab = document.getElementById('tab-weekly');
+  if (weeklyTab && weeklyTab.classList.contains('active')) loadWeeklyTrack(id);
+
+  var refTab = document.getElementById('tab-referrals');
+  if (refTab && refTab.classList.contains('active')) loadReferralsTab(id);
 }
 
 async function loadChildData(id) {
@@ -516,6 +725,210 @@ async function loadChildData(id) {
     loadSchedule(id)
   ]);
   updateHomeKpis();
+  // preload staff info for home card
+  loadStaffHomeCard(id);
+}
+
+// --- STAFF INFO ---
+async function loadStaffInfo(uid) {
+  var child = children.find(function(c) { return String(c.uid) === String(uid); });
+  if (!child || !child.class_name) return;
+  var className = child.class_name;
+
+  // Homeroom teacher
+  var homeEl = document.getElementById('homeroomInfo');
+  if (homeEl) homeEl.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+
+  // Subject teachers
+  var subEl = document.getElementById('subjectTeachersTable');
+  if (subEl) subEl.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+
+  var assignments = await dbGet('teacher_assignments',
+    'select=subject,teacher_name_ar&class_name=eq.' + encodeURIComponent(className) +
+    '&academic_year=eq.2026-2027&order=subject'
+  );
+
+  var homeroom = assignments.find(function(a) { return a.subject && a.subject.includes('مربي'); });
+  if (homeEl) {
+    if (homeroom && homeroom.teacher_name_ar && homeroom.teacher_name_ar !== 'شاغر') {
+      homeEl.innerHTML = '<div style="display:flex;align-items:center;gap:16px;padding:8px 0;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:16px">' +
+        '<div style="width:52px;height:52px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👩‍🏫</div>' +
+        '<div><div style="font-size:18px;font-weight:800;color:var(--text)">' + homeroom.teacher_name_ar + '</div>' +
+        '<div style="font-size:14px;color:var(--text3);margin-top:4px">مربية الصف · ' + className + '</div></div></div>' +
+        '<button onclick="openQuickMessage(\'مربية الصف\')" style="background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:Tajawal,Arial,sans-serif;font-size:14px;cursor:pointer;flex-shrink:0">📨 رسالة سريعة</button>' +
+        '</div>';
+    } else {
+      homeEl.innerHTML = '<div class="empty"><div class="empty-icon">👩‍🏫</div>لا تعيين مربية لهذا الصف</div>';
+    }
+  }
+
+  // Counselor (social workers) — فلترة حسب شعبة الطالب/ة ثم الحلقة
+  var cslEl = document.getElementById('counselorInfo');
+  if (cslEl) cslEl.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+  // تحديد الحلقة من اسم الصف (cycle1/cycle2/kg تطابق DB)
+  var gradeMatch = className ? className.match(/^(KG|\d+)/i) : null;
+  var gradeNum = gradeMatch ? (isNaN(parseInt(gradeMatch[1])) ? 0 : parseInt(gradeMatch[1])) : 0;
+  var studentCycle = (gradeNum === 0) ? 'kg' : (gradeNum <= 4 ? 'cycle1' : 'cycle2');
+  // 1️⃣ الأخصائي/ة المعيّنة للشعبة بالضبط
+  var counselors = await dbGet('staff_profiles',
+    'select=name_ar&role_key=eq.social_worker&is_active=eq.true&coord_classes=cs.{"' + className + '"}&limit=1'
+  );
+  // 2️⃣ احتياط: إذا لا أخصائية للشعبة — ابحث بالحلقة
+  if (!counselors || !counselors.length) {
+    counselors = await dbGet('staff_profiles',
+      'select=name_ar&role_key=eq.social_worker&is_active=eq.true&coord_cycle=eq.' + studentCycle + '&limit=1'
+    );
+  }
+  if (cslEl) {
+    if (counselors && counselors.length) {
+      var csl = counselors[0];
+      var cycleLabel = studentCycle === 'kg' ? 'الروضة' : studentCycle === 'cycle1' ? 'الحلقة الأولى' : 'الحلقة الثانية';
+      cslEl.innerHTML =
+        '<div style="display:flex;align-items:center;gap:16px;padding:8px 0;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:16px">' +
+        '<div style="width:52px;height:52px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">💙</div>' +
+        '<div><div style="font-size:18px;font-weight:800;color:var(--text)">' + (csl.name_ar || '—') + '</div>' +
+        '<div style="font-size:14px;color:var(--text3);margin-top:4px">أخصائي/ة اجتماعي/ة · ' + cycleLabel + ' · ' + className + '</div></div></div>' +
+        '<button onclick="openQuickMessage(\'الأخصائي/ة الاجتماعية\')" style="background:#3B82F6;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-family:Tajawal,Arial,sans-serif;font-size:14px;cursor:pointer;flex-shrink:0">📨 رسالة</button>' +
+        '</div>';
+    } else {
+      cslEl.innerHTML = '<div class="empty"><div class="empty-icon">💙</div>لا توجد أخصائي/ة مُعيَّنة لهذا الصف بعد</div>';
+    }
+  }
+
+  // Subject teachers — بطاقات مواد
+  var subjects = assignments.filter(function(a) { return !a.subject || !a.subject.includes('مربي'); });
+  // خريطة ألوان المواد
+  var SUBJ_COLORS = {
+    'التربية الإسلامية': {bg:'#D1FAE5',border:'#6EE7B7',icon:'🕌',text:'#065F46'},
+    'القرآن الكريم':      {bg:'#D1FAE5',border:'#6EE7B7',icon:'📖',text:'#065F46'},
+    'اللغة العربية':      {bg:'#FEF3C7',border:'#FCD34D',icon:'✍️',text:'#92400E'},
+    'اللغة الإنجليزية':   {bg:'#DBEAFE',border:'#93C5FD',icon:'🔤',text:'#1E40AF'},
+    'الرياضيات':           {bg:'#FEE2E2',border:'#FCA5A5',icon:'🔢',text:'#991B1B'},
+    'العلوم':              {bg:'#CFFAFE',border:'#67E8F9',icon:'🔬',text:'#155E75'},
+    'الدراسات الاجتماعية والتربية الأخلاقية': {bg:'#F3F4F6',border:'#D1D5DB',icon:'🌍',text:'#374151'},
+    'الفنون':              {bg:'#EDE9FE',border:'#C4B5FD',icon:'🎨',text:'#5B21B6'},
+    'التربية البدنية والصحية': {bg:'#FFE4E6',border:'#FDA4AF',icon:'⚽',text:'#9F1239'},
+    'الذكاء الاصطناعي والتكنولوجيا': {bg:'#E0F2FE',border:'#7DD3FC',icon:'🤖',text:'#0C4A6E'},
+    'السنع والمهارات الحياتية': {bg:'#FDF4FF',border:'#E879F9',icon:'🛠️',text:'#701A75'},
+    'المسرح':              {bg:'#FFF7ED',border:'#FDBA74',icon:'🎭',text:'#9A3412'},
+    'الموسيقى':            {bg:'#FFF7ED',border:'#FDBA74',icon:'🎵',text:'#9A3412'},
+    'التصميم والابتكار':  {bg:'#ECFDF5',border:'#6EE7B7',icon:'💡',text:'#065F46'},
+  };
+  function getSubjStyle(name) {
+    for (var k in SUBJ_COLORS) { if ((name||'').includes(k.split(' ')[0])) return SUBJ_COLORS[k]; }
+    return {bg:'#F8FAFC',border:'#CBD5E1',icon:'📘',text:'#334155'};
+  }
+  if (subEl) {
+    if (subjects.length) {
+      subEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:4px 0">' +
+        subjects.map(function(a) {
+          var isVacant = !a.teacher_name_ar || a.teacher_name_ar === 'شاغر';
+          var st = getSubjStyle(a.subject);
+          return '<div style="background:' + st.bg + ';border:1.5px solid ' + st.border + ';border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span style="font-size:22px">' + st.icon + '</span>' +
+            '<span style="font-weight:800;font-size:14px;color:' + st.text + ';flex:1">' + (a.subject || '—') + '</span>' +
+            '</div>' +
+            '<div style="font-size:13px;color:#475569;font-weight:600">' +
+              (isVacant ? '<span style="background:#FEE2E2;color:#991B1B;padding:2px 10px;border-radius:20px;font-size:12px">شاغر</span>' : a.teacher_name_ar) +
+            '</div>' +
+            (!isVacant ? '<button onclick="openQuickMessage(\'' + (a.teacher_name_ar||'').replace(/'/g,"\\'",'g') + '\')" style="margin-top:4px;background:linear-gradient(135deg,#6C3DD6,#22D3EE);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-family:Tajawal,Arial,sans-serif;font-size:12px;cursor:pointer;align-self:flex-start">📨 رسالة</button>' : '') +
+            '</div>';
+        }).join('') + '</div>';
+    } else {
+      subEl.innerHTML = '<div class="empty"><div class="empty-icon">📚</div>لا بيانات تعيينات لهذا الصف</div>';
+    }
+  }
+}
+
+async function loadStaffHomeCard(uid) {
+  var child = children.find(function(c) { return String(c.uid) === String(uid); });
+  if (!child || !child.class_name) return;
+
+  var assignments = await dbGet('teacher_assignments',
+    'select=subject,teacher_name_ar&class_name=eq.' + encodeURIComponent(child.class_name) +
+    '&academic_year=eq.2026-2027&subject=eq.مربية الصف&limit=1'
+  );
+  var homeroom = assignments[0];
+
+  // Inject into home summary if exists
+  var sumEl = document.getElementById('homeSummary');
+  if (!sumEl) return;
+  var existing = sumEl.innerHTML;
+  if (homeroom && homeroom.teacher_name_ar && homeroom.teacher_name_ar !== 'شاغر') {
+    var tag = '<div style="margin-top:14px;padding:12px 16px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;display:flex;align-items:center;gap:10px">' +
+      '<span style="font-size:20px">👩‍🏫</span>' +
+      '<div><div style="font-size:13px;color:#6B7280;font-weight:600">مربية الصف</div>' +
+      '<div style="font-weight:800;color:#1E293B">' + homeroom.teacher_name_ar + '</div></div></div>';
+    sumEl.innerHTML = existing + tag;
+  }
+}
+
+// --- WEEKLY TRACK ---
+async function loadWeeklyTrack(uid) {
+  var child = children.find(function(c) { return String(c.uid) === String(uid); });
+  if (!child || !child.class_name) return;
+  var el = document.getElementById('weeklyPlansList');
+  if (!el) return;
+  el.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+
+  // Calculate this week's date range (Mon-Fri UAE)
+  var now = new Date();
+  var day = now.getDay(); // 0=Sun, 1=Mon...6=Sat
+  var diffToMon = (day === 0) ? -6 : 1 - day;
+  var monday = new Date(now);
+  monday.setDate(now.getDate() + diffToMon);
+  var friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  function toISO(d) {
+    return d.toISOString().slice(0, 10);
+  }
+
+  var plans = await dbGet('lesson_plans',
+    'select=plan_date,subject,period,objectives,activities,homework&class_name=eq.' + encodeURIComponent(child.class_name) +
+    '&plan_date=gte.' + toISO(monday) + '&plan_date=lte.' + toISO(friday) +
+    '&order=plan_date,period'
+  );
+
+  if (!plans || !plans.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📖</div>' +
+      'لا توجد خطط درسية مسجّلة لهذا الأسبوع (' + toISO(monday) + ' – ' + toISO(friday) + ')</div>';
+    return;
+  }
+
+  var DAYS_AR = {0:'الأحد', 1:'الاثنين', 2:'الثلاثاء', 3:'الأربعاء', 4:'الخميس', 5:'الجمعة', 6:'السبت'};
+  // Group by date
+  var byDate = {};
+  plans.forEach(function(p) {
+    if (!byDate[p.plan_date]) byDate[p.plan_date] = [];
+    byDate[p.plan_date].push(p);
+  });
+
+  var html = '';
+  Object.keys(byDate).sort().forEach(function(date) {
+    var d = new Date(date + 'T00:00:00');
+    var dayName = DAYS_AR[d.getDay()] || date;
+    html += '<div style="margin-bottom:18px">';
+    html += '<div style="font-size:16px;font-weight:800;color:#6C3DD6;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #EDE9FE">' +
+      '📅 ' + dayName + ' — ' + date + '</div>';
+    byDate[date].forEach(function(p) {
+      html += '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 16px;margin-bottom:8px">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+      html += '<span style="background:#EDE9FE;color:#6C3DD6;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:700">ح' + (p.period || '—') + '</span>';
+      html += '<span style="font-weight:800;color:#1E293B">' + (p.subject || '—') + '</span>';
+      html += '</div>';
+      if (p.objectives) html += '<div style="font-size:14px;color:#374151;margin-bottom:4px"><strong>🎯 الأهداف:</strong> ' + p.objectives + '</div>';
+      if (p.activities) html += '<div style="font-size:14px;color:#374151;margin-bottom:4px"><strong>🎨 الأنشطة:</strong> ' + p.activities + '</div>';
+      if (p.homework) html += '<div style="font-size:14px;color:#D97706"><strong>📝 الواجب:</strong> ' + p.homework + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
 }
 
 // --- GRADES ---
@@ -528,19 +941,22 @@ async function loadGrades(id) {
 function renderGrades() {
   const el = document.getElementById('gradesTable');
   if (!gradesData.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📊</div>لا بيانات</div>'; return; }
+  const rubric = window.EduRubric || null;
   el.innerHTML = `
     <div class="tbl-wrap">
+      ${rubric ? rubric.scaleHTML() : ''}
       <table>
-        <thead><tr><th>المادة | Subject</th><th>الفصل | Term</th><th>الدرجة | Grade</th><th>التقدير | Rating</th></tr></thead>
+        <thead><tr><th>المادة</th><th>الفصل</th><th>الدرجة</th><th>المستوى</th></tr></thead>
         <tbody>${gradesData.map(g => {
           const pct = g.max_score > 0 ? Math.round((g.score / g.max_score) * 100) : 0;
-          const badge = pct >= 90 ? 'badge-green' : pct >= 75 ? 'badge-blue' : pct >= 60 ? 'badge-amber' : 'badge-red';
-          const label = pct >= 90 ? 'ممتاز | Excellent' : pct >= 75 ? 'جيد جداً | V.Good' : pct >= 60 ? 'جيد | Good' : 'دون المتوسط';
+          const badgeHTML = (g.score !== null && g.score !== undefined && rubric)
+            ? rubric.badge(pct, undefined, {showNum:true})
+            : '<span style="color:#94A3B8">—</span>';
           return `<tr>
             <td style="font-weight:700">${g.subject || '—'}</td>
             <td>${g.term || '—'}</td>
-            <td style="font-weight:800;font-size:17px">${g.score !== null && g.score !== undefined ? g.score + '/' + g.max_score : '—'}</td>
-            <td><span class="badge ${badge}">${label}</span></td>
+            <td style="font-weight:800;font-size:17px">${g.score !== null && g.score !== undefined ? g.score + '/' + g.max_score + ' (' + pct + '%)' : '—'}</td>
+            <td>${badgeHTML}</td>
           </tr>`;
         }).join('')}</tbody>
       </table>
@@ -577,25 +993,32 @@ function renderAttendance() {
 // --- BEHAVIOR ---
 let behData = [];
 async function loadBehavior(id) {
-  behData = await dbGet('behavior_incidents', `select=created_at,violation_type,description,degree&student_id=eq.${id}&order=created_at.desc&limit=20`);
+  behData = await dbGet('behavior_incidents', `select=created_at,violation_type,violation_category,action_type,description,degree,teacher_name&student_id=eq.${id}&order=created_at.desc&limit=20`);
   renderBehavior();
 }
 
 function renderBehavior() {
   const el = document.getElementById('behTable');
   if (!behData.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🌟</div>لا بيانات</div>'; return; }
+  const ACTION_AR = { verbal:'🗣 شفهي', written:'📝 كتابي', parent_summon:'📞 استدعاء' };
+  const CAT_AR = { uniform:'👗 الزي', book:'📚 كتاب', equipment:'✏️ أدوات', behavior:'😤 سلوك', other:'📋 أخرى' };
   el.innerHTML = `
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>التاريخ | Date</th><th>النوع | Type</th><th>الوصف | Description</th><th>النقاط | Points</th></tr></thead>
+        <thead><tr><th>التاريخ</th><th>الإجراء</th><th>السبب</th><th>الوصف</th><th>الشدة</th><th>المعلم/ة</th></tr></thead>
         <tbody>${behData.map(b => {
           const deg = b.degree != null ? (b.degree === 1 ? 'خفيف' : b.degree === 2 ? 'متوسط' : b.degree >= 3 ? 'شديد' : b.degree) : '—';
-          const badge = b.degree === 1 ? 'badge-amber' : b.degree >= 2 ? 'badge-red' : 'badge-green';
+          const degBadge = b.degree === 1 ? 'badge-amber' : b.degree === 2 ? 'badge-orange' : b.degree >= 3 ? 'badge-red' : 'badge-blue';
+          const actionLabel = ACTION_AR[b.action_type] || b.action_type || '—';
+          const catLabel = CAT_AR[b.violation_category] || b.violation_type || '—';
+          const actionColor = b.action_type === 'parent_summon' ? '#DC2626' : b.action_type === 'written' ? '#D97706' : '#2563EB';
           return `<tr>
             <td>${(b.created_at||'').slice(0,10) || '—'}</td>
-            <td><span class="badge badge-blue">${b.violation_type || '—'}</span></td>
-            <td>${b.description || '—'}</td>
-            <td><span class="badge ${badge}">${deg}</span></td>
+            <td><span style="font-weight:700;color:${actionColor};font-size:13px;">${actionLabel}</span></td>
+            <td><span class="badge badge-blue" style="font-size:12px;">${catLabel}</span></td>
+            <td style="font-size:13px;color:#475569;">${b.description || '—'}</td>
+            <td><span class="badge ${degBadge}">${deg}</span></td>
+            <td style="font-size:12px;color:#64748B;">${b.teacher_name || '—'}</td>
           </tr>`;
         }).join('')}</tbody>
       </table>
@@ -604,7 +1027,7 @@ function renderBehavior() {
 
 // --- SCHEDULE ---
 async function loadSchedule(id) {
-  var child = children.find(function(c) { return c.student_id === id; });
+  var child = children.find(function(c) { return String(c.uid) === String(id); });
   if (!child) return;
   var el = document.getElementById('schedTable');
   if (!child.class_name) {
@@ -732,6 +1155,10 @@ function updateHomeKpis() {
     const nums = gradesData.map(g => g.max_score > 0 ? Math.round((g.score/g.max_score)*100) : null).filter(n => n !== null);
     const avg = nums.length ? (nums.reduce((a,b) => a+b, 0) / nums.length).toFixed(1) : '—';
     document.getElementById('kpiAvg').textContent = avg + '%';
+    if (window.EduRubric && avg !== '—') {
+      const avgBadge = document.getElementById('kpiAvgBadge');
+      if (avgBadge) avgBadge.innerHTML = window.EduRubric.badge(parseFloat(avg));
+    }
   } else {
     document.getElementById('kpiAvg').textContent = '—';
   }
@@ -761,6 +1188,7 @@ function updateHomeKpis() {
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
             <span style="color:var(--text2)">${g.subject}</span>
             <span style="font-weight:800;color:var(--brand)">${g.score !== null && g.score !== undefined ? g.score + '/' + g.max_score : '—'}</span>
+            ${(g.score !== null && g.score !== undefined && window.EduRubric) ? window.EduRubric.badge(g.max_score > 0 ? Math.round((g.score/g.max_score)*100) : 0, undefined, {showNum:false}) : ''}
           </div>`).join('') || '<div class="empty" style="padding:16px">لا بيانات</div>'}
       </div>
       <div>
@@ -775,54 +1203,217 @@ function updateHomeKpis() {
 }
 
 // --- MESSAGES ---
-async function loadTeachersForMsg() {
-  const teachers = await dbGet('staff_profiles', 'select=id,name_ar&role_key=eq.teacher&order=name_ar&limit=60');
-  const sel = document.getElementById('msgTeacher');
-  if (teachers.length) {
-    sel.innerHTML = '<option value="">اختر المعلم/ة...</option>' +
-      teachers.map(t => `<option value="${t.id}">${t.name_ar || '—'}</option>`).join('');
+var MSG_REASONS = {
+  academic: [
+    'استفسار عن درجة',
+    'طلب شرح إضافي لمادة',
+    'غياب عن حصة',
+    'صعوبة في المادة',
+    'طلب خطة دعم أكاديمي'
+  ],
+  behavior: [
+    'ملاحظة سلوكية',
+    'طلب متابعة سلوك',
+    'شكوى من حادثة داخل المدرسة',
+    'طلب اجتماع للمناقشة'
+  ],
+  social: [
+    'دعم نفسي للطالب',
+    'قلق من وضع اجتماعي',
+    'وضع أسري يؤثر على الطالب',
+    'طلب تدخل الأخصائي/ة'
+  ],
+  appointment: [
+    'طلب لقاء حضوري',
+    'طلب مكالمة هاتفية',
+    'اجتماع مع المعلم/ة',
+    'اجتماع مع الإدارة'
+  ]
+};
+
+function msgTopicChanged() {
+  var topic = document.getElementById('msgTopic').value;
+  var reasonSel = document.getElementById('msgReason');
+  if (!topic) {
+    reasonSel.innerHTML = '<option value="">— اختر الموضوع أولاً —</option>';
+    return;
+  }
+  var reasons = MSG_REASONS[topic] || [];
+  reasonSel.innerHTML = '<option value="">— اختر السبب —</option>' +
+    reasons.map(function(r) { return '<option value="' + r + '">' + r + '</option>'; }).join('');
+}
+
+function openQuickMessage(recipientName) {
+  // Switch to messages tab and pre-select recipient
+  var items = document.querySelectorAll('.sb-item');
+  items.forEach(function(it) { it.classList.remove('active'); });
+  var tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  var msgTab = document.getElementById('tab-messages');
+  if (msgTab) msgTab.classList.add('active');
+  var sbMsg = document.querySelector('[data-tab="messages"]');
+  if (sbMsg) sbMsg.classList.add('active');
+  // Pre-select recipient
+  var sel = document.getElementById('msgTeacher');
+  if (sel && recipientName) {
+    var found = false;
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === recipientName) { sel.selectedIndex = i; found = true; break; }
+    }
+    if (!found) {
+      var opt = document.createElement('option');
+      opt.value = recipientName;
+      opt.text = recipientName;
+      opt.selected = true;
+      sel.appendChild(opt);
+    }
   }
 }
 
+async function loadTeachersForMsg() {
+  // Populate child selector
+  var childSel = document.getElementById('msgChild');
+  if (childSel && children.length) {
+    childSel.innerHTML = '<option value="">— اختر الابن/البنت —</option>' +
+      children.map(function(c) { return '<option value="' + c.uid + '">' + (c.name || c.uid) + '</option>'; }).join('');
+    if (selectedChild) childSel.value = selectedChild;
+  }
+  await loadMessages();
+}
+
 async function sendMessage() {
-  const teacher = document.getElementById('msgTeacher').value;
-  const text = document.getElementById('msgText').value.trim();
-  if (!teacher || !text) { showToast('⚠️ اختر/ي المعلم/ة واكتب/ي الرسالة'); return; }
+  var childSel = document.getElementById('msgChild');
+  var childId = (childSel && childSel.value) ? childSel.value : selectedChild;
+  if (!childId) { showToast('⚠️ اختر الابن/البنت أولاً'); return; }
+
+  var recipient = document.getElementById('msgTeacher').value;
+  var topic = document.getElementById('msgTopic').value;
+  var reason = document.getElementById('msgReason').value;
+
+  if (!topic) { showToast('⚠️ اختر الموضوع أولاً'); return; }
+  if (!reason) { showToast('⚠️ اختر السبب أولاً'); return; }
+
+  var TOPIC_AR = { academic: 'أكاديمي', behavior: 'سلوكي', social: 'اجتماعي / نفسي', appointment: 'تنسيق موعد' };
+  var childObj = children.find(function(c) { return String(c.uid) === String(childId); }) || {};
+  var subjectVal = TOPIC_AR[topic] + ' — ' + reason;
+  var bodyVal = 'الجهة: ' + recipient + '\nالموضوع: ' + TOPIC_AR[topic] + '\nالسبب: ' + reason + '\nالطالب: ' + (childObj.name || childId);
+  var user = getUser();
+  var natId = user.national_id || user.id || '';
 
   try {
-    const user = getUser();
-    await fetch(`${(window.EduOS?window.EduOS.SB_URL:'')}/rest/v1/parent_messages`, {
+    var res = await fetch((window.EduOS ? window.EduOS.SB_URL : '') + '/rest/v1/parent_messages', {
       method: 'POST',
       headers: {
-        'apikey': (window.EduOS?window.EduOS.SB_KEY:''), 'Authorization': 'Bearer ' + (window.EduOS?window.EduOS.SB_KEY:''),
-        'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+        'apikey': (window.EduOS ? window.EduOS.SB_KEY : ''),
+        'Authorization': 'Bearer ' + (window.EduOS ? window.EduOS.SB_KEY : ''),
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
       },
       body: JSON.stringify({
-        parent_id: currentParentId,
-        teacher_id: teacher,
-        student_id: selectedChild,
-        message: text,
-        sent_at: new Date().toISOString()
+        parent_phone: natId,
+        student_id: childId,
+        student_name: childObj.name || '',
+        message_type: 'parent_inquiry',
+        subject: subjectVal,
+        body: bodyVal,
+        direction: 'inbound',
+        status: 'pending'
       })
     });
-  } catch(e) {}
+    if (!res.ok) throw new Error('فشل الإرسال');
+  } catch(e) {
+    showToast('❌ حدث خطأ في الإرسال');
+    return;
+  }
 
-  showToast('✅ تم إرسال الرسالة | Message sent');
-  document.getElementById('msgText').value = '';
-  document.getElementById('msgTeacher').value = '';
+  showToast('✅ تم إرسال الرسالة بنجاح');
+  document.getElementById('msgTopic').value = '';
+  document.getElementById('msgReason').innerHTML = '<option value="">— اختر الموضوع أولاً —</option>';
+  document.getElementById('msgTeacher').selectedIndex = 0;
+  await loadMessages();
+}
+
+async function loadMessages() {
+  if (!selectedChild) return;
+  var rows = await dbGet('parent_messages',
+    'select=subject,body,direction,status,reply,replied_at,created_at&student_id=eq.' + selectedChild + '&order=created_at.desc&limit=30'
+  );
+  var el = document.getElementById('msgList');
+  if (!rows || !rows.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">💬</div>لا رسائل بعد</div>';
+    return;
+  }
+  el.innerHTML = rows.map(function(m) {
+    var isOut = m.direction === 'outbound';
+    var align = isOut ? 'right' : 'left';
+    var bg = isOut ? '#EDE9FE' : '#F0FDF4';
+    var border = isOut ? '#C4B5FD' : '#A7F3D0';
+    var label = isOut ? 'من المدرسة' : 'رسالتك';
+    var dateStr = m.created_at ? new Date(m.created_at).toLocaleDateString('ar-AE', {day:'2-digit',month:'short',year:'numeric'}) : '';
+    var statusBadge = m.status === 'replied' ? '<span class="badge badge-green" style="font-size:11px">تم الرد</span>' : '<span class="badge badge-amber" style="font-size:11px">بانتظار الرد</span>';
+    var replyHtml = '';
+    if (m.reply) {
+      replyHtml = '<div style="margin-top:10px;padding:10px 14px;background:#F0FDF4;border-right:3px solid #10B981;border-radius:8px;font-size:14px;color:#065F46">' +
+        '<strong>رد المدرسة:</strong> ' + m.reply + '</div>';
+    }
+    return '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:14px 18px;margin-bottom:12px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<span style="font-weight:800;font-size:14px;color:#1E293B">' + (m.subject || 'رسالة') + '</span>' +
+        '<div style="display:flex;gap:6px;align-items:center">' + statusBadge + '<span style="font-size:12px;color:#94A3B8">' + dateStr + '</span></div>' +
+      '</div>' +
+      '<div style="font-size:15px;color:#334155;line-height:1.7">' + m.body + '</div>' +
+      replyHtml +
+    '</div>';
+  }).join('');
+}
+
+async function loadParentReports() {
+  if (!selectedChild) return;
+  var el = document.getElementById('parentReportsList');
+  if (!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:24px">⏳ جارٍ التحميل...</div>';
+  try {
+    var res = await fetch((window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/parent_notifications?student_id=eq.' + selectedChild + '&order=sent_at.desc&limit=20', {
+      headers: {apikey:window.EduOS?window.EduOS.SB_KEY:'','Authorization':'Bearer '+(window.EduOS?window.EduOS.SB_KEY:'')}
+    });
+    var data = await res.json();
+    if (!data||!data.length){el.innerHTML='<div style="text-align:center;padding:24px;color:#9CA3AF">لا توجد تقارير مرسلة بعد</div>';return;}
+    el.innerHTML = data.map(function(r){
+      var typeMap = {attendance:'الحضور',grades:'الدرجات',behavior:'السلوك',progress:'التقدم'};
+      return '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="background:#EDE9FE;color:#6C3DD6;padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700">' + (typeMap[r.report_type]||r.report_type||'تقرير') + '</span><span style="font-size:12px;color:#9CA3AF">' + (r.sent_at?new Date(r.sent_at).toLocaleDateString('ar-AE'):'—') + '</span></div><div style="font-size:14px;line-height:1.7;color:#374151">' + (r.content||'') + '</div></div>';
+    }).join('');
+  } catch(e){el.innerHTML='<div style="color:#EF4444">خطأ: '+e.message+'</div>';}
+}
+
+async function submitObjection() {
+  var text = (document.getElementById('objText')||{}).value||'';
+  var type = (document.getElementById('objType')||{}).value||'general';
+  if (!text.trim()){showToast('⚠️ اكتب نص الاعتراض أولاً');return;}
+  var user = getUser();
+  try {
+    var res = await fetch((window.EduOS?window.EduOS.SB_URL:'') + '/rest/v1/parent_messages', {
+      method:'POST',
+      headers:{apikey:window.EduOS?window.EduOS.SB_KEY:'','Authorization':'Bearer '+(window.EduOS?window.EduOS.SB_KEY:''),'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({student_id:selectedChild||'',parent_phone:user.national_id||user.id||'',message_type:'objection',subject:'اعتراض رسمي — ' + type,body:text,direction:'inbound',status:'pending'})
+    });
+    if(res.ok||res.status===201){showToast('✅ تم رفع الاعتراض بنجاح');document.getElementById('objText').value='';}
+    else showToast('❌ فشل الإرسال');
+  } catch(e){showToast('خطأ: '+e.message);}
 }
 
 // --- ANNOUNCEMENTS ---
 async function loadAnnouncements() {
-  const rows = await dbGet('announcements', 'select=title,body,created_at&order=created_at.desc&limit=20');
-  const el = document.getElementById('announceList');
-  if (!rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📢</div>لا بيانات</div>'; return; }
-  el.innerHTML = rows.map(a => `
-    <div class="announce-card">
-      <div class="announce-title">📢 ${a.title || 'إعلان'}</div>
-      <div class="announce-body">${a.body || ''}</div>
-      <div class="announce-date">${a.created_at ? new Date(a.created_at).toLocaleDateString('ar') : ''}</div>
-    </div>`).join('');
+  var rows = await dbGet('school_news', 'select=title,summary,published_at,category&order=published_at.desc&limit=20');
+  var el = document.getElementById('announceList');
+  if (!rows || !rows.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📢</div>لا بيانات</div>'; return; }
+  el.innerHTML = rows.map(function(a) {
+    var dateStr = a.published_at ? new Date(a.published_at).toLocaleDateString('ar-AE', {day:'2-digit',month:'long',year:'numeric'}) : '';
+    return '<div class="announce-card">' +
+      '<div class="announce-title">📢 ' + (a.title || 'إعلان') + '</div>' +
+      '<div class="announce-body">' + (a.summary || '') + '</div>' +
+      '<div class="announce-date">' + dateStr + (a.category ? ' · ' + a.category : '') + '</div>' +
+    '</div>';
+  }).join('');
 }
 
 // --- NAV ---
@@ -833,7 +1424,11 @@ function switchTab(name, el) {
   if (el) el.classList.add('active');
 
   if (name === 'announcements') loadAnnouncements();
-  if (name === 'messages') loadTeachersForMsg();
+  if (name === 'reports') { if (selectedChild) loadParentReports(); }
+  if (name === 'messages') { loadTeachersForMsg(); if (selectedChild) loadMessages(); }
+  if (name === 'staff') { if (selectedChild) loadStaffInfo(selectedChild); }
+  if (name === 'weekly') { if (selectedChild) loadWeeklyTrack(selectedChild); }
+  if (name === 'referrals') { if (selectedChild) loadReferralsTab(selectedChild); }
 }
 
 // --- TOAST ---
@@ -843,14 +1438,214 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+// --- NOTIFICATION PREFERENCE ---
+function pEsc(s) {
+  return (s === undefined || s === null) ? '' : String(s).replace(/[&<>"]/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; });
+}
+
+async function checkNotifPref() {
+  if (!currentParentId) return;
+  try {
+    var rows = await dbGet('parent_notification_prefs', 'select=id&parent_id=eq.' + encodeURIComponent(String(currentParentId)));
+    if (!rows || !rows.length) {
+      var overlay = document.getElementById('prefModalOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
+  } catch(e) {}
+}
+
+async function savePref(freq) {
+  try {
+    var res = await fetch((window.EduOS ? window.EduOS.SB_URL : '') + '/rest/v1/parent_notification_prefs', {
+      method: 'POST',
+      headers: {
+        'apikey': (window.EduOS ? window.EduOS.SB_KEY : ''),
+        'Authorization': 'Bearer ' + (window.EduOS ? window.EduOS.SB_KEY : ''),
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ parent_id: String(currentParentId), notification_frequency: freq })
+    });
+    var overlay = document.getElementById('prefModalOverlay');
+    if (overlay) overlay.style.display = 'none';
+    showToast('✅ تم حفظ تفضيلك بنجاح');
+  } catch(e) {
+    showToast('❌ حدث خطأ أثناء الحفظ — حاول مرة أخرى');
+  }
+}
+
+// --- REFERRALS TIMELINE ---
+var REF_STATUS_AR = { pending: 'قيد المعالجة', in_progress: 'قيد المعالجة', contacted: 'تم التواصل', contact_failed: 'تعذّر التواصل', resolved: 'تم الحل' };
+var VARK_LABEL_AR = { V: '👁 بصري (Visual)', A: '👂 سمعي (Auditory)', R: '📖 قرائي (Read/Write)', K: '✋ حركي (Kinesthetic)', MULTI: '🌈 متعدد الأنماط' };
+var COMM_STYLE_AR = {
+  request_sent: { c: '#94A3B8', dot: '⚪', label: 'طلب تواصل مع ولي/ة الأمر' },
+  accepted: { c: '#16A34A', dot: '🟢', label: 'وافق ولي الأمر على التواصل' },
+  declined: { c: '#334155', dot: '⚫', label: 'رفض ولي الأمر التواصل' },
+  summary_sent: { c: '#16A34A', dot: '🟢', label: 'تم إرسال ملخص/إغلاق' },
+  parent_confirmed: { c: '#16A34A', dot: '🟢', label: 'أكّد ولي الأمر المعلومة' },
+  parent_denied: { c: '#334155', dot: '⚫', label: 'نفى ولي الأمر المعلومة' }
+};
+
+async function loadReferralsTab(uid) {
+  var child = children.find(function(c) { return String(c.uid) === String(uid); });
+  if (!child) return;
+  var sid = (child.id !== undefined && child.id !== null) ? String(child.id) : String(uid);
+  var className = child.class_name || '';
+
+  var infoEl = document.getElementById('refStudentInfo');
+  var tlEl = document.getElementById('refTimeline');
+  if (infoEl) infoEl.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+  if (tlEl) tlEl.innerHTML = '<div class="empty"><div class="empty-icon">⏳</div>جارٍ التحميل...</div>';
+
+  var results = await Promise.all([
+    dbGet('teacher_assignments', 'select=teacher_name_ar&class_name=eq.' + encodeURIComponent(className) + '&academic_year=eq.2026-2027&subject=eq.مربية الصف&limit=1'),
+    child.name ? dbGet('vark_results', 'select=dominant_style,completed_at&student_name=eq.' + encodeURIComponent(child.name) + '&order=completed_at.desc&limit=1') : Promise.resolve([]),
+    dbGet('behavior_incidents', 'select=id,created_at,violation_type,violation_category,action_type,action_taken,description,degree,teacher_name&student_id=eq.' + encodeURIComponent(sid) + '&order=created_at.desc&limit=50'),
+    dbGet('counselor_referrals', 'select=*&student_db_id=eq.' + encodeURIComponent(sid) + '&order=created_at.desc&limit=50')
+  ]);
+  var homeroom = results[0][0];
+  var vark = results[1][0];
+  var incidents = results[2] || [];
+  var referrals = results[3] || [];
+
+  var refIds = referrals.map(function(r) { return r.id; });
+  var comms = [];
+  if (refIds.length) {
+    comms = await dbGet('counselor_communications', 'select=*&referral_id=in.(' + refIds.join(',') + ')&order=created_at.desc&limit=200');
+  }
+
+  // ---- Student info card ----
+  var varkText = vark ? (VARK_LABEL_AR[vark.dominant_style] || vark.dominant_style || '—') : '—';
+  var behCount = incidents.length;
+  if (infoEl) {
+    infoEl.innerHTML = '<div class="stu-info-grid">' +
+      '<div class="stu-info-item"><div class="stu-info-lbl">الصف والشعبة</div><div class="stu-info-val">' + pEsc(className || '—') + '</div></div>' +
+      '<div class="stu-info-item"><div class="stu-info-lbl">مربية الصف</div><div class="stu-info-val">' + ((homeroom && homeroom.teacher_name_ar && homeroom.teacher_name_ar !== 'شاغر') ? pEsc(homeroom.teacher_name_ar) : '—') + '</div></div>' +
+      '<div class="stu-info-item"><div class="stu-info-lbl">نمط التعلم VARK</div><div class="stu-info-val">' + pEsc(varkText) + '</div></div>' +
+      '<div class="stu-info-item"><div class="stu-info-lbl">مخالفات هذا الفصل</div><div class="stu-info-val">' +
+        (behCount > 0 ? '<span class="badge badge-red">' + behCount + '</span>' : '<span class="badge badge-green">0 ✓</span>') +
+      '</div></div>' +
+    '</div>';
+  }
+
+  // ---- Unified timeline ----
+  var events = [];
+  var ACTION_MAP = {
+    verbal: { c: '#D97706', dot: '🟡', label: 'شفهي' },
+    written: { c: '#EA580C', dot: '🟠', label: 'كتابي' },
+    parent_summon: { c: '#DC2626', dot: '🔴', label: 'استدعاء' }
+  };
+  incidents.forEach(function(b) {
+    var m = ACTION_MAP[b.action_type];
+    if (!m) {
+      var actionTaken = b.action_taken || '';
+      m = actionTaken.indexOf('كتاب') > -1 ? ACTION_MAP.written : (actionTaken.indexOf('إحال') > -1 ? { c: '#DC2626', dot: '🔴', label: 'إحالة' } : ACTION_MAP.verbal);
+    }
+    events.push({
+      date: b.created_at, color: m.c, dot: m.dot,
+      title: m.label + ' — ' + (b.violation_category || b.violation_type || 'مخالفة'),
+      meta: 'المعلم/ة: ' + (b.teacher_name || '—'),
+      body: b.description || ''
+    });
+  });
+  referrals.forEach(function(r) {
+    events.push({
+      date: r.created_at, color: '#DC2626', dot: '🔴',
+      title: 'إحالة للأخصائية الاجتماعية — ' + (r.topic || '—'),
+      meta: 'المعلم/ة: ' + (r.referred_by_name || '—') + ' · الحالة: ' + (REF_STATUS_AR[r.status] || r.status || '—'),
+      body: r.notes || ''
+    });
+  });
+  comms.forEach(function(c) {
+    var s = COMM_STYLE_AR[c.contact_type] || { c: '#94A3B8', dot: '⚪', label: c.contact_type || 'تواصل' };
+    events.push({ date: c.created_at, color: s.c, dot: s.dot, title: s.label, meta: '', body: c.notes || '' });
+  });
+  events.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+  if (tlEl) {
+    if (!events.length) {
+      tlEl.innerHTML = '<div class="empty"><div class="empty-icon">🕐</div>لا يوجد سجل تواصل أو مخالفات لهذا الطالب/ة — سجل نظيف ✓</div>';
+    } else {
+      tlEl.innerHTML = '<div class="tl-wrap">' + events.map(function(e) {
+        var dateStr = e.date ? new Date(e.date).toLocaleString('ar-AE', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+        return '<div class="tl-event">' +
+          '<span class="tl-dot" style="color:' + e.color + '"></span>' +
+          '<div class="tl-card">' +
+            '<div class="tl-title">' + e.dot + ' ' + pEsc(e.title) + '</div>' +
+            '<div class="tl-meta">' + dateStr + (e.meta ? (' · ' + pEsc(e.meta)) : '') + '</div>' +
+            (e.body ? ('<div class="tl-body">' + pEsc(e.body) + '</div>') : '') +
+          '</div></div>';
+      }).join('') + '</div>';
+    }
+  }
+}
+
 // --- INIT ---
 async function init() {
   initWeek();
   await loadChildren();
   loadAnnouncements();
+  checkNotifPref();
 }
 
 init();
+// ============= مهارات الصف من الحصص الفعلية =============
+async function loadSkillsTab(childIdx){
+  const el=document.getElementById('skillsContent');
+  if(!el)return;
+  const children=window._parentChildren||[];
+  const child=children[childIdx||0];
+  if(!child||!child.class_name){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:#94A3B8">لا توجد بيانات متاحة لهذه الطالب/ة</div>';
+    return;
+  }
+  el.innerHTML='<div style="text-align:center;padding:32px;color:#94A3B8">جارٍ التحليل...</div>';
+  try{
+    const SB_URL=window.EduOS?window.EduOS.SB_URL:'';
+    const SB_KEY=window.EduOS?window.EduOS.SB_KEY:'';
+    const r=await fetch(SB_URL+'/rest/v1/lesson_sessions?class_name=eq.'+encodeURIComponent(child.class_name)+'&not.post_lesson_data.is.null&order=created_at.desc&limit=30&select=subject,post_lesson_data,created_at',
+      {headers:{apikey:SB_KEY,Authorization:'Bearer '+SB_KEY}});
+    const sessions=await r.json().catch(()=>[]);
+    if(!Array.isArray(sessions)||!sessions.length){
+      el.innerHTML='<div style="text-align:center;padding:32px"><div style="font-size:2rem;margin-bottom:12px">📚</div>'+
+        '<div style="font-size:14px;color:#64748B">لا توجد بيانات مهارات مسجلة بعد<br><span style="font-size:12px;color:#94A3B8">ستظهر بعد تسجيل أولى الحصص من قِبل المعلم/ة</span></div></div>';
+      return;
+    }
+    const bySubject={};
+    sessions.forEach(function(s){if(!bySubject[s.subject])bySubject[s.subject]=s;});
+    const LEVELS=['—','🔴 ناشئ','🟡 قيد التطور','🔵 متقن','🟢 متقدم'];
+    const COLORS=['','#DC2626','#D97706','#0284C7','#059669'];
+    let html='<div style="margin-top:8px">';
+    Object.entries(bySubject).forEach(function(entry){
+      const subject=entry[0],session=entry[1];
+      const scores=(session.post_lesson_data&&session.post_lesson_data.rubric_scores)||[];
+      if(!scores.length)return;
+      const date=new Date(session.created_at).toLocaleDateString('ar-AE',{month:'long',day:'numeric'});
+      html+='<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:16px;margin-bottom:12px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
+        '<div style="font-size:15px;font-weight:800;color:#1E293B">'+subject+'</div>'+
+        '<div style="font-size:11px;color:#94A3B8">آخر تسجيل: '+date+'</div></div>';
+      scores.forEach(function(s){
+        const lvl=s.level||0;
+        const bar=Math.round((lvl/4)*100);
+        html+='<div style="margin-bottom:10px">'+
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'+
+          '<div style="font-size:13px;color:#374151">'+s.criterion+'</div>'+
+          '<div style="font-size:12px;font-weight:700;color:'+(COLORS[lvl]||'#94A3B8')+'">'+(LEVELS[lvl]||'—')+'</div></div>'+
+          '<div style="background:#E2E8F0;border-radius:4px;height:6px">'+
+          '<div style="background:'+(COLORS[lvl]||'#E2E8F0')+';height:6px;border-radius:4px;width:'+bar+'%;transition:width .4s"></div></div></div>';
+      });
+      html+='</div>';
+    });
+    html+='</div>';
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML='<div style="text-align:center;padding:24px;color:#94A3B8">تعذّر تحميل بيانات المهارات</div>';
+  }
+}
+
+
 </script>
+<script src="/apps/platform-parent-trips.js" defer></script>
 </body>
 </html>
