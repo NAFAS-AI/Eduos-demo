@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://xdkiktwuuwghvzcukvew.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>النور — تجربة تصميم المسار الأسبوعي</title>
+<link rel="stylesheet" href="./pilot.css"><script src="/apps/platform-week.js" defer></script><script type="module" src="./pilot.js"></script>
+</head>
+<body class="noor-pilot" data-page="weekly">
+<a class="np-skip" href="#main">انتقل إلى المحتوى</a>
+<header class="np-header">
+ <a class="np-brand" href="./"><span class="np-logo" aria-label="شعار المنصة التعليمية">🎓</span><span><strong>مدرسة النور النموذجية</strong><small>بوابة المدرسة · نسخة اختبار التصميم</small></span></a>
+ <div class="np-tools" id="header-tools"><span class="np-pill">تجربة محدودة</span><time class="np-clock" id="clock"></time><a class="np-login" id="login-link" href="/apps/eduos-login/">دخول حساب النور</a></div>
+</header>
+<div class="np-layout">
+ <nav class="np-nav" aria-label="صفحات تجربة التصميم"><p class="np-nav-label">مساحة العمل</p><a href="./"><span aria-hidden="true">⌂</span>الرئيسية</a><a href="./weekly.html" aria-current="page"><span aria-hidden="true">▦</span>المسار الأسبوعي</a><p class="np-nav-note">المادة تُكتب يدوياً.<br>لا تعديل على مسار المدرسة الحالي.</p></nav>
+ <main class="np-main" id="main">
+ <div class="np-context"><span class="np-dot" aria-hidden="true"></span><span id="academic-context">العام والفصل والأسبوع: لم تُحمّل بيانات التقويم</span><span id="identity-context" hidden></span></div>
+ <div class="np-title-row"><div><p class="np-eyebrow">نموذج وجدول في مساحة واحدة</p><h1>المسار الأسبوعي</h1><p class="np-lead">اختر سجلاً من الجدول لقراءة تفاصيله. يمكن فحص إدخال النص محلياً؛ لن تُرسل التعديلات إلى قاعدة البيانات في هذه المرحلة.</p></div><a class="np-btn secondary" href="./">العودة إلى الرئيسية</a></div>
+ <aside class="np-notice"><p><strong>نسخة اختبار دون حفظ.</strong> تعديلات النموذج محلية؛ لا كتابة مدرسية ولا نشر أو اعتماد.</p></aside>
+ <div class="np-status" id="connection-status" role="status" aria-live="polite">جارٍ فحص اتصال البيئة التجريبية…</div>
+ <section class="np-card" aria-labelledby="records-heading"><div class="np-section-heading"><h2 id="records-heading">مسارات حساب التجربة</h2><button class="np-btn secondary" id="refresh-button" type="button" disabled>تحديث القراءة</button></div><p class="np-empty" id="records-message">لم تُحمّل البيانات بعد. لا تُعرض بيانات اصطناعية بديلة.</p><div class="np-table-wrap" id="records-wrap" hidden><table class="np-table"><caption>المسارات الخاصة بالحساب التجريبي المتحقق</caption><thead><tr><th scope="col">الشعبة</th><th scope="col">الأسبوع</th><th scope="col">المادة</th><th scope="col">حالة السجل</th><th scope="col">التفاصيل</th></tr></thead><tbody id="records-body"></tbody></table></div></section>
+ <section class="np-card np-form" aria-labelledby="form-heading"><div class="np-section-heading"><h2 id="form-heading">تفاصيل المسار</h2><span class="np-read-label" id="selected-label">لا يوجد سجل محدد</span></div>
+  <form id="track-form" autocomplete="off">
+   <div class="np-fields">
+    <div class="np-field"><label for="class-name">الشعبة</label><input id="class-name" name="class_name" readonly placeholder="تُقرأ من السجل المحدد"><small>لا تُستنتج الشعب أو التعيينات.</small></div>
+    <div class="np-field"><label for="week-number">رقم الأسبوع</label><input id="week-number" name="week_number" readonly placeholder="تُقرأ من السجل المحدد"></div>
+    <div class="np-field"><label for="subject-name">المادة</label><input id="subject-name" name="subject_name" type="text" maxlength="200" placeholder="اكتب المادة يدوياً"><small>نص حر؛ لا تُستورد المادة من قاعدة التعيينات.</small></div>
+    <div class="np-field"><label for="topic-main">الموضوع الرئيسي</label><input id="topic-main" name="topic_main" type="text" maxlength="500" placeholder="اكتب موضوع الأسبوع"></div>
+    <div class="np-field full"><label for="weekly-keywords">الكلمات المفتاحية</label><input id="weekly-keywords" name="weekly_keywords" type="text" maxlength="1000" placeholder="افصل الكلمات بفاصلة"></div>
+    <div class="np-field full"><label for="activities-planned">الأنشطة المخططة</label><textarea id="activities-planned" name="activities_planned" maxlength="5000" placeholder="اكتب الأنشطة المخططة، كل نشاط في سطر"></textarea></div>
+    <div class="np-field"><label for="resources-planned">الموارد التعليمية</label><textarea id="resources-planned" name="resources_planned" maxlength="5000" placeholder="اكتب الموارد، كل مورد في سطر"></textarea></div>
+    <div class="np-field"><label for="assessment-types">التقييم المخطط</label><textarea id="assessment-types" name="assessment_types" maxlength="5000" placeholder="اكتب أساليب التقييم"></textarea></div>
+    <div class="np-field full"><label for="bloom-levels">مستويات بلوم المستهدفة</label><input id="bloom-levels" name="bloom_levels" type="text" maxlength="1000" placeholder="تذكر، فهم، تطبيق، تحليل، تقييم، إبداع"></div>
+    <div class="np-field"><label for="diff-gifted">الإثراء والتميّز</label><textarea id="diff-gifted" name="differentiation_gifted" maxlength="5000" placeholder="أنشطة الإثراء المقترحة"></textarea></div>
+    <div class="np-field"><label for="diff-remedial">التعزيز والدعم</label><textarea id="diff-remedial" name="differentiation_remedial" maxlength="5000" placeholder="خطوات الدعم المقترحة"></textarea></div>
+    <div class="np-field full"><label for="diff-sen">أصحاب الهمم</label><textarea id="diff-sen" name="differentiation_sen" maxlength="5000" placeholder="التسهيلات والتعديلات المقترحة"></textarea></div>
+    <div class="np-field full"><label for="notes-main">ملاحظات إضافية</label><textarea id="notes-main" name="notes" maxlength="5000" placeholder="اكتب الملاحظات"></textarea></div>
+   </div>
+   <div class="np-actions"><span class="np-dirty" id="dirty-status" role="status" aria-live="polite">لا تعديل محفوظ في هذه النسخة</span><button class="np-btn" type="button" id="save-button" disabled aria-describedby="save-reason">الحفظ معطّل مؤقتاً</button></div>
+  </form>
+  <p class="np-helper" id="save-reason">لم تُفحص الكتابة والصلاحيات على قاعدة التجربة بعد. لا يُرسل النموذج أي طلب حفظ، ولا يوجد زر اعتماد أو نشر تلقائي.</p>
+ </section>
+ </main>
+</div>
+<footer class="np-footer"><p>المنصة التعليمية — نسخة اختبار مدرسة النور</p><p class="np-company">NAFAS FOR ARTIFICIAL INTELLIGENCE · CN-6573712</p><small>© 2026 جميع الحقوق محفوظة.</small></footer>
+</body></html>
